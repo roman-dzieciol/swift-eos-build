@@ -1,1 +1,3 @@
-# swift-eos-build
+# SwiftEOSBuild
+
+A description of this package.

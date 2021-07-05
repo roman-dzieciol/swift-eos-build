@@ -1,0 +1,40 @@
+
+import Foundation
+
+public class SwiftSuperExpr: SwiftPrimaryExpr {
+}
+
+public final class SwiftSuperMethodExpr: SwiftSuperExpr {
+
+    public let identifier: SwiftIdentifier
+
+    public init(identifier: SwiftIdentifier) {
+        self.identifier = identifier
+    }
+
+    public override func evaluateType(in context: SwiftDeclContext?) -> SwiftType? {
+        return identifier.evaluateType(in: context)
+    }
+
+    public override func write(to swift: SwiftOutputStream) {
+        swift.write(name: "super")
+        swift.write(token: ".")
+        swift.write(identifier)
+    }
+}
+
+public final class SwiftSuperSubscriptExpr: SwiftSuperExpr {
+
+    public let function: SwiftExpr
+
+    public init(function: SwiftExpr) {
+        self.function = function
+    }
+
+    public override func write(to swift: SwiftOutputStream) {
+        swift.write(name: "super")
+        swift.write(token: "[")
+        swift.write(function)
+        swift.write(token: "]")
+    }
+}

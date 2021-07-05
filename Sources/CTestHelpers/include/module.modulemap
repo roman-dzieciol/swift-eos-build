@@ -1,0 +1,6 @@
+module CTestHelpers {
+    requires c11
+    header "CTestHelpers.h"
+    link "CTestHelpers"
+    export *
+}
