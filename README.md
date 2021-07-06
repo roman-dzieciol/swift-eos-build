@@ -1,6 +1,6 @@
 # SwiftEOSBuild
 
-Automatic Swift bindings for Epic Online Services framework.
+Swift bindings generator for Epic Online Services framework.
 
 This tool takes the C language EOSSDK.framework as input and generates object oriented Swift bindings for the C SDK.
 
