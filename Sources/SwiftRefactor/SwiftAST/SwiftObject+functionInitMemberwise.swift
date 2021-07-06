@@ -1,0 +1,82 @@
+
+import Foundation
+import SwiftAST
+
+
+extension SwiftObject {
+
+    func functionInitMemberwise() throws -> SwiftFunction {
+
+        if let function = linked(.functionInitMemberwise) as? SwiftFunction {
+            return function
+        }
+
+        let function = SwiftFunction(
+            name: "init",
+            isAsync: false,
+            isThrowing: false,
+            returnType: .void,
+            inner: [],
+            comment: .init("Memberwise initializer"))
+
+        inner.append(function)
+        link(.functionInitMemberwise, ref: function)
+
+        var statements: [SwiftExpr] = []
+
+        for member in members {
+
+            if let decl = member.type.canonical.asDeclRef?.decl.canonical, let memberObject = decl as? SwiftObject, memberObject.inSwiftEOS {
+                try memberObject.functionInitMemberwise()
+            }
+
+            let functionParm = SwiftFunctionParm(
+                label: member.name,
+                name: member.name,
+                type: member.type)
+
+            functionParm.link(.member, ref: member)
+
+            function.inner.append(functionParm)
+
+            statements.append(.self_(.string(member.name)).assign(.string(functionParm.name)))
+        }
+
+        function.code = SwiftCodeBlock(statements: statements)
+
+        return function
+    }
+
+
+    func functionDeinit() throws -> SwiftFunction {
+
+
+        if let function = linked(.functionDeinit) as? SwiftFunction {
+            return function
+        }
+
+        let function = SwiftFunction(
+            name: "deinit",
+            isAsync: false,
+            isThrowing: false,
+            returnType: .void,
+            inner: [],
+            comment: .init(""))
+
+        inner.append(function)
+        link(.functionDeinit, ref: function)
+
+        var statements: [SwiftExpr] = []
+
+        for member in members {
+
+            if let releaseFunc = member.type.asDeclRef?.decl.linked(.releaseFunc) as? SwiftFunction {
+                statements += [releaseFunc.call([.string("Handle").arg(nil)])]
+            }
+        }
+
+        function.code = SwiftCodeBlock(statements: statements)
+
+        return function
+    }
+}
