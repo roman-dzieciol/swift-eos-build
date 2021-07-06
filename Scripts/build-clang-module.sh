@@ -34,13 +34,17 @@ grep -lr "#include " "$OUTPUT_FW_DIR/Headers" | xargs sed -i '' -E "s|#include \
 #grep -lr "#include " "$OUTPUT_FW_DIR/Headers" | xargs sed -i '' -E "s|#include \"(.*).inl\"|#include <EOSSDK/\1.h>|gi"
 
 # add umbrella header
-find "$OUTPUT_FW_DIR/Headers" -type f -name "*.h" -print | xargs -n1 basename | sort | sed -E "s|(.*).h|#include <EOSSDK/\1.h>|gi" > "$OUTPUT_FW_DIR/Headers/eos_umbrella.h"
+echo "#pragma once" > "$OUTPUT_FW_DIR/Headers/eos_umbrella.h"
+find "$OUTPUT_FW_DIR/Headers" -type f -name "*.h" -print | xargs -n1 basename | sort | sed -E "s|(.*).h|#include <EOSSDK/\1.h>|gi" >> "$OUTPUT_FW_DIR/Headers/eos_umbrella.h"
 #find "$OUTPUT_FW_DIR/Headers" -type f -name "*.inl" -print | xargs -n1 basename | sort | sed -E "s|(.*).inl|#include <EOSSDK/\1.h>|gi" >> "$OUTPUT_FW_DIR/Headers/eos_umbrella.h"
 #find "$OUTPUT_FW_DIR/Headers" -type f -name "*.inl" -exec sh -c 'mv "$1" "${1%.inl}.h"' _ {} \;
 
 # remove textual headers from umbrella header
 sed -i '' -E "s|#include <EOSSDK/eos_result.h>||gi" "$OUTPUT_FW_DIR/Headers/eos_umbrella.h"
 sed -i '' -E "s|#include <EOSSDK/eos_ui_keys.h>||gi" "$OUTPUT_FW_DIR/Headers/eos_umbrella.h"
+
+# fix comments
+grep -lr "// " "$OUTPUT_FW_DIR/Headers" | xargs sed -i '' -E "s|// (.*)|/** \1 */|gi"
 
 # add module map
 if [[ ! -d "$OUTPUT_FW_DIR/Modules" ]]; then
