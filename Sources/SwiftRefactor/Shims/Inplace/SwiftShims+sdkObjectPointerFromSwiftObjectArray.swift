@@ -5,9 +5,9 @@ import SwiftAST
 
 extension SwiftShims {
 
+    /// Managed `Pointer<SdkObject>` = `[SwiftObject]`
     static func sdkObjectPointerFromSwiftObjectArray(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
 
-        // Managed `Pointer<SdkObject>` = `[SwiftObject]`
         if !rhs.isInOutParm,
            !(lhs is SwiftFunctionParm && rhs.linked(.arrayLength) != nil),
            let lhsPointer = lhs.type.canonical.asPointer,

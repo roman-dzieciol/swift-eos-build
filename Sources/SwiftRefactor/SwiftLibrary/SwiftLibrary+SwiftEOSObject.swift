@@ -16,17 +16,6 @@ extension SwiftExpr.function {
         SwiftFunctionCallExpr.named("init", args: [ sdkObject.arg("sdkObject") ])
     }
 
-    static func withSdkObjectPointerFromSwiftObject(
-        _ swiftObject: SwiftExpr,
-        managedBy pointerManager: SwiftExpr,
-        pointerName: String,
-        nest: SwiftExpr
-    ) -> SwiftExpr {
-        SwiftFunctionCallExpr.named("withSdkObjectPointerFromSwiftObject", args: [
-            swiftObject.arg(nil),
-            pointerManager.arg("managedBy"),
-            .closure([pointerName], nest: nest) ])
-    }
 
     static func withSdkObjectPointerFromInOutSwiftObject(
         _ inoutSwiftObject: SwiftExpr,

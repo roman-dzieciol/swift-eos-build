@@ -53,18 +53,7 @@ public func withPointer(
 }
 
 
-//public func withPointerForInOutString<LengthType: BinaryInteger>(
-//    _ string: inout String,
-//    capacity: Int? = nil,
-//    _ nested: (UnsafeMutablePointer<CChar>?, UnsafeMutablePointer<LengthType>?) throws -> Void) rethrows
-//{
-//    string = String(cString: try withArrayBuffer(capacity: capacity, nested))
-//}
-
-//
-
-
-
+/// With nested `Pointer<CChar>` from `inout String`
 public func withCCharPointerFromInOutString<R>(
     inoutString: inout String,
     capacity: Int,
@@ -82,6 +71,7 @@ public func withCCharPointerFromInOutString<R>(
     return result
 }
 
+/// With nested `Pointer<CChar>` from `inout Optional<String>`
 public func withCCharPointerFromInOutOptionalString<R>(
     inoutOptionalString: inout String?,
     capacity: Int,
@@ -110,6 +100,7 @@ public func withCCharPointerFromInOutOptionalString<R>(
     }
 }
 
+/// With nested `Pointer<Pointer<CChar>>, Int` from `inout Optional<String>`
 public func withCCharPointerPointersFromInOutOptionalString<LengthType: BinaryInteger, R>(
     inoutOptionalString: inout String?,
     nested: (UnsafeMutablePointer<CChar>?, UnsafeMutablePointer<LengthType>?) throws -> R) rethrows -> R
@@ -123,22 +114,7 @@ public func withCCharPointerPointersFromInOutOptionalString<LengthType: BinaryIn
     return result
 }
 
-
-//public func cCharPointerPointerFromInOutStringArray<LengthType: BinaryInteger, R>(
-//    inoutArray: inout [String]?,
-//    nested: (UnsafeMutablePointer<CChar>?, UnsafeMutablePointer<LengthType>?) throws -> R) rethrows -> R
-//{
-//    guard let array = inoutArray else {
-//        return try nested(nil, nil)
-//    }
-//    var utf8Array = Array(string.utf8CString)
-//    let result = try withPointerForInOut(array: &utf8Array, capacity: utf8Array.capacity, nested)
-//    inoutString = String(cString: utf8Array)
-//    return result
-//}
-
-
-
+/// `[String]` = `Pointer<Pointer<CChar>>`
 public func stringArrayFromCCharPointerPointer<Integer: BinaryInteger>(
     pointer: UnsafePointer<UnsafePointer<CChar>?>?,
     count: Integer
@@ -147,24 +123,4 @@ public func stringArrayFromCCharPointerPointer<Integer: BinaryInteger>(
                         count: try safeNumericCast(exactly: count))
         .compactMap { $0 }
         .map { String(cString: $0) }
-}
-
-
-extension Array where Element == String {
-
-    public func withCharPtrArray<R>(_ body: ([UnsafePointer<CChar>?]) throws -> R) rethrows -> R {
-        let charPtrs = map { strdup($0) }
-        defer {
-            charPtrs.forEach { free($0) }
-        }
-        return try body(charPtrs)
-    }
-
-    public func withMutbleCharPtrArray<R>(_ body: (inout [UnsafeMutablePointer<CChar>?]) throws -> R) rethrows -> R {
-        var charPtrs = map { strdup($0) }
-        defer {
-            charPtrs.forEach { free($0) }
-        }
-        return try body(&charPtrs)
-    }
 }

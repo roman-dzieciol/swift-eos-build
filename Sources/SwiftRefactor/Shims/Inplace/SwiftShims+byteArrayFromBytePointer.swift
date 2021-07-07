@@ -5,6 +5,7 @@ import SwiftAST
 
 extension SwiftShims {
 
+    /// `[UInt8]` = `Pointer<Void>`
     static func byteArrayFromBytePointer(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
 
         // `Array` = `Pointer array`

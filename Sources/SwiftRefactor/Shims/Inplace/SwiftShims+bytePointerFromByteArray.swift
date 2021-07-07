@@ -5,9 +5,9 @@ import SwiftAST
 
 extension SwiftShims {
 
+    /// Managed `Pointer<Void or UInt8 or Int8>` = `[UInt8 or Int8]`
     static func bytePointerFromByteArray(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
 
-        // Managed `Pointer<Void or UInt8 or Int8>` = `[UInt8 or Int8]`
         if !rhs.isInOutParm,
            !(lhs is SwiftFunctionParm && rhs.linked(.arrayLength) != nil),
            let lhsPointer = lhs.type.canonical.asPointer,

@@ -453,35 +453,6 @@ public func nested(in nestingCall: SwiftCode, withPointer lhs: SwiftVarDecl, fro
     //        return true
     //    }
     //
-    //    if let builtin = parm.type.canonical.asBuiltin,
-    //       let sdkBuiltin = parm.sdkVarDecl.type.canonical.asPointer?.pointeeType.asBuiltin,
-    //       builtin.isInt,
-    //       sdkBuiltin.isInt {
-    //
-    //        if builtin.builtinName == sdkBuiltin.builtinName {
-    //            passToSdkCall(parm, typecastedTo: parm.sdkVarDecl)
-    //        } else {
-    //            let typecastInvocation = SwiftInvocation { swift in
-    //                swift.write(token: "{")
-    //                swift.write(typecastTo: parm, from: sdkBuiltin.tempVar()) { swift in
-    //                    swift.write(name: "$0")
-    //                }
-    //                swift.write(token: "}")
-    //            }
-    //
-    //            nestedCalls.nested { swift, innerCall in
-    //                swift.write(prefixForCall: self.function)
-    //                swift.write(withPointerForInOutInteger: parm,
-    //                            integerPointer: parm.sdkVarDecl,
-    //                            typecastInvocation: typecastInvocation,
-    //                            invocation: SwiftInvocation(output: innerCall))
-    //            }
-    //            passToSdkCall(parm)
-    //        }
-    //        return true
-    //    }
-    //
-    //
     //
     //
     //    if parm.type.canonical.asOpaque != nil || parm.type.canonical.asOpaquePointer != nil {

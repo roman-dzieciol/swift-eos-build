@@ -1,6 +1,7 @@
 
 import Foundation
 
+/// Returns exact value of Int as another Int type, or throws error
 public func safeNumericCast<LHS: BinaryInteger, RHS: BinaryInteger>(
     exactly rhs: @autoclosure () throws -> RHS
 ) throws -> LHS {
@@ -11,16 +12,6 @@ public func safeNumericCast<LHS: BinaryInteger, RHS: BinaryInteger>(
     }
 }
 
-
-public func intFromPointerToInt<Pointee: BinaryInteger, R: BinaryInteger>(
-    _ transform: (Pointee) -> R = { R(exactly: $0)! },
-    _ nested: (UnsafeMutablePointer<Pointee>) throws -> Void
-) rethrows -> R {
-    var value: Pointee = .zero
-    try nested(&value)
-    return transform(value)
-}
-
 /// With `Int` result from`() -> AnotherInt`
 public func withIntResult<LHS: BinaryInteger, RHS: BinaryInteger>(
     _ nested: () throws -> RHS
@@ -28,25 +19,11 @@ public func withIntResult<LHS: BinaryInteger, RHS: BinaryInteger>(
     return try safeNumericCast(exactly: try nested())
 }
 
-
-//public func withPointerForInOutInteger<Pointee: BinaryInteger, Integer: BinaryInteger, R>(
-//    _ integer: inout Integer,
-//    _ transform: (Pointee) -> Integer = { R(exactly: $0)! },
-//    _ nested: (UnsafeMutablePointer<Pointee>) throws -> R
-//) rethrows {
-//    var value: Pointee = .zero
-//    try nested(&value)
-//    integer = transform(value)
-//}
-
-
+/// With `Pointer<Int>` from `inout Int`
 public func withIntPointerFromInOutInt<Pointee: BinaryInteger, Integer: BinaryInteger, R>(
     _ inoutInteger: inout Integer,
     nested: (UnsafeMutablePointer<Pointee>?) throws -> R
 ) rethrows -> R {
-//    guard var integer = inoutInteger else {
-//        return try nested(nil)
-//    }
     var integer = inoutInteger
     let result = try withTransformedInOut(inoutValue: &integer) { value in
         try safeNumericCast(exactly: value)
@@ -59,7 +36,7 @@ public func withIntPointerFromInOutInt<Pointee: BinaryInteger, Integer: BinaryIn
     return result
 }
 
-
+/// With `Pointer<Int>` from `inout Optional<Int>`
 public func withIntPointerFromInOutOptionalInt<Pointee: BinaryInteger, Integer: BinaryInteger, R>(
     _ inoutOptionalInteger: inout Optional<Integer>,
     nested: (UnsafeMutablePointer<Pointee>?) throws -> R

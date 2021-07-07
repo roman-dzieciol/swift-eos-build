@@ -5,9 +5,9 @@ import SwiftAST
 
 extension SwiftShims {
 
+    /// Void pointer exceptions
     static func voidPointerWorkarounds(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
 
-        // Void pointer exceptions
         if let lhsPointer = lhs.type.canonical.asPointer,
            let rhsPointer = rhs.type.canonical.asPointer,
            lhsPointer.pointeeType.isVoid,

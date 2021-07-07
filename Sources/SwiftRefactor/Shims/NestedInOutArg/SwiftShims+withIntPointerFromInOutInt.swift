@@ -5,17 +5,15 @@ import SwiftAST
 
 extension SwiftShims {
 
+    /// With `Pointer<Int>` from `inout Int`
+    /// With `Pointer<Int>` from `inout Optional<Int>`
     static func withIntPointerFromInOutInt(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
 
-        if rhs.name == "OutPort" {
-
-        }
         if rhs.isInOutParm
             , let lhsBuiltin = lhs.type.canonical.asPointer?.pointeeType.asBuiltin
             , let rhsBuiltin = rhs.type.canonical.asBuiltin
             , lhsBuiltin.isInt
             , rhsBuiltin.isInt
-//            , builtin.builtinName != sdkBuiltin.builtinName
         {
             if rhs.type.isOptional != false {
                 return .function.withIntPointerFromInOutOptionalInt(
@@ -31,5 +29,30 @@ extension SwiftShims {
             }
         }
         return nil
+    }
+}
+
+extension SwiftExpr.function {
+
+    /// With `Pointer<Int>` from `inout Int`
+    static func withIntPointerFromInOutInt(
+        inoutInteger: SwiftExpr,
+        pointerName: String,
+        nest: SwiftExpr
+    ) -> SwiftExpr {
+        SwiftFunctionCallExpr.named("withIntPointerFromInOutInt", args: [
+            inoutInteger.arg(nil),
+            .closure([pointerName], nest: nest) ])
+    }
+
+    /// With `Pointer<Int>` from `inout Optional<Int>`
+    static func withIntPointerFromInOutOptionalInt(
+        inoutOptionalInteger: SwiftExpr,
+        pointerName: String,
+        nest: SwiftExpr
+    ) -> SwiftExpr {
+        SwiftFunctionCallExpr.named("withIntPointerFromInOutOptionalInt", args: [
+            inoutOptionalInteger.arg(nil),
+            .closure([pointerName], nest: nest) ])
     }
 }

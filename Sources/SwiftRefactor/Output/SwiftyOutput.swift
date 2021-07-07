@@ -161,27 +161,6 @@ extension SwiftOutputStream {
             invocation.write(to: self)
         }
     }
-
-    public func write(
-        withPointerForInOutInteger inoutIntegerParm: SwiftVarDecl,
-        integerPointer: SwiftVarDecl,
-        typecastInvocation: SwiftInvocation,
-        invocation: SwiftInvocation
-    ) {
-        write(name: "withPointerForInOutInteger")
-        write(nested: "(", ")") {
-            write(token: "&")
-            write(inoutIntegerParm.name)
-            write(token: ",")
-            typecastInvocation.write(to: self)
-        }
-        write(nested: "{", "}") {
-            write(name: integerPointer.name)
-            write(name: "in")
-            write(textIfNeeded: "\n")
-            invocation.write(to: self)
-        }
-    }
 }
 
 

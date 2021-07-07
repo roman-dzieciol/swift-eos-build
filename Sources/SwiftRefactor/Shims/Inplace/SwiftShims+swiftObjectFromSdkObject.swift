@@ -5,9 +5,9 @@ import SwiftAST
 
 extension SwiftShims {
 
+    /// `SwiftObject` = `SdkObject`
     static func swiftObjectFromSdkObject(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
 
-        // `SwiftObject` = `SdkObject`
         if !rhs.isInOutParm,
            let lhsDeclRef = lhs.type.canonical.asDeclRef,
            let lhsDecl = lhsDeclRef.decl.canonical as? SwiftObject,

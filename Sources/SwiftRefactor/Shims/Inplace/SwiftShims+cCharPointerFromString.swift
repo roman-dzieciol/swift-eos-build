@@ -5,9 +5,9 @@ import SwiftAST
 
 extension SwiftShims {
 
+    /// Managed `Pointer<CChar>?` = `String?`
     static func cCharPointerFromString(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
 
-        // Managed `Pointer<CChar>?` = `String?`
         if !rhs.isInOutParm,
            !(lhs is SwiftFunctionParm && rhs.linked(.arrayLength) != nil),
            let lhsPointer = lhs.type.canonical.asPointer,

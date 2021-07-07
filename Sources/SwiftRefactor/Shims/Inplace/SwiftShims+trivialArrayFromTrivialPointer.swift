@@ -5,6 +5,7 @@ import SwiftAST
 
 extension SwiftShims {
 
+    /// `[Pointer<Trivial>]` = `Pointer<Trivial>, Int`
     static func trivialArrayFromTrivialPointer(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
 
         // `Array` = `Pointer array`
@@ -19,7 +20,6 @@ extension SwiftShims {
                       fatalError("unknown typecast: \(lhs.name) = \(rhs.name), \nlhs: \(lhs.type), \nrhs: \(rhs.type)")
                   }
 
-            // `[Pointer<Opaque>]` = `Pointer<Pointer<Opaque>>`
             if lhsArray.elementType.isTrivial,
                rhsPointer.pointeeType.isTrivial,
                lhsArray.elementType == rhsPointer.pointeeType {
@@ -27,10 +27,17 @@ extension SwiftShims {
                 let rhsArrayCountExpr: SwiftExpr = nested.outer().map { $0.member(rhsArrayCount.expr) } ?? rhsArrayCount.expr
 
                 return .try(.function.trivialArrayFromTrivialPointer(start: nested, count: rhsArrayCountExpr))
-//                return .function.array(.function.unsafeBufferPointer(start: nested, count: rhsArrayCountExpr))
             }
         }
 
         return nil
+    }
+}
+
+extension SwiftExpr.function {
+
+    /// `[Pointer<Trivial>]` = `Pointer<Trivial>, Int`
+    static func trivialArrayFromTrivialPointer(start: SwiftExpr, count: SwiftExpr) -> SwiftExpr {
+        SwiftFunctionCallExpr.named("trivialArrayFromTrivialPointer", args: [ start.arg("start"), count.arg("count") ])
     }
 }

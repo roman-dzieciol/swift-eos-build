@@ -4,6 +4,7 @@ import SwiftAST
 
 extension SwiftShims {
 
+    /// `(EOS_Bool) -> Bool`
     static func swiftBoolFromEosBool(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
 
         if let lhsBuiltin = lhs.type.canonical.asBuiltin
@@ -14,5 +15,13 @@ extension SwiftShims {
             return .try(.function.swiftBoolFromEosBool(eosBool: nested))
         }
         return nil
+    }
+}
+
+extension SwiftExpr.function {
+
+    /// `(EOS_Bool) -> Bool`
+    static func swiftBoolFromEosBool(eosBool: SwiftExpr) -> SwiftExpr {
+        SwiftFunctionCallExpr.named("swiftBoolFromEosBool", args: [ eosBool.arg(nil) ])
     }
 }

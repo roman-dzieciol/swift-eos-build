@@ -5,10 +5,9 @@ import SwiftAST
 
 extension SwiftShims {
 
+    /// TODO: Tuples
     static func tuples(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
 
-
-        // TODO: Tuples
         if let lhsBuiltin = lhs.type.canonical.asBuiltin,
            let rhsBuiltin = rhs.type.canonical.asBuiltin,
            lhsBuiltin == rhsBuiltin,

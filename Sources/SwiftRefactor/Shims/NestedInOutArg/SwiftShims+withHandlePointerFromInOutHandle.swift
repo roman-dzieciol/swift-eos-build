@@ -7,10 +7,6 @@ extension SwiftShims {
 
     static func withHandlePointerFromInOutHandle(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
 
-        if lhs.name == "OutPeerId" {
-
-        }
-
         if let lhsPointer = lhs.type.canonical.asPointer,
            (lhs.name.hasSuffix("Handle") || lhsPointer.pointeeType.isHandlePointer || lhsPointer.pointeeType.isOpaquePointer()),
            (rhs.name.hasSuffix("Handle") || rhs.type.canonical.isHandlePointer || rhs.type.canonical.isOpaquePointer()),

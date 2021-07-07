@@ -5,6 +5,7 @@ import SwiftAST
 
 extension SwiftShims {
 
+    /// `[Pointer<Opaque>]` = `Pointer<Pointer<Opaque>>`
     static func opaquePointerArrayFromOpaquePointerPointer(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
 
         // `Array` = `Pointer array`
@@ -20,7 +21,6 @@ extension SwiftShims {
                       fatalError("unknown typecast: \(lhs.name) = \(rhs.name), \nlhs: \(lhs.type), \nrhs: \(rhs.type)")
                   }
 
-            // `[Pointer<Opaque>]` = `Pointer<Pointer<Opaque>>`
             if let lhsOpaquePtr = lhsArray.elementType.asOpaquePointer,
                let rhsOpaquePtr = rhsPointer.pointeeType.asOpaquePointer,
                lhsOpaquePtr == rhsOpaquePtr {

@@ -5,6 +5,7 @@ import SwiftAST
 
 extension SwiftShims {
 
+    /// `[String]` = `Pointer<Pointer<CChar>>`
     static func stringArrayFromCCharPointerPointer(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
 
         // `Array` = `Pointer array`
@@ -19,7 +20,6 @@ extension SwiftShims {
                       fatalError("unknown typecast: \(lhs.name) = \(rhs.name), \nlhs: \(lhs.type), \nrhs: \(rhs.type)")
                   }
 
-            // `[String]` = `Pointer<Pointer<CChar>>`
             if lhsArray.elementType.asString != nil,
                let rhsInnerPointer = rhsPointer.pointeeType.asPointer,
                rhsInnerPointer.pointeeType.asCChar != nil {
@@ -33,5 +33,13 @@ extension SwiftShims {
         }
 
         return nil
+    }
+}
+
+extension SwiftExpr.function {
+
+    /// `[String]` = `Pointer<Pointer<CChar>>`
+    static func stringArrayFromCCharPointerPointer(pointer: SwiftExpr, count: SwiftExpr) -> SwiftExpr {
+        SwiftFunctionCallExpr.named("stringArrayFromCCharPointerPointer", args: [ pointer.arg("pointer"), count.arg("count") ])
     }
 }

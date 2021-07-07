@@ -5,9 +5,9 @@ import SwiftAST
 
 extension SwiftShims {
 
+    /// Returns exact value of Int as another Int type, or throws error
     static func intFromAnotherInt(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
 
-        // `Integer` = `Integer of another type`
         if let lhsInt = lhs.type.canonical.asInt,
            let rhsInt = rhs.type.canonical.asInt,
            lhsInt.builtinName != rhsInt.builtinName {

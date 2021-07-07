@@ -5,8 +5,8 @@ import SwiftAST
 
 extension SwiftShims {
 
+    /// With nested `Pointer<Trivial>, Int` from `Optional<[Trivial]>`
     static func withTrivialPointersFromOptionalTrivialArray(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
-
 
         if !rhs.isInOutParm,
            let lhsPointer = lhs.type.canonical.asPointer,
@@ -24,5 +24,22 @@ extension SwiftShims {
                 nest: nested))
         }
         return nil
+    }
+}
+
+extension SwiftExpr.function {
+
+    /// With nested `Pointer<Trivial>, Int` from `Optional<[Trivial]>`
+    static func withTrivialPointersFromOptionalTrivialArray(
+        _ optionalValue: SwiftExpr,
+        managedBy pointerManager: SwiftExpr,
+        pointerName: String,
+        arrayCountName: String,
+        nest: SwiftExpr
+    ) -> SwiftExpr {
+        SwiftFunctionCallExpr.named("withTrivialPointersFromOptionalTrivialArray", args: [
+            optionalValue.arg(nil),
+            pointerManager.arg("managedBy"),
+            .closure([pointerName, arrayCountName], nest: nest) ])
     }
 }

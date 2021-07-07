@@ -5,6 +5,7 @@ import SwiftAST
 
 extension SwiftShims {
 
+    /// `[SwiftObject]` = `Pointer<SdkObject>`
     static func swiftObjectArrayFromSdkObjectPointer(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
 
         // `Array` = `Pointer array`
@@ -19,7 +20,6 @@ extension SwiftShims {
                       fatalError("unknown typecast: \(lhs.name) = \(rhs.name), \nlhs: \(lhs.type), \nrhs: \(rhs.type)")
                   }
 
-            // `[SwiftObject]` = `Pointer<SdkObject>`
             if let lhsObject = lhsArray.elementType.asDeclRef?.decl as? SwiftObject,
                let rhsObject = rhsPointer.pointeeType.asDeclRef?.decl as? SwiftObject,
                lhsObject.linked(.sdk)?.canonical === rhsObject.canonical {

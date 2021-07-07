@@ -4,12 +4,9 @@ import SwiftAST
 
 
 extension SwiftShims {
-    /// `Pointer<SdkObject>`: `SwiftObject`
+
+    /// With nested `Pointer<SdkObject>` from `SwiftObject`
     static func withSdkObjectPointerFromSwiftObject(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
-
-        if lhs.name == "Options" {
-
-        }
 
         if !rhs.isInOutParm,
            let lhsPointer = lhs.type.canonical.asPointer,
@@ -28,5 +25,21 @@ extension SwiftShims {
                 nest: nested))
         }
         return nil
+    }
+}
+
+extension SwiftExpr.function {
+
+    /// With nested `Pointer<SdkObject>` from `SwiftObject`
+    static func withSdkObjectPointerFromSwiftObject(
+        _ swiftObject: SwiftExpr,
+        managedBy pointerManager: SwiftExpr,
+        pointerName: String,
+        nest: SwiftExpr
+    ) -> SwiftExpr {
+        SwiftFunctionCallExpr.named("withSdkObjectPointerFromSwiftObject", args: [
+            swiftObject.arg(nil),
+            pointerManager.arg("managedBy"),
+            .closure([pointerName], nest: nest) ])
     }
 }

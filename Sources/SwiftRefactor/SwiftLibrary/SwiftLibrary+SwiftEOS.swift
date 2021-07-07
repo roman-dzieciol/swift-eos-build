@@ -13,25 +13,6 @@ extension SwiftExpr.function {
     static func string(cString: SwiftExpr) -> SwiftExpr {
         SwiftFunctionCallExpr.named("String", args: [ cString.arg("cString") ])
     }
-
-    static func stringArrayFromCCharPointerPointer(pointer: SwiftExpr, count: SwiftExpr) -> SwiftExpr {
-        SwiftFunctionCallExpr.named("stringArrayFromCCharPointerPointer", args: [ pointer.arg("pointer"), count.arg("count") ])
-    }
-
-    static func safeNumericCast(exactly: SwiftExpr) -> SwiftExpr {
-        SwiftFunctionCallExpr.named("safeNumericCast", args: [ exactly.arg("exactly") ])
-    }
-}
-
-extension SwiftExpr.function {
-
-    static func swiftBoolFromEosBool(eosBool: SwiftExpr) -> SwiftExpr {
-           SwiftFunctionCallExpr.named("swiftBoolFromEosBool", args: [ eosBool.arg(nil) ])
-    }
-
-    static func eosBoolFromSwiftBool(swiftBool: SwiftExpr) -> SwiftExpr {
-           SwiftFunctionCallExpr.named("eosBoolFromSwiftBool", args: [ swiftBool.arg(nil) ])
-    }
 }
 
 extension SwiftExpr.function {
@@ -55,10 +36,6 @@ extension SwiftExpr.function {
 
     static func unsafeBufferPointer(start: SwiftExpr, count: SwiftExpr) -> SwiftExpr {
            SwiftFunctionCallExpr.named("UnsafeBufferPointer", args: [ start.arg("start"), count.arg("count") ])
-    }
-
-    static func trivialArrayFromTrivialPointer(start: SwiftExpr, count: SwiftExpr) -> SwiftExpr {
-        SwiftFunctionCallExpr.named("trivialArrayFromTrivialPointer", args: [ start.arg("start"), count.arg("count") ])
     }
 
     static func mapBufferToObjects(arrayCount: SwiftExpr, objectInit: SwiftExpr) -> SwiftExpr {

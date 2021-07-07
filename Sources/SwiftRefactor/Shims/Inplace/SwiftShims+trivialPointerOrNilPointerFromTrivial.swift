@@ -5,11 +5,11 @@ import SwiftAST
 
 extension SwiftShims {
 
+    /// Managed `Pointer<TrivialValue>?` = `TrivialValue?`
     static func trivialPointerOrNilPointerFromTrivial(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
 
         let rhsCanonical = rhs.type.canonical
 
-        // Managed `Pointer<TrivialValue>?` = `TrivialValue?`
         if !rhs.isInOutParm,
            let lhsPointer = lhs.type.canonical.asPointer,
            lhsPointer.pointeeType.isTrivial,
