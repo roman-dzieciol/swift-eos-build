@@ -9,11 +9,12 @@ export LANG=C.UTF-8
 
 export SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
-export EOS_VERSION="1.13.0"
+export EOS_VERSION=$(cat "$SCRIPT_DIR/../eos-version.txt" | tr -d '[:space:]')
+export EOS_FW_SUB_DIR="SDK/Bin/IOS"
 export EOS_FW_NAME="EOSSDK.framework"
 export EOS_XCFW_NAME="EOSSDK.xcframework"
 
-export FW_PATH="SDK/$EOS_VERSION/$EOS_FW_NAME"
+export FW_PATH="$EOS_VERSION/$EOS_FW_SUB_DIR/$EOS_FW_NAME"
 export FW_DIR="$SCRIPT_DIR/../../$FW_PATH"
 export HEADERS_DIR="$FW_DIR/Headers"
 export OUTPUT_DIR="$SCRIPT_DIR/../Temp"

@@ -1,5 +1,4 @@
 import XCTest
-@testable import SwiftEOSBuild
 
 final class SwiftEOSBuildTests: XCTestCase {
     func testExample() throws {

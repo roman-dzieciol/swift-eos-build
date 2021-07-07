@@ -9,7 +9,7 @@ let package = Package(
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .executable(
-            name: "SwiftEOSBuild",
+            name: "swift-eos-build",
             targets: ["SwiftEOSBuild"]
         ),
         .library(
@@ -111,7 +111,7 @@ let package = Package(
             dependencies: ["SwiftRefactor"]),
         .testTarget(
             name: "SwiftPrinterTests",
-            dependencies: ["SwiftPrinter"]),
+            dependencies: ["SwiftPrinter", "SwiftRefactor"]),
         .testTarget(
             name: "SwiftEOSBuildTests",
             dependencies: ["SwiftEOSBuild"]),
