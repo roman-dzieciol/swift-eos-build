@@ -82,9 +82,6 @@ private class SwiftArraysPassVisitor: SwiftVisitor {
                     if alias == pointer {
                         alias = pointer.pointeeType
                     }
-                    print(stack)
-                    print(varDecl)
-                    print(canonical)
                     varDecl.type = SwiftArrayType(elementType: alias.explicitlyOptional, qual: qual)
                 }
 

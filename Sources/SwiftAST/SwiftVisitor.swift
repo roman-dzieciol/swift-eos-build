@@ -21,9 +21,6 @@ open class SwiftVisitor {
     open func visitReplacing(type: inout SwiftType) throws {
         let newType = try visit(type: type)
         if newType !== type {
-            if newType.asPointer?.pointeeType.asOpaque?.typeName.contains("EOS_Ecom_HTransaction") == true {
-                print(newType)
-            }
             type = newType
         }
     }

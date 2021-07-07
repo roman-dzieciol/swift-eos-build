@@ -84,7 +84,6 @@ private class SwiftTypesDeclPassVisitor: SwiftVisitor {
         if let varDecl = ast as? SwiftMember,
            varDecl.type.canonical.baseType.isOpaque,
            varDecl.type.isOptional != true {
-            print("---- \(varDecl.name)")
             varDecl.type = varDecl.type.optional
         }
 
