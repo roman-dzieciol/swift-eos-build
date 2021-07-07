@@ -5,6 +5,7 @@ import Foundation
 import EOSSDK
 #endif
 
+/// `Array<Value>` ->` Value*, int*`
 public func withArrayBuffer<Element, LengthType: BinaryInteger>(
     capacity: Int? = nil,
     _ nested: (UnsafeMutablePointer<Element>?, UnsafeMutablePointer<LengthType>?) throws -> Void) rethrows -> Array<Element>
@@ -28,6 +29,7 @@ public func withArrayBuffer<Element, LengthType: BinaryInteger>(
 }
 
 
+/// `inout Array<Value>` ->` Value*, int*`
 public func withPointersToInOutArray<LengthType: BinaryInteger, Element, R>(
     inoutArray: inout Array<Element>?,
     nested: (UnsafeMutablePointer<Element>?, UnsafeMutablePointer<LengthType>?) throws -> R) rethrows -> R
@@ -40,6 +42,7 @@ public func withPointersToInOutArray<LengthType: BinaryInteger, Element, R>(
     return result
 }
 
+/// `inout Array<Value>` ->` Value*, int*`
 public func withPointerForInOut<Element, LengthType: BinaryInteger, R>(
     array: inout Array<Element>,
     capacity: Int? = nil,
@@ -67,7 +70,7 @@ public func withPointerForInOut<Element, LengthType: BinaryInteger, R>(
     return returnValue
 }
 
-
+/// `inout Array<Value>` ->` Value*, int*`
 public func withPointerForInOut<Element, LengthType: BinaryInteger, R>(
     array: inout Array<Element>,
     count: inout Int,

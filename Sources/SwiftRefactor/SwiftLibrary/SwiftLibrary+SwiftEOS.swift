@@ -21,20 +21,6 @@ extension SwiftExpr.function {
     static func safeNumericCast(exactly: SwiftExpr) -> SwiftExpr {
         SwiftFunctionCallExpr.named("safeNumericCast", args: [ exactly.arg("exactly") ])
     }
-
-    static func typecastIntResult(_ nest: SwiftExpr) -> SwiftExpr {
-            .try(SwiftFunctionCallExpr.named("typecastIntResult", args: [ .closure([], nest: nest) ]))
-    }
-
-    static func typecastBoolResult(_ nest: SwiftExpr) -> SwiftExpr {
-            .try(SwiftFunctionCallExpr.named("typecastBoolResult", args: [ .closure([], nest: nest) ]))
-    }
-
-    static func withStringResult(_ nest: SwiftExpr) -> SwiftExpr {
-            .try(SwiftFunctionCallExpr.named("withStringResult", args: [ .closure([], nest: nest) ]))
-    }
-
-
 }
 
 extension SwiftExpr.function {

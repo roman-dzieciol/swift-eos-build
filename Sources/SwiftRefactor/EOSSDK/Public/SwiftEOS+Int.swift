@@ -20,11 +20,15 @@ public func intFromPointerToInt<Pointee: BinaryInteger, R: BinaryInteger>(
     try nested(&value)
     return transform(value)
 }
-public func typecastIntResult<LHS: BinaryInteger, RHS: BinaryInteger>(
+
+/// With `Int` result from`() -> AnotherInt`
+public func withIntResult<LHS: BinaryInteger, RHS: BinaryInteger>(
     _ nested: () throws -> RHS
 ) throws -> LHS {
     return try safeNumericCast(exactly: try nested())
 }
+
+
 //public func withPointerForInOutInteger<Pointee: BinaryInteger, Integer: BinaryInteger, R>(
 //    _ integer: inout Integer,
 //    _ transform: (Pointee) -> Integer = { R(exactly: $0)! },

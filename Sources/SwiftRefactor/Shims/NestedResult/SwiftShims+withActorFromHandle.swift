@@ -5,9 +5,9 @@ import SwiftAST
 
 extension SwiftShims {
 
+    /// With `Actor` result from`() -> Handle`
     static func withActorFromHandle(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
 
-        // Actor = actor handle
         if let lhsObject = lhs.type.canonical.asDeclRef?.decl as? SwiftObject,
            lhsObject.name.hasSuffix("_Actor"),
            let lhsHandle = lhsObject.members.first(where: { $0.name == "Handle" }),
@@ -19,5 +19,15 @@ extension SwiftShims {
         }
 
         return nil
+    }
+}
+
+extension SwiftExpr.function {
+
+    /// With `Actor` result from`() -> Handle`
+    static func withActorFromHandle(
+        nest: SwiftExpr
+    ) -> SwiftExpr {
+        SwiftFunctionCallExpr.named("withActorFromHandle", args: [.closure([], nest: nest) ])
     }
 }

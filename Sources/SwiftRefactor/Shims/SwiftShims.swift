@@ -27,8 +27,8 @@ extension SwiftShims {
     ]
 
     static let functionResultShims: SwiftShims = [
-        SwiftShims.typecastIntResult,
-        SwiftShims.typecastBoolResult,
+        SwiftShims.withIntResult,
+        SwiftShims.withBoolResult,
         SwiftShims.withActorFromHandle,
         SwiftShims.withStringResult,
     ]
