@@ -16,11 +16,11 @@ extension SwiftShims {
            !lhsObject.inSwiftEOS,
            lhsObject === rhsObject.sdk
         {
-            return .function.withSdkObjectPointerFromInOutSwiftObject(
+            return .try(.function.withSdkObjectPointerFromInOutSwiftObject(
                 rhs.expr.inout,
                 managedBy: .string("pointerManager"),
                 pointerName: rhs.name,
-                nest: nested)
+                nest: nested))
         }
         return nil
     }
