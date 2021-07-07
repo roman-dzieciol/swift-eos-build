@@ -24,13 +24,6 @@ public func withPointers<R>(toStringsCopy strings: [String], _ body: (UnsafePoin
     return try body(charPtrs.map { UnsafePointer($0) }, charPtrs.count)
 }
 
-/// With `String` result from`() -> Pointer<CChar>`
-public func withStringResult(
-    _ nested: () throws -> UnsafePointer<CChar>) rethrows -> String
-{
-    String(cString: try nested())
-}
-
 public func withStringBuffer<LengthType: BinaryInteger>(
     capacity: Int? = nil,
     _ nested: (UnsafeMutablePointer<CChar>?, UnsafeMutablePointer<LengthType>?) throws -> Void) rethrows -> String

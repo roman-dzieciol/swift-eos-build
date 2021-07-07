@@ -5,7 +5,8 @@ import SwiftAST
 
 extension SwiftShims {
 
-    /// `[Pointer<Trivial>]` = `Pointer<Trivial>, Int`
+    /// `[Trivial]` = `Pointer<Trivial>, Int`
+    /// `Optional<[Trivial]>` = `Pointer<Optional<Trivial>>, Int`
     static func trivialArrayFromTrivialPointer(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
 
         // `Array` = `Pointer array`
@@ -26,17 +27,25 @@ extension SwiftShims {
 
                 let rhsArrayCountExpr: SwiftExpr = nested.outer().map { $0.member(rhsArrayCount.expr) } ?? rhsArrayCount.expr
 
-                return .try(.function.trivialArrayFromTrivialPointer(start: nested, count: rhsArrayCountExpr))
+                if rhsPointer.pointeeType.isOptional != false || rhsPointer.pointeeType.isOpaquePointer() {
+                    return .try(.function.trivialOptionalArrayFromTrivialOptionalPointer(start: nested, count: rhsArrayCountExpr))
+                } else {
+                    return .try(.function.trivialArrayFromTrivialPointer(start: nested, count: rhsArrayCountExpr))
+                }
             }
         }
-
         return nil
     }
 }
 
 extension SwiftExpr.function {
 
-    /// `[Pointer<Trivial>]` = `Pointer<Trivial>, Int`
+    /// `Optional<[Trivial]>` = `Pointer<Optional<Trivial>>, Int`
+    static func trivialOptionalArrayFromTrivialOptionalPointer(start: SwiftExpr, count: SwiftExpr) -> SwiftExpr {
+        SwiftFunctionCallExpr.named("trivialOptionalArrayFromTrivialOptionalPointer", args: [ start.arg("start"), count.arg("count") ])
+    }
+
+    /// `[Trivial]` = `Pointer<Trivial>, Int`
     static func trivialArrayFromTrivialPointer(start: SwiftExpr, count: SwiftExpr) -> SwiftExpr {
         SwiftFunctionCallExpr.named("trivialArrayFromTrivialPointer", args: [ start.arg("start"), count.arg("count") ])
     }

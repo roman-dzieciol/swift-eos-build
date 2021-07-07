@@ -1,12 +1,23 @@
 
 import Foundation
 
-/// `[Pointer<Trivial>]` = `Pointer<Trivial>, Int`
-public func trivialArrayFromTrivialPointer<Element, Integer: BinaryInteger>(
+/// `Optional<[Trivial]>` = `Pointer<Optional<Trivial>>, Int`
+public func trivialOptionalArrayFromTrivialOptionalPointer<Element, Integer: BinaryInteger>(
     start: UnsafePointer<Optional<Element>>?,
     count: Integer
 ) throws -> [Element]? {
     guard let start = start else { return nil }
+    return Array(UnsafeBufferPointer(
+        start: start,
+        count: try safeNumericCast(exactly: count)))
+        .compactMap { $0 }
+}
+
+/// `[Trivial]` = `Pointer<Trivial>, Int`
+public func trivialArrayFromTrivialPointer<Element, Integer: BinaryInteger>(
+    start: UnsafePointer<Element>?,
+    count: Integer
+) throws -> [Element] {
     return Array(UnsafeBufferPointer(
         start: start,
         count: try safeNumericCast(exactly: count)))

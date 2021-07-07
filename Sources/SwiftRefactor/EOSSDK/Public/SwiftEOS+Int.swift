@@ -12,13 +12,6 @@ public func safeNumericCast<LHS: BinaryInteger, RHS: BinaryInteger>(
     }
 }
 
-/// With `Int` result from`() -> AnotherInt`
-public func withIntResult<LHS: BinaryInteger, RHS: BinaryInteger>(
-    _ nested: () throws -> RHS
-) throws -> LHS {
-    return try safeNumericCast(exactly: try nested())
-}
-
 /// With `Pointer<Int>` from `inout Int`
 public func withIntPointerFromInOutInt<Pointee: BinaryInteger, Integer: BinaryInteger, R>(
     _ inoutInteger: inout Integer,

@@ -6,7 +6,7 @@ import SwiftAST
 extension SwiftShims {
 
     /// With `Actor` result from`() -> Handle`
-    static func withActorFromHandle(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
+    static func returningActorFromHandle(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
 
         if let lhsObject = lhs.type.canonical.asDeclRef?.decl as? SwiftObject,
            lhsObject.name.hasSuffix("_Actor"),
@@ -15,7 +15,7 @@ extension SwiftShims {
            let rhsOpaque = rhs.type.canonical.asOpaquePointer?.pointeeType.asOpaque,
            lhsOpaque == rhsOpaque
         {
-            return .function.withActorFromHandle(nest: nested)
+            return .function.returningActorFromHandle(nest: nested)
         }
 
         return nil
@@ -25,9 +25,9 @@ extension SwiftShims {
 extension SwiftExpr.function {
 
     /// With `Actor` result from`() -> Handle`
-    static func withActorFromHandle(
+    static func returningActorFromHandle(
         nest: SwiftExpr
     ) -> SwiftExpr {
-        SwiftFunctionCallExpr.named("withActorFromHandle", args: [.closure([], nest: nest) ])
+        SwiftFunctionCallExpr.named("returningActorFromHandle", args: [.closure([], nest: nest) ])
     }
 }

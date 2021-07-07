@@ -28,10 +28,8 @@ extension SwiftShims {
     ]
 
     static let functionResultShims: SwiftShims = [
-        SwiftShims.withIntResult,
-        SwiftShims.withBoolResult,
-        SwiftShims.withActorFromHandle,
-        SwiftShims.withStringResult,
+        SwiftShims.returningActorFromHandle,
+        SwiftShims.returningTransformedResult,
     ]
 
     static let implicitPointerShims: SwiftShims = [

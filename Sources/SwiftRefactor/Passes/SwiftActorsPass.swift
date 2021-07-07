@@ -66,7 +66,7 @@ public class SwiftActorsPass: SwiftRefactorPass {
 
                 if let acquireFunc = functionsReturningHandle.first(where: { $0.returnType.canonical == handle.type.canonical }) {
                     acquireFunc.returnType = SwiftDeclRefType(decl: object, qual: .optional)
-                    acquireFunc.code = .function.withActorFromHandle(nest: acquireFunc.code!)
+                    acquireFunc.code = .function.returningActorFromHandle(nest: acquireFunc.code!)
                 }
             }
 

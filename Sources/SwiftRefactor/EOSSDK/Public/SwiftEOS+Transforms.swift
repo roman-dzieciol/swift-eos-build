@@ -13,7 +13,14 @@ public func withTransformedInOut<Value, Transformed, R>(
     return result
 }
 
-
+public func returningTransformedResult<Transformed, R>(
+    nested: () throws -> R,
+    transformedResult: (R) throws -> Transformed
+) rethrows -> Transformed {
+    let result = try nested()
+    let transformedResult = try transformedResult(result)
+    return transformedResult
+}
 
 
 //public func withPointerToInOut2<Value, Pointee, R>(

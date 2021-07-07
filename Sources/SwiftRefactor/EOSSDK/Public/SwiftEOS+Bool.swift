@@ -6,13 +6,6 @@ import Foundation
 import EOSSDK
 #endif
 
-/// With `Bool` result from`() -> EOS_Bool`
-public func withBoolResult(
-    _ nested: () throws -> Int32
-) throws -> Bool {
-    try swiftBoolFromEosBool(nested())
-}
-
 /// `(EOS_Bool) -> Bool`
 public func swiftBoolFromEosBool(
     _ eosBool: EOS_Bool

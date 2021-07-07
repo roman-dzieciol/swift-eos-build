@@ -23,6 +23,6 @@ public class SwiftVarDecl: SwiftTypeDecl, SwiftVar {
 extension SwiftType {
 
     public func tempVar(named: SwiftVarDecl? = nil, attributes: Set<String> = [], isMutable: Bool = false) -> SwiftVarDecl {
-        SwiftVarDecl(name: named?.name ?? "TEMP", inner: [], attributes: attributes, type: self, isMutable: isMutable, comment: nil)
+        SwiftVarDecl(name: named?.name ?? "$0", inner: [], attributes: attributes, type: self, isMutable: isMutable, comment: nil)
     }
 }
