@@ -23,8 +23,9 @@ extension SwiftShims {
     ]
 
     static let nestedShims: SwiftShims = [
-        SwiftShims.withSdkObjectPointerFromSwiftObject,
         SwiftShims.withTrivialPointersFromOptionalTrivialArray,
+        SwiftShims.withSdkObjectPointerFromSwiftObject,
+        SwiftShims.withTransformed,
     ]
 
     static let functionResultShims: SwiftShims = [

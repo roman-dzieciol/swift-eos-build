@@ -13,6 +13,15 @@ public func withTransformedInOut<Value, Transformed, R>(
     return result
 }
 
+public func withTransformed<Value, Transformed, R>(
+    value: Value,
+    transform: (Value) throws -> Transformed,
+    nested: (Transformed) throws -> R
+) rethrows -> R {
+    let transformed: Transformed = try transform(value)
+    return try nested(transformed)
+}
+
 public func returningTransformedResult<Transformed, R>(
     nested: () throws -> R,
     transformedResult: (R) throws -> Transformed
