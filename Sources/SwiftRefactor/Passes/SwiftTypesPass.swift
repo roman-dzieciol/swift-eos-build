@@ -160,6 +160,15 @@ private class SwiftTypesDeclPassVisitor: SwiftVisitor {
                 }
                 varDecl.isMutable = pointer.isMutable
             }
+
+            // A mutable pointer to builtin Bool is inout Bool
+            else if let pointer = canonical.asPointer,
+                    let builtin = pointer.pointeeType.asBuiltin,
+                    builtin.isBool,
+                    pointer.isMutable {
+                varDecl.type = SwiftBuiltinType(name: builtin.builtinName, qual: qual)
+                varDecl.isMutable = pointer.isMutable
+            }
         }
 
         // WORKAROUND: [char *] in Options is [String]

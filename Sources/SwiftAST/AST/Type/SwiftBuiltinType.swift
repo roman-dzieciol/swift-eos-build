@@ -77,6 +77,14 @@ extension SwiftType {
     public var isVoid: Bool {
         asBuiltin?.builtinName == "Void"
     }
+
+    public var isBool: Bool {
+        asBuiltin?.builtinName == "Bool"
+    }
+
+    public var isEosBool: Bool {
+        asDeclRef?.decl.canonical.name == "EOS_Bool"
+    }
 }
 
 

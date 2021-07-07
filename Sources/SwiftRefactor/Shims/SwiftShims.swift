@@ -18,6 +18,7 @@ extension SwiftShims {
         SwiftShims.withSdkObjectPointerFromInOutSwiftObject,
         SwiftShims.withSdkObjectPointerFromInOutSdkObject,
         SwiftShims.withIntPointerFromInOutInt,
+        SwiftShims.withEosBoolPointerFromInOutSwiftBool,
         SwiftShims.withTrivialMutablePointerFromInOutTrivial,
     ]
 
