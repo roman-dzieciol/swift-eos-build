@@ -1,4 +1,10 @@
 
+import Foundation
+
+#if canImport(EOSSDK)
+import EOSSDK
+#endif
+
 
 public func withNotification<SwiftCallbackInfo>(
     notification: @escaping (SwiftCallbackInfo) -> Void,
