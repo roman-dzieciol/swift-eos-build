@@ -32,16 +32,16 @@ class SwiftyArrayLinker {
     }
 
     func overridenName(for name: String) -> String? {
-        if name == "ByteArray" {
-            if decl.name.hasSuffix("EOS_ByteArray_ToString") {
+        if name == "ByteArray", decl.name.hasSuffix("EOS_ByteArray_ToString") {
                 return "Length"
-            }
         }
 
-        if name == "OutData" {
-            if decl.name.hasSuffix("EOS_P2P_ReceivePacket") {
+        if name == "OutData", decl.name.hasSuffix("EOS_P2P_ReceivePacket") {
                 return "OutBytesWritten"
-            }
+        }
+
+        if name == "TargetUserIpAddresses", decl.name.hasSuffix("EOS_RTCAdmin_QueryJoinRoomTokenOptions") {
+            return "TargetUserIdsCount"
         }
 
         return nil
@@ -64,6 +64,7 @@ class SwiftyArrayLinker {
     }
 
     func link(maybeArrayBufferDecls: inout [SwiftVarDecl], in decl: SwiftAST, invocationDecl: SwiftVarDecl? = nil) {
+
         let maybeArrayCountDecls = decl
             .inner
             .compactMap { $0 as? SwiftVarDecl }
@@ -106,7 +107,7 @@ class SwiftyArrayLinker {
         let name = arrayBuffer.name
 
         if let overridenName = overridenName(for: name) {
-            guard let arrayCount = arrayCounts[overridenName] else {
+            guard let arrayCount = decl.inner.first(where: { $0.name == overridenName }) as? SwiftVarDecl else {
                 fatalError("var with overriden name not found: \(overridenName) for: \(arrayBuffer.name) in: \(decl.name)")
             }
             return arrayCount
@@ -153,7 +154,6 @@ class SwiftyArrayLinker {
     }
 
     func isMaybeArrayCount(varDecl: SwiftVarDecl) -> Bool {
-
         let canonical = (varDecl.canonical as? SwiftVarDecl)?.type.canonical
         if canonical?.asBuiltin?.isInt == true {
             return true
@@ -179,9 +179,6 @@ class SwiftyArrayLinker {
     }
 
     func isMaybeArrayCount(name: String) -> Bool {
-        if name == "OutBytesWritten" {
-            return true
-        }
         for additionalSuffix in additionalSuffixesToAdd {
             for countSuffix in countSuffixesToAdd where !countSuffix.isEmpty {
                 if String(name.dropSuffix(additionalSuffix)).hasSuffix(countSuffix) {

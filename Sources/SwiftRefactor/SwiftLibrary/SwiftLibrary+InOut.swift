@@ -18,8 +18,6 @@ extension SwiftExpr.function {
             .closure([transformedName], nest: nest) ])
     }
 
-
-
     static func withPointersToInOutArray(
         inoutArray: SwiftExpr,
         bufferPointerName: String,

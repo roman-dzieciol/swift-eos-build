@@ -41,9 +41,9 @@ public class SwiftAST: SwiftOutputStreamable, CustomStringConvertible, CustomDeb
 
     public func linked(_ linkType: SwiftASTLinkType) -> SwiftAST? {
         let linkedRefs = linkedRefs(linkType)
-        if linkedRefs.count > 1 {
-            fatalError()
-        }
+//        if linkedRefs.count > 1 {
+//            fatalError()
+//        }
         return linkedRefs.first
     }
 
