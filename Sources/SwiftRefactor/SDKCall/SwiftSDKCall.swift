@@ -137,7 +137,7 @@ public class SwiftSDKCall {
 
         guard let sdkCallbackDeclType = sdkCallbackFunctionType.paramTypes.first?.asPointer?.pointeeType.asDeclRef else { fatalError() }
         guard let sdkCallbackInfoObject = sdkCallbackDeclType.decl as? SwiftStruct else { fatalError() }
-        guard let callbackInfoObject = sdkCallbackInfoObject.copiedAST as? SwiftStruct
+        guard let callbackInfoObject = sdkCallbackInfoObject.linked(.swifty) as? SwiftStruct
                 , callbackInfoObject !== sdkCallbackInfoObject else { fatalError() }
 
         _ = try callbackInfoObject.functionInitFromSdkObject()
@@ -223,12 +223,12 @@ func findRemoveNotifyFunction(for addNotifyFunction: SwiftFunction, outer: Swift
     let removeNotifyName = addNotifyFunction.name.replacingOccurrences(of: "_AddNotify", with: "_RemoveNotify")
     let functions = outer.inner.compactMap { $0 as? SwiftFunction }
     if let removeNotifyFunction = functions.first(where: { $0.name == removeNotifyName }),
-       let sdkFunction = removeNotifyFunction.sourceAST as? SwiftFunction {
+       let sdkFunction = removeNotifyFunction.linked(.sdk) as? SwiftFunction {
         return sdkFunction
     }
     let removeNotifyNameWithoutVersion = String(removeNotifyName.reversed().drop(while: { $0.isNumber }).reversed()).dropSuffix("V")
     if let removeNotifyFunction = functions.first(where: { $0.name == removeNotifyNameWithoutVersion }),
-       let sdkFunction = removeNotifyFunction.sourceAST as? SwiftFunction {
+       let sdkFunction = removeNotifyFunction.linked(.sdk) as? SwiftFunction {
         return sdkFunction
     }
     return nil

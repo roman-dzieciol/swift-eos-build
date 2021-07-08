@@ -87,7 +87,7 @@ private class SwiftUpdateDeclsInTypesVisitor: SwiftVisitor {
     public override func visit(type: SwiftType) throws -> SwiftType {
 
         if let resolvedType = type as? SwiftDeclRefType {
-            guard let copiedAST = resolvedType.decl.copiedAST as? SwiftDecl else { fatalError() }
+            guard let copiedAST = resolvedType.decl.linked(.swifty) as? SwiftDecl else { fatalError() }
             return SwiftDeclRefType(decl: copiedAST, qual: resolvedType.qual)
         }
 

@@ -3,6 +3,8 @@ import Foundation
 
 public class SwiftDecl: SwiftAST {
 
+    public var access: String = "public"
+    
     public var expr: SwiftDeclRefExpr {
         self.declRefType(qual: .none).declRefExpr
     }

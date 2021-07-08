@@ -31,24 +31,16 @@ public struct SwiftASTLink {
 
 public class SwiftAST: SwiftOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible {
 
-    public var links: [SwiftASTLink] = []
-
     public func linkedRefs(_ linkType: SwiftASTLinkType) -> [SwiftAST] {
-        links
-            .filter { $0.type == linkType }
-            .compactMap { $0.ref }
+        SwiftASTLinker.shared.linkedRefs(for: self, linkType)
     }
 
     public func linked(_ linkType: SwiftASTLinkType) -> SwiftAST? {
-        let linkedRefs = linkedRefs(linkType)
-//        if linkedRefs.count > 1 {
-//            fatalError()
-//        }
-        return linkedRefs.first
+        SwiftASTLinker.shared.linked(for: self, linkType)
     }
 
     public func link(_ linkType: SwiftASTLinkType, ref: SwiftAST) {
-        links.append(.init(type: linkType, ref: ref))
+        SwiftASTLinker.shared.link(for: self, linkType, ref: ref)
     }
 
     func linkCopy(from: SwiftAST, to: SwiftAST) {
@@ -57,23 +49,11 @@ public class SwiftAST: SwiftOutputStreamable, CustomStringConvertible, CustomDeb
     }
 
     public func unlink(all linkType: SwiftASTLinkType) {
-        links.removeAll(where: { $0.type == linkType })
+        SwiftASTLinker.shared.unlink(for: self, all: linkType)
     }
 
     public func removeCode() {
-        linkedRefs(.code).forEach { ref in
-            if let codeAst = ref as? SwiftCodeAST {
-                codeAst.output.output = nil
-            }
-        }
-        linkedRefs(.expr).forEach { ref in
-            if let exprRef = ref as? SwiftExprRef,
-               let exprBuilder = exprRef.expr as? SwiftExprBuilder {
-                exprBuilder.expr = nil
-            }
-        }
-        unlink(all: .code)
-        unlink(all: .expr)
+        SwiftASTLinker.shared.removeCode(for: self)
     }
 
     public var sdk: SwiftAST? {
@@ -85,23 +65,13 @@ public class SwiftAST: SwiftOutputStreamable, CustomStringConvertible, CustomDeb
     }
 
     public var name: String
-    public var comment: SwiftComment?
-    public var inner: [SwiftAST]
-    public var access: String = "public"
     public var attributes: Set<String>
-
-    public weak var otherAST: SwiftAST?
-
-    public weak var copiedAST: SwiftAST? {
-        linked(.swifty)
-    }
-
-    public weak var sourceAST: SwiftAST? {
-        linked(.sdk)
-    }
+    public var comment: SwiftComment?
+    public let uuid: SwiftASTLinker.Key = SwiftASTLinker.shared.uuid()
+    public var inner: [SwiftAST]
 
     public weak var origAST: SwiftAST? {
-        if let sourceAST = sourceAST {
+        if let sourceAST = linked(.sdk) {
             return sourceAST.origAST
         } else {
             return self
@@ -125,7 +95,7 @@ public class SwiftAST: SwiftOutputStreamable, CustomStringConvertible, CustomDeb
     }
 
     public var asSource: Self? {
-        if let sourceAST = sourceAST as? Self, sourceAST !== self {
+        if let sourceAST = linked(.sdk) as? Self, sourceAST !== self {
             return sourceAST
         }
         return nil
@@ -145,7 +115,7 @@ public class SwiftAST: SwiftOutputStreamable, CustomStringConvertible, CustomDeb
     }
 
     public var description: String {
-        SwiftWriterString.description(for: self)
+        "\(type(of: self))(\(debugDescriptionDetails))"
     }
 
     public var debugDescription: String {

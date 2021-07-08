@@ -197,8 +197,6 @@ class SwiftyArrayLinker {
         array.sdk!.link(.arrayLength, ref: num.sdk!)
         num.sdk!.link(.arrayBuffer, ref: array.sdk!)
 
-        array.otherAST = num
-        num.otherAST = array
         array.add(comment: "- array num: \(num.name)")
         num.add(comment: "- array buffer: \(array.name)")
         os_log("array: %{public}s.%{public}s[%{public}s]", decl.name, array.name, num.name)
