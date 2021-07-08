@@ -1,5 +1,4 @@
 
-import Foundation
 
 /// With `Actor` result from`() -> Handle`
 public func returningActorFromHandle<A: SwiftEOSActor>(

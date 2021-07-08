@@ -1,6 +1,4 @@
 
-import Foundation
-
 public protocol SwiftEOSActor: AnyObject {
 
     associatedtype HandleType

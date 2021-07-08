@@ -127,6 +127,16 @@ private class SwiftArraysPassVisitor: SwiftVisitor {
                 fatalError()
             }
         }
+//
+//        // Workaround: 
+//        else if let varDecl = ast as? SwiftVarDecl, ast.name == "TargetUserIpAddresses",
+//                let pointer = varDecl.type.canonical.asPointer,
+//                let innerPointer = pointer.pointeeType.asPointer,
+//                innerPointer.pointeeType.isCChar {
+//            varDecl.type = SwiftArrayType(elementType: SwiftBuiltinType(name: "String"),
+//                                          qual: varDecl.type.qual.explicitlyOptional)
+//        }
+
 
 
         try super.visit(ast: ast)
