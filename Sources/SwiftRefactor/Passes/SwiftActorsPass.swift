@@ -7,8 +7,6 @@ public class SwiftActorsPass: SwiftRefactorPass {
 
     public override func refactor(module: SwiftModule) throws {
 
-//        let sdkModule = module.origAST as! SwiftModule
-
         var objectsByName: [String: SwiftObject] = [:]
 
         func object(named objectName: String) -> SwiftObject {
@@ -81,29 +79,5 @@ public class SwiftActorsPass: SwiftRefactorPass {
 
         module.removeAll(movedFunctions)
 
-//        // Gather available sdk objects by name
-//        let sdkObjects = [String: SwiftObject](uniqueKeysWithValues: sdkModule.inner
-//                                                .compactMap { $0 as? SwiftObject }
-//                                                .map { ($0.name, $0) })
-//
-//        // Add actors for all the sdk handles
-//        sdkModule.inner
-//            .compactMap { $0 as? SwiftTypealias }
-//            .filter { $0.type.withoutTypealias.isOpaquePointer() }
-//            .filter { $0.type.baseType.name.hasSuffix("Handle") }
-//            .forEach { handleDecl in
-//
-//                let actorName = String(handleDecl.type.baseType.name.dropSuffix("Handle"))
-//                let handleActor = SwiftActor(name: actorName, superTypes: [], inner: [], comment: nil)
-//                let handleType = SwiftDeclRefType(decl: handleDecl, qual: .none)
-//                let handleField = SwiftMember(name: "Handle", type: handleType, comment: nil)
-//                handleActor.inner.append(handleField)
-//
-////                if let currentSdkObject = sdkObjects["_tag" + actorName] {
-////                    guard let object = currentSdkObject.copiedAST as? SwiftObject else { fatalError() }
-////                    print(currentSdkObject.name)
-////                } else {
-////                }
-//            }
     }
 }

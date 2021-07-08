@@ -54,21 +54,7 @@ public class SwiftSDKCall {
 
             }
 
-//            if rhs.isInOutParm,
-//               rhs.type.isOptional != false,
-//               lhs.type.isOptional != false,
-//               lhs.type.isPointer,
-//               lhs.type.asPointer?.pointeeType.isOptional == false
-////               lhs.type.canonical.asPointer?.pointeeType.optional == rhs.type
-//            {
-//                os_log("non-optional inout arg: %{public}s.%{public}s", function.name, rhs.name)
-//                rhs.type = rhs.type.nonOptional
-//            }
-
             do {
-
-
-
 
                 // Array count arg is handled by array buffer arg
                 // Pass the arg name to SDK function
