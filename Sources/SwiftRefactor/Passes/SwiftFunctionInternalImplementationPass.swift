@@ -32,7 +32,13 @@ private class SwiftFunctionInternalImplementationPassVisitor: SwiftVisitor {
 
                 let args = internalFunction.parms
                     .map { $0.isInOutParm ? SwiftInOutExpr(identifier: $0.expr).arg(nil) : $0.expr.arg(nil) }
-                function.code = .try(internalFunction.call(args))
+
+                var internalFunctionCall = internalFunction.call(args)
+                if function.isThrowing {
+                    internalFunctionCall = .try(internalFunctionCall)
+                }
+                
+                function.code = internalFunctionCall
 
                 object.inner.append(internalFunction)
             }
