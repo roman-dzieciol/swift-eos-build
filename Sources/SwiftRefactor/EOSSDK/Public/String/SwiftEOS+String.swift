@@ -117,3 +117,12 @@ public func stringArrayFromCCharPointerPointer<Integer: BinaryInteger>(
         .compactMap { $0 }
         .map { String(cString: $0) }
 }
+
+public func withCCharPointerPointersReturnedAsOptionalString<LengthType: BinaryInteger>(
+    nested: (UnsafeMutablePointer<CChar>?, UnsafeMutablePointer<LengthType>?) throws -> Void) rethrows -> Optional<String>
+{
+    var utf8Array = Array("".utf8CString)
+    try withPointerForInOut(array: &utf8Array, capacity: utf8Array.capacity, nested)
+    return String(cString: utf8Array)
+}
+
