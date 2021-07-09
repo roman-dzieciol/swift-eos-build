@@ -47,3 +47,11 @@ public func withIntPointerFromInOutOptionalInt<Pointee: BinaryInteger, Integer: 
     inoutOptionalInteger = integer
     return result
 }
+
+public func withIntegerPointerReturnedAsInteger<Pointee: BinaryInteger, Integer: BinaryInteger>(
+    nested: (UnsafeMutablePointer<Pointee>?) throws -> Void
+) throws -> Integer {
+    var pointee: Pointee = .zero
+    try withUnsafeMutablePointer(to: &pointee, nested)
+    return try safeNumericCast(exactly: pointee)
+}
