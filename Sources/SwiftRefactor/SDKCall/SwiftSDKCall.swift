@@ -66,7 +66,27 @@ public class SwiftSDKCall {
 
                 let inoutParms = self.inoutParms.filter { $0 !== rhs.linked(.arrayLength) }
 
-                if rhs.isInOutParm,
+                if lhs.name.hasSuffix("Options"),
+                   let lhsPointer = lhs.type.canonical.asPointer,
+                   let lhsObject = lhsPointer.pointeeType.asDeclRef?.decl.canonical as? SwiftObject,
+                   !lhsObject.inSwiftEOS,
+                   !(lhsObject is SwiftEnum),
+                   let rhsObject = rhs.type.canonical.asDeclRef?.decl.canonical as? SwiftObject,
+                   rhsObject.inSwiftEOS,
+                   !(rhsObject is SwiftEnum),
+                   lhsObject === rhsObject.sdk,
+                   lhsObject.members.count == 1,
+                   lhsObject.members.first?.name == "ApiVersion"
+                {
+                    code = .try(.function.withSdkObjectMutablePointerFromSwiftObject(
+                        rhsObject.expr.call([]),
+                        managedBy: .string("pointerManager"),
+                        pointerName: rhs.name,
+                        nest: code))
+                    function.removeAll([rhs])
+                    sdkArgs += [lhs.arg(rhs.expr)]
+                }
+                else if rhs.isInOutParm,
                    inoutParms.count == 1,
                    function.returnType.isVoid,
                    let shimmed = try code.shimmed(.nestedOutShims, lhs: lhs, rhs: rhs) {

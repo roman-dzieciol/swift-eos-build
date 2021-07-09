@@ -112,7 +112,27 @@ public func withSdkObjectPointerFromSwiftObject<SwiftObject: SwiftEOSObject, R>(
     nested: (Optional<UnsafePointer<SwiftObject.SdkObject>>) throws -> R
 ) throws -> R {
     let sdkObjectPointer = try pointerManager.managedPointer(copyingValueOrNilPointer: swiftObject?.buildSdkObject(pointerManager: pointerManager))
-//    Cannot convert value of type 'UnsafePointer<SwiftObject.SdkObject>?' to expected argument type 'Optional<UnsafePointer<Optional<SwiftObject.SdkObject>>>'
+    return try nested(sdkObjectPointer)
+}
+
+public func withSdkObjectMutablePointerFromSwiftObject<SwiftObject: SwiftEOSObject, R>(
+    _ swiftObject: SwiftObject,
+    managedBy pointerManager: SwiftEOS__PointerManager,
+    nested: (Optional<UnsafeMutablePointer<SwiftObject.SdkObject>>) throws -> R
+) throws -> R {
+
+    let sdkObjectPointer = UnsafeMutablePointer<SwiftObject.SdkObject>.allocate(capacity: 1)
+    defer {
+        pointerManager.onDeinit {
+            sdkObjectPointer.deallocate()
+        }
+    }
+
+    try sdkObjectPointer.initialize(to: swiftObject.buildSdkObject(pointerManager: pointerManager))
+    pointerManager.onDeinit {
+        sdkObjectPointer.deinitialize(count: 1)
+    }
+
     return try nested(sdkObjectPointer)
 }
 
@@ -171,18 +191,3 @@ public func withSdkObjectPointerFromInOutSdkObject<SdkObject, R>(
 
     return result
 }
-
-
-
-//public func withPointer<SwiftObject, SdkObject, R>(
-//    toSdkObjectFrom swiftyObject: SwiftObject,
-//    _ nested: (UnsafePointer<SdkObject>) throws -> R
-//) rethrows -> R {
-//    swiftyObject.with
-//    return try withUnsafeMutablePointer(to: &mutableOptions, nested)
-//}
-//
-//
-//protocol SwiftObject {
-//    associatedtype SdkObject
-//}

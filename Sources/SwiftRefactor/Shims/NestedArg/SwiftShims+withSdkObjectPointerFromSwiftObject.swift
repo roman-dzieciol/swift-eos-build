@@ -42,4 +42,17 @@ extension SwiftExpr.function {
             pointerManager.arg("managedBy"),
             .closure([pointerName], nest: nest) ])
     }
+
+    /// With nested `Pointer<SdkObject>` from `SwiftObject`
+    static func withSdkObjectMutablePointerFromSwiftObject(
+        _ swiftObject: SwiftExpr,
+        managedBy pointerManager: SwiftExpr,
+        pointerName: String,
+        nest: SwiftExpr
+    ) -> SwiftExpr {
+        SwiftFunctionCallExpr.named("withSdkObjectMutablePointerFromSwiftObject", args: [
+            swiftObject.arg(nil),
+            pointerManager.arg("managedBy"),
+            .closure([pointerName], nest: nest) ])
+    }
 }
