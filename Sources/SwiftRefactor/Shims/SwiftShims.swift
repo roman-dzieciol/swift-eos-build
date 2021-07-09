@@ -10,6 +10,10 @@ typealias SwiftShims = Array<SwiftShimFunc>
 
 extension SwiftShims {
 
+    static let nestedOutShims: SwiftShims = [
+        SwiftShims.withSdkObjectPointerPointerReturnedAsSwiftObject,
+    ]
+
     static let nestedInOutShims: SwiftShims = [
         SwiftShims.withHandlePointerFromInOutHandle,
         SwiftShims.withCCharPointerPointersFromInOutString,

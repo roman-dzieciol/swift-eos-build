@@ -15,6 +15,7 @@ public class SwiftSDKCall {
     var code: SwiftExpr
 
     var functionTypeParms: [SwiftFunctionParm]
+    var inoutParms: [SwiftFunctionParm]
 
     let outer: SwiftDecl
 
@@ -37,6 +38,9 @@ public class SwiftSDKCall {
 
         functionTypeParms = function.parms
             .filter { $0.type.canonical is SwiftFunctionType }
+
+        inoutParms = function.parms
+            .filter { $0.isInOutParm }
     }
 
     func functionCode() throws -> SwiftExpr {
@@ -50,10 +54,6 @@ public class SwiftSDKCall {
             let lhs = sdkParm
             let rhs = parm
 
-            if lhs.name == "OutSessionHandle" {
-
-            }
-
             do {
 
                 // Array count arg is handled by array buffer arg
@@ -64,7 +64,18 @@ public class SwiftSDKCall {
                     continue
                 }
 
-                if rhs.isInOutParm {
+                if rhs.isInOutParm,
+                   inoutParms.count == 1,
+                   function.returnType.isVoid,
+                   let shimmed = try code.shimmed(.nestedOutShims, lhs: lhs, rhs: rhs) {
+                    os_log("shim out arg: %{public}s.%{public}s", function.name, rhs.name)
+                    self.code = shimmed
+                    self.sdkArgs += [lhs.arg(rhs.expr)]
+                    function.returnType = rhs.type
+                    function.removeAll([parm])
+                    continue
+                }
+                else if rhs.isInOutParm {
                     if let shimmed = try code.shimmed(.nestedInOutShims, lhs: lhs, rhs: rhs) {
                         os_log("shim arg: %{public}s.%{public}s", function.name, rhs.name)
                         self.code = shimmed

@@ -29,6 +29,24 @@ extension SwiftExpr.function {
             .closure([pointerName], nest: nest) ])
     }
 
+    static func withSdkObjectPointerPointerReturnedAsSwiftObject(
+        managedBy pointerManager: SwiftExpr,
+        pointerPointerName: String,
+        nest: SwiftExpr,
+        release: SwiftExpr
+    ) -> SwiftExpr {
+        SwiftFunctionCallExpr.named(
+            "withSdkObjectPointerPointerReturnedAsSwiftObject",
+            args: [
+                pointerManager.arg("managedBy"),
+                .closure([pointerPointerName], nest: nest).arg("nest"),
+                release.arg("release"),
+            ],
+            useTrailingClosures: false)
+    }
+
+
+
     static func withSdkObjectPointerFromInOutSdkObject(
         _ inoutSdkObject: SwiftExpr,
         managedBy pointerManager: SwiftExpr,

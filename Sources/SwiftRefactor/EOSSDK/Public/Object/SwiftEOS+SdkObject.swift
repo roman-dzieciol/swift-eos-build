@@ -46,7 +46,34 @@ public func withSdkObjectPointerPointerFromInOutSwiftObject<SwiftObject: SwiftEO
 
     inoutSwiftObject = try SwiftObject(sdkObject: sdkObjectPointer.pointee)
     return result
+}
 
+public func withSdkObjectPointerPointerReturnedAsSwiftObject<SwiftObject: SwiftEOSObject>(
+    managedBy pointerManager: SwiftEOS__PointerManager,
+    nest: (UnsafeMutablePointer<UnsafeMutablePointer<SwiftObject.SdkObject>?>?) throws -> Void,
+    release: (UnsafeMutablePointer<SwiftObject.SdkObject>) -> Void
+) throws -> SwiftObject? {
+
+    let pointerPointer = UnsafeMutablePointer<UnsafeMutablePointer<SwiftObject.SdkObject>?>.allocate(capacity: 1)
+    defer {
+        pointerManager.onDeinit {
+            pointerPointer.deallocate()
+        }
+    }
+
+    pointerPointer.initialize(to: nil)
+
+    try nest(pointerPointer)
+
+    guard let sdkObjectPointer = pointerPointer.pointee else {
+        return nil
+    }
+
+    let result = try SwiftObject(sdkObject: sdkObjectPointer.pointee)
+
+    release(sdkObjectPointer)
+
+    return result
 }
 
 public func withSdkObjectPointerFromInOutSwiftObject<SwiftObject: SwiftEOSObject, R>(
