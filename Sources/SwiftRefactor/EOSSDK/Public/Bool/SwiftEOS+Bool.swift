@@ -57,3 +57,11 @@ public func withEosBoolPointerFromInOutOptionalSwiftBool<R>(
     return result
 }
 
+
+public func withEosBoolPointerReturnedAsSwiftBool(
+    nested: (UnsafeMutablePointer<EOS_Bool>?) throws -> Void
+) throws -> Bool {
+    var bValue: EOS_Bool = EOS_FALSE
+    try withUnsafeMutablePointer(to: &bValue, nested)
+    return try swiftBoolFromEosBool(bValue)
+}
