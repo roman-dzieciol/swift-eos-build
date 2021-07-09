@@ -12,9 +12,9 @@ public class SwiftFunctionParm: SwiftVarDecl {
         set { newValue.map { type = $0 } }
     }
 
-    public init(label: String? = nil, name: String, type: SwiftType, isMutable: Bool = false, comment: SwiftComment? = nil) {
+    public init(label: String? = nil, name: String, type: SwiftType, isMutable: Bool = false, attributes: Set<String> = [], comment: SwiftComment? = nil) {
         self.label = label
-        super.init(name: name, inner: [], type: type, isMutable: isMutable, comment: comment)
+        super.init(name: name, inner: [], attributes: attributes, type: type, isMutable: isMutable, comment: comment)
     }
 
     public override func handle(visitor: SwiftVisitor) throws {
@@ -31,7 +31,7 @@ public class SwiftFunctionParm: SwiftVarDecl {
     }
 
     public override func copy() -> SwiftFunctionParm {
-        let copy = SwiftFunctionParm(label: label, name: name, type: type, isMutable: isMutable, comment: comment?.copy())
+        let copy = SwiftFunctionParm(label: label, name: name, type: type, isMutable: isMutable, attributes: attributes, comment: comment?.copy())
         linkCopy(from: self, to: copy)
         return copy
     }

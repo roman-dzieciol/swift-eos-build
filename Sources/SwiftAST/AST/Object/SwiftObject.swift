@@ -1,5 +1,6 @@
 
 import Foundation
+import Algorithms
 
 public class SwiftObject: SwiftDecl {
 
@@ -35,8 +36,32 @@ public class SwiftObject: SwiftDecl {
             swift.write(token: ":")
             swift.write(superTypes.map { SwiftBuiltinType(name: $0, qual: .none) }, separated: ",")
         }
+
+        var sortedInner = inner
+        let split = sortedInner.stablePartition {
+            $0.name.hasPrefix("__") &&
+            ($0 as? SwiftDecl)?.access == "private"
+        }
+
+        let publicImpl = sortedInner[..<split]
+
         swift.write(nested: "{", "}") {
-            swift.write(inner)
+            for ast in publicImpl {
+                swift.write(ast)
+            }
+        }
+
+        let privateImpl = sortedInner[split...]
+        if !privateImpl.isEmpty {
+            swift.write(text: "\n")
+            swift.write(text: "\n")
+            swift.write(name: "extension")
+            swift.write(name: name)
+            swift.write(nested: "{", "}") {
+                for ast in privateImpl {
+                    swift.write(ast)
+                }
+            }
         }
     }
 }

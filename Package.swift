@@ -33,6 +33,7 @@ let package = Package(
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
         .package(url: "https://github.com/apple/swift-argument-parser", from: "0.4.0"),
+        .package(url: "https://github.com/apple/swift-algorithms", from: "0.0.1"),
         //.package(url: "https://github.com/apple/swift-syntax.git", .branch("release/5.5")),
 
     ],
@@ -65,7 +66,8 @@ let package = Package(
             name: "SwiftAST",
             dependencies: [
                 .target(name: "ClangAST"),
-                .target(name: "SwiftEOSBuildCore")
+                .target(name: "SwiftEOSBuildCore"),
+                .product(name: "Algorithms", package: "swift-algorithms")
             ]
         ),
         .target(
@@ -86,7 +88,8 @@ let package = Package(
             dependencies: [
                 .target(name: "ClangAST"),
                 .target(name: "SwiftAST"),
-                .target(name: "SwiftEOSBuildCore")
+                .target(name: "SwiftEOSBuildCore"),
+                .product(name: "Algorithms", package: "swift-algorithms")
             ]
         ),
         .target(
