@@ -99,3 +99,11 @@ public func withPointerForInOut<Element, LengthType: BinaryInteger, R>(
     count = array.count
     return returnValue
 }
+
+public func withElementPointerPointersReturnedAsArray<LengthType: BinaryInteger, Element>(
+    nested: (UnsafeMutablePointer<Element>?, UnsafeMutablePointer<LengthType>?) throws -> Void) rethrows -> Array<Element>
+{
+    var array = Array<Element>()
+    try withPointerForInOut(array: &array, capacity: array.capacity, nested)
+    return array
+}

@@ -14,6 +14,7 @@ extension SwiftShims {
         SwiftShims.withSdkObjectPointerPointerReturnedAsSwiftObject,
         SwiftShims.withCCharPointerPointersReturnedAsOptionalString,
         SwiftShims.withHandleReturned,
+        SwiftShims.withBytePointerPointersReturnedAsByteArray,
     ]
 
     static let nestedInOutShims: SwiftShims = [
