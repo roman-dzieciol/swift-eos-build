@@ -64,6 +64,8 @@ public class SwiftSDKCall {
                     continue
                 }
 
+                let inoutParms = self.inoutParms.filter { $0 !== rhs.linked(.arrayLength) }
+
                 if rhs.isInOutParm,
                    inoutParms.count == 1,
                    function.returnType.isVoid,
