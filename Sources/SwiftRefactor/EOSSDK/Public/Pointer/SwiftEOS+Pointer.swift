@@ -7,6 +7,24 @@ import EOSSDK
 
 
 
+public func withPointeeReturned<Pointee>(
+    managedBy pointerManager: SwiftEOS__PointerManager,
+    nested: (UnsafeMutablePointer<Pointee>) throws -> Void
+) rethrows -> Pointee {
+
+    let pointer = UnsafeMutablePointer<Pointee>.allocate(capacity: 1)
+    defer {
+        pointerManager.onDeinit {
+            pointer.deallocate()
+        }
+    }
+
+    try nested(pointer)
+
+    return pointer.pointee
+}
+
+
 extension UnsafePointer {
 
     public func array(_ count: Int) -> [Self] {

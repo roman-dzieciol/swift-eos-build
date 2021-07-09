@@ -42,3 +42,18 @@ extension SwiftExpr.function {
     }
 
 }
+
+extension SwiftExpr.function {
+
+    static func withPointeeReturned(
+        managedBy pointerManager: SwiftExpr,
+        pointerName: String,
+        nest: SwiftExpr
+    ) -> SwiftExpr {
+        SwiftFunctionCallExpr.named("withPointeeReturned", args: [
+            pointerManager.arg("managedBy"),
+            .closure([pointerName], nest: nest) ])
+    }
+}
+
+
