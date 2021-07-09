@@ -20,6 +20,7 @@ public enum SwiftASTLinkType {
     case member
     case module
     case releaseFunc
+    case removeNotifyFunc
     case sdk
     case swifty
 }

@@ -87,7 +87,8 @@ extension SwiftExpr.function {
         let onDeinit: SwiftExpr = SwiftFunctionCallExpr(
             expr: removeNotifyFuncExpr,
             args: [
-                .string("notificationId").arg(removeNotifyFunc.parms.last!.name)
+                .string("Handle").arg(nil),
+                .string("notificationId").arg(nil)
             ], useTrailingClosures: false)
         
         return .try(SwiftFunctionCallExpr.named(
@@ -96,7 +97,7 @@ extension SwiftExpr.function {
                 notification.arg("notification"),
                 pointerManager.arg("managedBy"),
                 .closure(["ClientData"], nest: nest, identifier: .string("nested")),
-                .closure(captures: ["weak self"], ["notificationId"], nest: onDeinit, identifier: .string("onDeinit")),
+                .closure(captures: ["Handle"], ["notificationId"], nest: onDeinit, identifier: .string("onDeinit")),
             ],
             useTrailingClosures: false))
     }

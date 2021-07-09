@@ -177,7 +177,7 @@ public class SwiftSDKCall {
 
         if isNotification {
 
-            guard let removeNotifyFunction = findRemoveNotifyFunction(for: function, outer: outer) else {
+            guard let removeNotifyFunction = function.sdk?.linked(.removeNotifyFunc) as? SwiftFunction else {
                 fatalError()
             }
 
@@ -187,13 +187,11 @@ public class SwiftSDKCall {
                                                                specializationTypes: [SwiftDeclRefType(decl: callbackInfoObject, qual: .none)],
                                                                qual: .none)
 
-            let removeExpr = SwiftExplicitMemberExpr(expr: .string("self").optional, identifier: (removeNotifyFunction.swifty as! SwiftFunction).expr, argumentNames: [])
-
             code = .function.withNotification(
                 notification: parm.expr,
                 managedBy: .string("pointerManager"),
-                removeNotifyFunc: removeNotifyFunction.swifty as! SwiftFunction,
-                removeNotifyFuncExpr: removeExpr,
+                removeNotifyFunc: removeNotifyFunction,
+                removeNotifyFuncExpr: removeNotifyFunction.expr,
                 nest: code)
 
             _ = try callbackInfoObject.functionSendNotification(sdkCallbackInfoDecl: sdkCallbackInfoObject)
@@ -251,21 +249,6 @@ public class SwiftSDKCall {
         return true
     }
 
-
-func findRemoveNotifyFunction(for addNotifyFunction: SwiftFunction, outer: SwiftDecl) -> SwiftFunction? {
-    let removeNotifyName = addNotifyFunction.name.replacingOccurrences(of: "_AddNotify", with: "_RemoveNotify")
-    let functions = outer.inner.compactMap { $0 as? SwiftFunction }
-    if let removeNotifyFunction = functions.first(where: { $0.name == removeNotifyName }),
-       let sdkFunction = removeNotifyFunction.linked(.sdk) as? SwiftFunction {
-        return sdkFunction
-    }
-    let removeNotifyNameWithoutVersion = String(removeNotifyName.reversed().drop(while: { $0.isNumber }).reversed()).dropSuffix("V")
-    if let removeNotifyFunction = functions.first(where: { $0.name == removeNotifyNameWithoutVersion }),
-       let sdkFunction = removeNotifyFunction.linked(.sdk) as? SwiftFunction {
-        return sdkFunction
-    }
-    return nil
-}
 
 
 }

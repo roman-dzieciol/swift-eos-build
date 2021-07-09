@@ -7,35 +7,46 @@ public class SwiftReleaseFuncsPass: SwiftRefactorPass {
 
     public override func refactor(module: SwiftModule) throws {
 
-        let releaseFuncs = module.inner
+        let funcs = module.inner
             .compactMap { $0 as? SwiftFunction }
+
+        let releaseFuncs = funcs
             .filter { $0.name.hasSuffix("_Release") }
             .filter { $0.sdk?.name.hasSuffix("EOS_Leaderboards_LeaderboardDefinition_Release") != true }
-
-//        let releaseFuncsByTypeName = [String: SwiftFunction]
-//            .init(releaseFuncs.map { (canonicalNameFor($0), $0) }) { lhs, rhs in
-//                fatalError()
-//            }
-
 
         releaseFuncs.forEach {
             linkStructNameFor($0)
             linkCanonicalNameFor($0)
         }
 
+        let notifyFuncs = funcs.filter { $0.name.contains("Notify") }
+        let notifyFuncsByName = [String: [SwiftFunction]](grouping: notifyFuncs, by: { $0.name })
 
-//        try SwiftReleaseFuncsPassVisitor().visit(ast: module)
+        notifyFuncs
+            .filter { $0.name.contains("AddNotify") }
+            .forEach { addNotifyFunc in
+                
+                let removeNotifyName = addNotifyFunc.name.replacingOccurrences(of: "_AddNotify", with: "_RemoveNotify")
+                if let removeNotifyFunc = notifyFuncsByName[removeNotifyName]?.first {
+                    addNotifyFunc.link(.removeNotifyFunc, ref: removeNotifyFunc)
+                }
+
+                let removeNotifyNameWithoutVersion = String(String(removeNotifyName.reversed().drop(while: { $0.isNumber }).reversed()).dropSuffix("V"))
+                if let removeNotifyFunc = notifyFuncsByName[removeNotifyNameWithoutVersion]?.first {
+                    addNotifyFunc.link(.removeNotifyFunc, ref: removeNotifyFunc)
+                }
+            }
     }
 }
 
-func link(decl: SwiftAST, toReleaseFunc: SwiftFunction) {
+private func link(decl: SwiftAST, toReleaseFunc: SwiftFunction) {
     decl.swifty?.add(comment: "")
     decl.swifty?.add(comment: " - see: release func: \(toReleaseFunc.name)")
 //    decl.swifty?.link(.releaseFunc, ref: toReleaseFunc)
     decl.link(.releaseFunc, ref: toReleaseFunc)
 }
 
-func linkStructNameFor(_ releaseFunction: SwiftFunction) {
+private func linkStructNameFor(_ releaseFunction: SwiftFunction) {
 
     let type = releaseFunction.parms[0].type
 
@@ -50,7 +61,7 @@ func linkStructNameFor(_ releaseFunction: SwiftFunction) {
     }
 }
 
-func linkCanonicalNameFor(_ releaseFunction: SwiftFunction) {
+private func linkCanonicalNameFor(_ releaseFunction: SwiftFunction) {
 
     let type = releaseFunction.parms[0].type.canonical
 
@@ -65,7 +76,7 @@ func linkCanonicalNameFor(_ releaseFunction: SwiftFunction) {
     }
 }
 
-func structNameFor(_ releaseFunction: SwiftFunction) -> String {
+private func structNameFor(_ releaseFunction: SwiftFunction) -> String {
 
     let type = releaseFunction.parms[0].type
 
@@ -85,7 +96,7 @@ func structNameFor(_ releaseFunction: SwiftFunction) -> String {
     }
 }
 
-func canonicalNameFor(_ releaseFunction: SwiftFunction) -> String {
+private func canonicalNameFor(_ releaseFunction: SwiftFunction) -> String {
 
     let type = releaseFunction.parms[0].type
 
@@ -104,23 +115,3 @@ func canonicalNameFor(_ releaseFunction: SwiftFunction) -> String {
         fatalError("\(ptrType)")
     }
 }
-
-private class SwiftReleaseFuncsPassVisitor: SwiftVisitor {
-
-    override func visit(type: SwiftType) throws -> SwiftType {
-
-//        if let declType = type as? SwiftDeclRefType,
-//           declType.decl is SwiftUnion,
-//           let sdkDecl = declType.decl.origAST as? SwiftUnion,
-//           let outerStruct = stack.last(where: { $0 is SwiftObject }),
-//           let outerSdkStruct = outerStruct.origAST as? SwiftObject {
-//            let sdkUnionName = outerSdkStruct.name + "." + sdkDecl.name
-//            os_log("union: %{public}s.%{public}s", stackPath, sdkUnionName)
-//            return SwiftBuiltinType(name: sdkUnionName, qual: type.qual)
-//            //            return SwiftDeclRefType(decl: declType.decl, qual: type.qual)
-//        }
-
-        return try super.visit(type: type)
-    }
-}
-

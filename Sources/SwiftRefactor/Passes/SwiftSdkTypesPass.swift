@@ -21,6 +21,11 @@ public class SwiftSdkTypesPass: SwiftRefactorPass {
         module.replaceWithSdkRefs { decl in
             (decl as? SwiftFunction)?.name.hasSuffix("_Release") == true
         }
+        
+        // *RemoveNotify* funcs are present in SDK AST only
+        module.replaceWithSdkRefs { decl in
+            (decl as? SwiftFunction)?.name.contains("RemoveNotify") == true
+        }
 
 //        // Vec3f is present in SDK AST only
 //        module.replaceWithSdkRefs { decl in
