@@ -64,7 +64,22 @@ public class SwiftPrinter {
             }
         }
 
-        try uniqueOutputs.forEach { (url, ast) in
+        let finalOutputs: [(URL, [SwiftAST])] = uniqueOutputs.map { (url, asts) in
+
+            let lastComponent = url.lastPathComponent
+
+            if lastComponent.hasSuffix("Options.swift") {
+                let url = url.deletingLastPathComponent().appendingPathComponent("Options").appendingPathComponent(lastComponent)
+                return (url, asts)
+            } else if lastComponent.hasSuffix("CallbackInfo.swift") {
+                let url = url.deletingLastPathComponent().appendingPathComponent("CallbackInfo").appendingPathComponent(lastComponent)
+                return (url, asts)
+            }
+
+            return (url, asts)
+        }
+
+        try finalOutputs.forEach { (url, ast) in
             try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true, attributes: [:])
             try writingToDisk(url: url) { swiftOutput in
                 swiftOutput.write(name: "import")
