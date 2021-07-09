@@ -127,7 +127,7 @@ public class SwiftSDKCall {
         let parmCanonical = parm.type.canonical
         guard let sdkCallbackFunctionType = parmCanonical as? SwiftFunctionType else { return false }
 
-        if function.name == "SwiftEOS_Logging_SetCallback" {
+        if function.sdk?.name.hasSuffix("EOS_Logging_SetCallback") == true {
             return false
         }
 

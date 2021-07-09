@@ -10,7 +10,7 @@ public class SwiftReleaseFuncsPass: SwiftRefactorPass {
         let releaseFuncs = module.inner
             .compactMap { $0 as? SwiftFunction }
             .filter { $0.name.hasSuffix("_Release") }
-            .filter { $0.name != "EOS_Leaderboards_LeaderboardDefinition_Release" }
+            .filter { $0.sdk?.name.hasSuffix("EOS_Leaderboards_LeaderboardDefinition_Release") != true }
 
 //        let releaseFuncsByTypeName = [String: SwiftFunction]
 //            .init(releaseFuncs.map { (canonicalNameFor($0), $0) }) { lhs, rhs in
@@ -19,10 +19,6 @@ public class SwiftReleaseFuncsPass: SwiftRefactorPass {
 
 
         releaseFuncs.forEach {
-
-            if $0.name == "EOS_Platform_Release" {
-                
-            }
             linkStructNameFor($0)
             linkCanonicalNameFor($0)
         }

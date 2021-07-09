@@ -17,7 +17,7 @@ public class SwiftPrinter {
     }
 
     func writingToDisk(url: URL, action: (SwiftOutputStream) throws -> Void) throws {
-        try! FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true, attributes: [:])
+        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true, attributes: [:])
         FileManager.default.createFile(atPath: url.path, contents: nil, attributes: [:])
         let fileHandle = try FileHandle(forWritingTo: url)
         let outputStream = SwiftWriterStream(outputStream: FileHandlerOutputStream(fileHandle))
@@ -26,12 +26,46 @@ public class SwiftPrinter {
 
     public func write(module: SwiftModule) throws {
 
-//        try? FileManager.default.removeItem(at: outputDir)
-        try! FileManager.default.createDirectory(at: outputDir, withIntermediateDirectories: true, attributes: [:])
+        try FileManager.default.createDirectory(at: outputDir, withIntermediateDirectories: true, attributes: [:])
 
         let outputs = [URL: [SwiftAST]](grouping: module.inner, by: { url(for: $0) })
 
-        try outputs.forEach { (url, ast) in
+        let byName = [String: [(URL, [SwiftAST])]](grouping: outputs.map { ($0.key, $0.value) }, by: { $0.0.lastPathComponent })
+
+        var uniqueOutputs: [URL: [SwiftAST]] = [:]
+        for (_, urlPairs) in byName {
+            if let (url, asts) = urlPairs.first, urlPairs.count == 1 {
+                uniqueOutputs[url] = asts
+            } else {
+                var uniqueNames: [String] = urlPairs.map { $0.0.lastPathComponent }
+                var urls: [URL] = urlPairs.map { $0.0.deletingLastPathComponent() }
+
+
+                while( Set(uniqueNames).count != urlPairs.count ) {
+                    uniqueNames = zip(urls, uniqueNames).map { $0.0.lastPathComponent + $0.1 }
+                    urls = urls.map { $0.deletingLastPathComponent() }
+                    urls.forEach {
+                        guard !$0.lastPathComponent.isEmpty else { fatalError() }
+                    }
+                }
+
+                let pairs: [(URL, [SwiftAST])] = zip(urlPairs, uniqueNames).map { pair, uniqueName in
+                    (pair.0.deletingLastPathComponent().appendingPathComponent(uniqueName), pair.1)
+                }
+
+
+                for (url, asts) in pairs {
+                    if let outputPairs = uniqueOutputs[url] {
+                        uniqueOutputs[url] = outputPairs + asts
+                    } else {
+                        uniqueOutputs[url] = asts
+                    }
+                }
+            }
+        }
+
+        try uniqueOutputs.forEach { (url, ast) in
+            try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true, attributes: [:])
             try writingToDisk(url: url) { swiftOutput in
                 swiftOutput.write(name: "import")
                 swiftOutput.write(name: "Foundation")
@@ -46,38 +80,21 @@ public class SwiftPrinter {
 
     private func url(for swiftAST: SwiftAST) -> URL {
 
-        let suffix: String = {
-            if swiftAST is SwiftEnum {
-                return "+Enums"
-            } else if swiftAST is SwiftFunction {
-                return ""
-            } else if swiftAST.name.hasSuffix("_Actor") {
-                return ""
-            } else {
-                return "+Types"
-            }
-        }()
+        var components = swiftAST.name.split(separator: "_", maxSplits: Int.max, omittingEmptySubsequences: true)
 
-        if swiftAST is SwiftEnum {
-            return outputDir
-                .appendingPathComponent("EOS" + suffix)
-                .appendingPathExtension("swift")
+        if components.first == "SwiftEOS" {
+            components.removeFirst()
         }
 
-        var tokens = swiftAST.name.split(separator: "_", maxSplits: Int.max, omittingEmptySubsequences: true)
+        var outputUrl = outputDir
 
-        if swiftAST is SwiftObject {
-            tokens = Array(tokens.prefix(2))
-            return outputDir
-                .appendingPathComponent(String(tokens.last!) + suffix)
-                .appendingPathExtension("swift")
-        } else {
-            tokens = tokens.dropLast()
-            tokens = Array(tokens.prefix(2))
-            return outputDir
-                .appendingPathComponent(String(tokens.last!) + suffix)
-                .appendingPathExtension("swift")
+        for component in components {
+            outputUrl.appendPathComponent(String(component))
         }
+
+        outputUrl.appendPathExtension("swift")
+
+        return outputUrl
     }
 }
 

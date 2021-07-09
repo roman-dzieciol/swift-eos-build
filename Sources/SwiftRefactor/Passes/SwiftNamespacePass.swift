@@ -7,22 +7,27 @@ public class SwiftNamespacePass: SwiftRefactorPass {
     public override init() {}
 
     public override func refactor(module: SwiftModule) throws {
-        try SwiftModuleNamespacePassVisitor().visit(ast: module)
+
+//        let objects = SwiftGatheringVisitor(astFilter: { $0 is SwiftObject}, typeFilter: nil).visit(ast: module)
+
+        let visitor = SwiftModuleNamespacePassVisitor()
+        try visitor.visit(ast: module)
     }
 }
 
-class SwiftModuleNamespacePassVisitor: SwiftVisitor {
+private class SwiftModuleNamespacePassVisitor: SwiftVisitor {
+
+    var objectsByName: [String: SwiftObject] = [:]
+    var functionsByName: [String: SwiftFunction] = [:]
+    var aliasesByName: [String: SwiftTypealias] = [:]
 
     private func adjust(name: inout String)  {
 
-        // Use SwiftEOS_ prefix
-        if name.hasPrefix("EOS_") {
-            name = "Swift" + name
-        }
+
     }
 
     public override func visit(ast: SwiftAST) throws {
-        adjust(name: &ast.name)
+//        adjust(name: &ast.name)
         try super.visit(ast: ast)
     }
 }

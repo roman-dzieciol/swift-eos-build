@@ -27,7 +27,7 @@ public class SwiftRefactor {
         passes = [
             SwiftDocsPass(),
             SwiftRemoveTagsPass(),
-            SwiftNamespacePass(),
+            SwiftEpicPass(),
             SwiftSdkTypesPass(),
             SwiftOptionalsPass(),
             SwiftArraysPass(),
@@ -39,6 +39,7 @@ public class SwiftRefactor {
             SwiftInitPass(),
             SwiftApiVersionPass(),
             SwiftCleanupPass(),
+            SwiftNamespacePass(),
         ]
 
 

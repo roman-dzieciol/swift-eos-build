@@ -32,15 +32,15 @@ class SwiftyArrayLinker {
     }
 
     func overridenName(for name: String) -> String? {
-        if name == "ByteArray", decl.name.hasSuffix("EOS_ByteArray_ToString") {
+        if name == "ByteArray", decl.sdk!.name.hasSuffix("EOS_ByteArray_ToString") {
                 return "Length"
         }
 
-        if name == "OutData", decl.name.hasSuffix("EOS_P2P_ReceivePacket") {
+        if name == "OutData", decl.sdk!.name.hasSuffix("EOS_P2P_ReceivePacket") {
                 return "OutBytesWritten"
         }
 
-        if name == "TargetUserIpAddresses", decl.name.hasSuffix("EOS_RTCAdmin_QueryJoinRoomTokenOptions") {
+        if name == "TargetUserIpAddresses", decl.sdk!.name.hasSuffix("EOS_RTCAdmin_QueryJoinRoomTokenOptions") {
             return "TargetUserIdsCount"
         }
 
