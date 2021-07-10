@@ -10,8 +10,22 @@ public class SwiftCommentBlock: SwiftComment {
     }
 
     public override func write(to swift: SwiftOutputStream) {
-        swift.write(token: "@")
-        swift.write(name: name)
+        swift.write(token: "- ")
+        swift.write(name: adjusted(name: name))
+        swift.write(token: ":")
         swift.write(inner)
+    }
+
+    private func adjusted(name: String) -> String {
+        switch name.lowercased() {
+        case "note":
+            return "Note"
+        case "see":
+            return "SeeAlso"
+        case "return":
+            return "Returns"
+        default:
+            return name
+        }
     }
 }
