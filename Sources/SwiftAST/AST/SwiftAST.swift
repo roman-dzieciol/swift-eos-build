@@ -162,6 +162,12 @@ public class SwiftAST: SwiftOutputStreamable, CustomStringConvertible, CustomDeb
         ast.link(.outer, ref: self)
     }
 
+    public func append(contentsOf array: [SwiftAST]) {
+        for item in array {
+            append(item)
+        }
+    }
+
     public func removeAll(_ array: [SwiftAST]) {
         removeAll(Set(array.map { ObjectIdentifier($0) }) )
         let comments = array.compactMap { $0.linked(.comment) }

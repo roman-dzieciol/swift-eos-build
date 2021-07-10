@@ -19,6 +19,9 @@ public class SwiftSDKCall {
 
     let outer: SwiftDecl
 
+    var returnComment: SwiftCommentBlock?
+    var throwsComment: SwiftCommentBlock?
+
     public init(function: SwiftFunction, sdkFunction: SwiftFunction, outer: SwiftDecl) throws {
 
         self.outer = outer
@@ -29,18 +32,27 @@ public class SwiftSDKCall {
 
         code = sdkCallBuilder
 
-        // If function returns EOS_EResult error code, throw it instead
-        if function.returnType.canonical.asDeclRef?.decl.name == "EOS_EResult" {
-            function.returnType = SwiftBuiltinType.void
-            function.isThrowing = true
-            code = .try(.function.throwingSdkResult(sdkCall: code))
-        }
-
         functionTypeParms = function.parms
             .filter { $0.type.canonical is SwiftFunctionType }
 
         inoutParms = function.parms
             .filter { $0.isInOutParm }
+
+        returnComment = function.comment?.blockComments.first(where: { $0.name.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() == "return" })
+
+        // If function returns EOS_EResult error code, throw it instead
+        if function.returnType.canonical.asDeclRef?.decl.name == "EOS_EResult" {
+            function.returnType = SwiftBuiltinType.void
+            function.isThrowing = true
+            code = .try(.function.throwingSdkResult(sdkCall: code))
+            throwsComment = returnComment
+            throwsComment?.name = "Throws"
+            throwsComment?.fixEosResultComment()
+            returnComment = nil
+        } else {
+            // TODO: fix invalid comments that should be on callbacks instead
+        }
+        
     }
 
     func functionCode() throws -> SwiftExpr {
@@ -94,6 +106,19 @@ public class SwiftSDKCall {
                     self.code = shimmed
                     self.sdkArgs += [lhs.arg(rhs.expr)]
                     function.returnType = rhs.type
+
+                    if returnComment == nil {
+
+                        let returnComment = SwiftCommentBlock(name: "Returns", comments: [])
+                        if let paramComments = function.comment?.paramComments.first(where: { $0.name == rhs.name })?.inner {
+                            returnComment.append(contentsOf: paramComments)
+                        } else {
+                            returnComment.add(comment: " ")
+                        }
+                        self.returnComment = returnComment
+                        function.comment?.append(returnComment)
+                    }
+
                     function.removeAll([parm])
                     continue
                 }

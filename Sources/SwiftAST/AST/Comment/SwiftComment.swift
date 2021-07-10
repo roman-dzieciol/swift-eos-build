@@ -5,13 +5,18 @@ public class SwiftComment: SwiftAST {
 
     public var comments: [SwiftComment] { inner.compactMap { $0 as? SwiftComment } }
     public var paramComments: [SwiftCommentParam] { inner.compactMap { $0 as? SwiftCommentParam } }
+    public var blockComments: [SwiftCommentBlock] { inner.compactMap { $0 as? SwiftCommentBlock } }
+    public var paragraphComments: [SwiftCommentParagraph] { inner.compactMap { $0 as? SwiftCommentParagraph } }
+    public var textComments: [SwiftCommentText] { inner.compactMap { $0 as? SwiftCommentText } }
+
+    public var isTopLevel: Bool { type(of: self) == SwiftComment.self }
 
     public init(name: String = "", comments: [SwiftComment]) {
         super.init(name: name, inner: comments)
     }
 
     public init(_ topComment: String, comments: [SwiftComment] = []) {
-        super.init(name: "", inner: [SwiftCommentParagraph(comments: [topComment])] + comments)
+        super.init(name: "", inner: [SwiftCommentParagraph(text: [topComment])] + comments)
     }
 
     public override func copy() -> SwiftComment {
@@ -29,7 +34,7 @@ public class SwiftComment: SwiftAST {
     }
 
     public override func add(comment: String) {
-        inner.append(SwiftCommentParagraph(comments: [comment]))
+        inner.append(SwiftCommentParagraph(text: [comment]))
     }
 }
 
@@ -37,6 +42,14 @@ extension SwiftComment {
 
     func paramComment(named: String) -> SwiftCommentParam? {
         paramComments.first(where: { $0.name == named })
+    }
+
+    public static func paragraph(text: [String]) -> SwiftCommentParagraph {
+        SwiftCommentParagraph(text: text)
+    }
+
+    public static func paragraph(comments: [SwiftCommentText]) -> SwiftCommentParagraph {
+        SwiftCommentParagraph(comments: comments)
     }
 
 }

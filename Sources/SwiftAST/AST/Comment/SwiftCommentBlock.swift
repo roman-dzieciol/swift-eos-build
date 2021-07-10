@@ -29,3 +29,21 @@ public class SwiftCommentBlock: SwiftComment {
         }
     }
 }
+
+extension SwiftCommentBlock {
+    public func fixEosResultComment() {
+
+        if let paragraph = paragraphComments.first, let text = paragraph.textComments.first {
+            if let successRange = text.name.range(of: "EOS_Success") {
+                if let subsequentRange = text.name[successRange.upperBound...].range(of: "EOS_") {
+                    text.name = String(text.name[subsequentRange.lowerBound...])
+                } else {
+                    paragraph.removeAll([text])
+                    if paragraph.comments.isEmpty || paragraph.textComments.allSatisfy({ $0.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }) {
+                        removeAll([paragraph])
+                    }
+                }
+            }
+        }
+    }
+}

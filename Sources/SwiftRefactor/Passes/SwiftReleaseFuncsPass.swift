@@ -40,9 +40,7 @@ public class SwiftReleaseFuncsPass: SwiftRefactorPass {
 }
 
 private func link(decl: SwiftAST, toReleaseFunc: SwiftFunction) {
-    decl.swifty?.add(comment: "")
-    decl.swifty?.add(comment: " - see: release func: \(toReleaseFunc.name)")
-//    decl.swifty?.link(.releaseFunc, ref: toReleaseFunc)
+    decl.swifty?.comment?.append(SwiftCommentBlock(name: "Note", comments: [SwiftCommentParagraph(text: ["Release func: ``\(toReleaseFunc.name)``"])]))
     decl.link(.releaseFunc, ref: toReleaseFunc)
 }
 

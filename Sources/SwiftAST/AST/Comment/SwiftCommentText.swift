@@ -4,7 +4,6 @@ import Foundation
 public class SwiftCommentText: SwiftComment {
 
     public init(comment: String) {
-        let comment = comment.hasPrefix(" ") ? comment : " " + comment
         super.init(name: comment, comments: [])
     }
 
@@ -15,6 +14,6 @@ public class SwiftCommentText: SwiftComment {
     }
 
     public override func write(to swift: SwiftOutputStream) {
-        swift.write(text: name)
+        swift.write(name: name)
     }
 }

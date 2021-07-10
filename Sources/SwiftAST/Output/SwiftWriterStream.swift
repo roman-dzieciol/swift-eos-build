@@ -16,6 +16,8 @@ open class SwiftWriterStream<OutputStream>: SwiftOutputStream where OutputStream
 
     let reservedNames: Set<String> = ["Type"]
 
+    var indentIfNeeded: String { outputWasNewLine() ? indent : "" }
+
     public init(outputStream: OutputStream) {
         self.outputStream = outputStream
     }
@@ -169,26 +171,6 @@ extension SwiftWriterStream {
 
     private func format(_ inner: SwiftOutputStreamable, _ action: () -> Void) {
 
-        if let comment = inner as? SwiftComment {
-
-            if type(of: comment) == SwiftComment.self {
-                write(textIfNeeded: "\n")
-                write(text: "\n")
-                write(token: "/**")
-                if !comment.isOneLine {
-                    write(textIfNeeded: "\n")
-                }
-            }
-
-            if outputWasNewLine() {
-                if type(of: comment) == SwiftCommentText.self {
-                    write(token: " *")
-                } else if type(of: comment) == SwiftCommentBlock.self || type(of: comment) == SwiftCommentParam.self {
-                    write(token: " * ")
-                }
-            }
-        }
-
         if let formatting = textPrefix(inner, stack: stack) {
             write(textIfNeeded: formatting)
         }
@@ -197,17 +179,6 @@ extension SwiftWriterStream {
 
         if let formatting = textPostfix(inner, stack: stack) {
             write(textIfNeeded: formatting)
-        }
-
-        if let comment = inner as? SwiftComment {
-            if type(of: comment) == SwiftComment.self {
-                write(token: " */")
-                write(textIfNeeded: "\n")
-            } else if comment is SwiftCommentText,
-                      let topComment = stack.last(where: { type(of: $0) == SwiftComment.self }) as? SwiftComment,
-                      !topComment.isOneLine {
-                write(text: "\n")
-            }
         }
     }
 
@@ -278,17 +249,43 @@ extension SwiftWriterStream {
     }
 
     func textPrefix(_ streamable: SwiftOutputStreamable, stack: [SwiftOutputStreamable]) -> String? {
-        nil
+        switch (streamable, stack.last) {
+        case (is SwiftCommentText, _): return nil
+        case (is SwiftCommentParam, _): return nil
+        case (is SwiftCommentBlock, _): return nil
+        case (let c as SwiftComment, _) where c.isTopLevel:
+            return ("\n" + indent + "/**") + (isMultiline(c) ? "\n" : " ")
+        case (is SwiftDecl, _): return "\n"
+        default: return nil
+        }
     }
 
     func textPostfix(_ streamable: SwiftOutputStreamable, stack: [SwiftOutputStreamable]) -> String? {
         switch (streamable, stack.last) {
+        case (is SwiftCommentText, _): return nil
+        case (is SwiftCommentParam, _): return nil
+        case (is SwiftCommentBlock, _): return nil
+        case (let c as SwiftCommentParagraph, _):
+            guard let outerComment = stack.last as? SwiftComment else { fatalError() }
+            if outerComment.isTopLevel {
+                if !isMultiline(outerComment) {
+                    return nil
+                } else if outerComment.inner.last !== c {
+                    return "\n\n"
+                }
+            }
+            return "\n"
+        case (let c as SwiftComment, _) where c.isTopLevel: return (isMultiline(c) ? indentIfNeeded : " ") + "*/" + "\n"
         case (is SwiftObject, _): return "\n"
         case (is SwiftFunction, _): return "\n"
         case (is SwiftMember, _): return "\n"
         case (is SwiftClosureSignatureExpr, _): return "\n"
         default: return nil
         }
+    }
+
+    private func isMultiline(_ comment: SwiftComment) -> Bool {
+        !comment.isOneLine
     }
 }
 

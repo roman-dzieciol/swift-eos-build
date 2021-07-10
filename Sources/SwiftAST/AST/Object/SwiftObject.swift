@@ -90,8 +90,9 @@ extension SwiftObject: SwiftDeclContext {
                    let arrayBuffer = member.linked(.arrayBuffer) {
                     let sdkName = sdk.map { "EOS" + "/" + $0.name + "/" } ?? ""
                     if arrayBuffer.comment?.inner.isEmpty == false {
-                        arrayBuffer.comment?.add(comment: " ")
-                        arrayBuffer.comment?.add(comment: "- Note: ``\(sdkName)\(member.name)``:")
+                        arrayBuffer.comment?.append(SwiftCommentBlock(
+                            name: "Note",
+                            comments: [.paragraph(text: ["``\(sdkName)\(member.name)``:"])]))
                     }
                     arrayBuffer.comment?.inner.append(contentsOf: memberComments)
                 }

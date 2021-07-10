@@ -111,7 +111,7 @@ public class SwiftFunction: SwiftDecl {
         let parmsComments = parms.map { param -> SwiftCommentParam in
             let paramComment = SwiftCommentParam(
                 name: param.name,
-                comments: (param.comment?.comments ?? [SwiftCommentParagraph(comments: [" "])])
+                comments: (param.comment?.comments ?? [SwiftCommentParagraph(text: ["TODO"])])
             )
             paramComment.link(param: param)
             return paramComment

@@ -69,7 +69,7 @@ public class SwiftFromClang {
             return SwiftCommentText(comment: clangAST.text)
 
         case let clangAST as ParagraphComment:
-            let comments = try clangAST.inner.compactMap { try swiftCommentElement(from: $0, stack: stack) }
+            let comments = try clangAST.inner.compactMap { try swiftCommentElement(from: $0, stack: stack) as? SwiftCommentText }
             return SwiftCommentParagraph(comments: comments)
 
         case let clangAST as BlockCommandComment:

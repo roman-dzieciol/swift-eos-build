@@ -29,7 +29,6 @@ extension SwiftObject {
         link(.functionBuildSdkObject, ref: function)
 
         function.add(comment: "Returns SDK Object initialized with values from this object")
-        function.add(comment: "")
         function.add(comment: "Pointers in the SDK object are managed by provided SwiftEOS__PointerManager object")
 
         inner.append(function)
