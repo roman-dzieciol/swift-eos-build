@@ -65,26 +65,27 @@ class SwiftDocPassVisitor: SwiftVisitor {
                 output += text[readCursor..<identifierRange.lowerBound]
 
                 readCursor = identifierRange.lowerBound
-                var isIdentifier = false
+                var addIdentifier = false
 
                 while(readCursor != text.endIndex) {
 
                     let char = text[readCursor]
                     if char == "_" {
-                        isIdentifier = true
-                    }
-                    else if !(char.isLetter || char.isNumber) {
+                        addIdentifier = true
+                    } else if !(char.isLetter || char.isNumber) {
                         break
                     }
-
                     readCursor = text.index(after: readCursor)
                 }
+                if readCursor != text.endIndex && text[readCursor] == "`" {
+                    addIdentifier = false
+                }
 
-                if isIdentifier {
+                if addIdentifier {
                     output += "`"
                 }
                 output += text[identifierRange.lowerBound..<readCursor]
-                if isIdentifier {
+                if addIdentifier {
                     output += "`"
                 }
             } else {
