@@ -7,9 +7,11 @@ public class SwiftArraysPass: SwiftRefactorPass {
     public override func refactor(module: SwiftModule) throws {
 
         // Link array buffer with array count variables
-        try module.inner.forEach {
-            try SwiftyArrayLinker(in: $0).link()
-        }
+        try module.inner
+            .compactMap { $0 as? SwiftDecl }
+            .forEach {
+                try SwiftyArrayLinker(in: $0).link()
+            }
 
         // Use Swift types for arrays
         try SwiftArraysPassVisitor().visit(ast: module)

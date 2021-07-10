@@ -4,6 +4,7 @@ import Foundation
 public class SwiftComment: SwiftAST {
 
     public var comments: [SwiftComment] { inner.compactMap { $0 as? SwiftComment } }
+    public var paramComments: [SwiftCommentParam] { inner.compactMap { $0 as? SwiftCommentParam } }
 
     public init(name: String = "", comments: [SwiftComment]) {
         super.init(name: name, inner: comments)
@@ -32,3 +33,10 @@ public class SwiftComment: SwiftAST {
     }
 }
 
+extension SwiftComment {
+
+    func paramComment(named: String) -> SwiftCommentParam? {
+        paramComments.first(where: { $0.name == named })
+    }
+
+}

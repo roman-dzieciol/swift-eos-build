@@ -26,6 +26,7 @@ public class SwiftRefactor {
 
         passes = [
             SwiftDocsPass(),
+            SwiftCommentLinkerPass(),
             SwiftRemoveTagsPass(),
             SwiftEpicPass(),
             SwiftSdkTypesPass(),

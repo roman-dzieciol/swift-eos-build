@@ -16,3 +16,11 @@ public class SwiftCommentParam: SwiftComment {
         swift.write(inner)
     }
 }
+
+extension SwiftCommentParam {
+    
+    public func link(param: SwiftFunctionParm) {
+        link(.commented, ref: param)
+        param.link(.comment, ref: self)
+    }
+}

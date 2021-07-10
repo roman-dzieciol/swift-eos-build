@@ -141,10 +141,10 @@ public class SwiftSDKCall {
             self.code = shimmed
         }
 
-        function.inner
-            .filter { $0.name == "ClientData" }
-            .forEach { $0.removeCode() }
-        function.inner.removeAll { $0.name == "ClientData" }
+        if let clientDataParam = function.parms.first(where: { $0.name == "ClientData" }) {
+            clientDataParam.removeCode()
+            function.removeAll([clientDataParam])
+        }
 
         code = .function.withPointerManager(code)
 

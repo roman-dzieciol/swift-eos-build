@@ -108,10 +108,15 @@ public class SwiftFunction: SwiftDecl {
         inner.replaceElement(at: parmIndex, with: parms)
 
         // Replace parm comment with specified parm comments
-        let parmsComments = parms.map { SwiftCommentParam(
-            name: $0.name,
-            comments: ($0.comment?.comments ?? [SwiftCommentParagraph(comments: [" "])])
-        ) }
+        let parmsComments = parms.map { param -> SwiftCommentParam in
+            let paramComment = SwiftCommentParam(
+                name: param.name,
+                comments: (param.comment?.comments ?? [SwiftCommentParagraph(comments: [" "])])
+            )
+            paramComment.link(param: param)
+            return paramComment
+        }
+
         if let commentIndex = comment?.inner.firstIndex(where: { ($0 as? SwiftCommentParam)?.name == parm.name }) {
             comment?.inner.replaceElement(at: commentIndex, with: parmsComments)
         } else {

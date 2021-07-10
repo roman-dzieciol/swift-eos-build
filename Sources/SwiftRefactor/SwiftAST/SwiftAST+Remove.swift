@@ -8,6 +8,10 @@ extension SwiftAST {
 
     public func removeAll(_ array: [SwiftAST]) {
         removeAll(Set(array.map { ObjectIdentifier($0) }) )
+        let comments = array.compactMap { $0.linked(.comment) }
+        if let decl = self as? SwiftDecl {
+            decl.comment?.removeAll(comments)
+        }
     }
 
     public func removeAll(_ objects: Set<ObjectIdentifier>) {

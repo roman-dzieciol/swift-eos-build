@@ -13,10 +13,10 @@ class SwiftyArrayLinker {
     let countSuffixesToAdd = ["Count", "Length", "LengthBytes", "SizeBytes"]
     let additionalSuffixesToAdd = ["", "_DEPRECATED"]
 
-    let decl: SwiftAST
+    let decl: SwiftDecl
     let decls: [SwiftAST]
 
-    init(in decl: SwiftAST) throws {
+    init(in decl: SwiftDecl) throws {
 
         self.decl = decl
 
@@ -63,7 +63,7 @@ class SwiftyArrayLinker {
         }
     }
 
-    func link(maybeArrayBufferDecls: inout [SwiftVarDecl], in decl: SwiftAST, invocationDecl: SwiftVarDecl? = nil) {
+    func link(maybeArrayBufferDecls: inout [SwiftVarDecl], in decl: SwiftDecl, invocationDecl: SwiftVarDecl? = nil) {
 
         let maybeArrayCountDecls = decl
             .inner
@@ -76,7 +76,7 @@ class SwiftyArrayLinker {
         let arrayDecls = maybeArrayBufferDecls
         arrayDecls.forEach { maybeArrayBuffer in
             if let arrayCount = findArrayCount(for: maybeArrayBuffer, in: maybeArrayCountsByName) {
-                link(array: maybeArrayBuffer, num: arrayCount)
+                link(array: maybeArrayBuffer, num: arrayCount, in: decl)
                 if let invocationDecl = invocationDecl {
                     arrayCount.link(.invocation, ref: invocationDecl)
                     arrayCount.sdk!.link(.invocation, ref: invocationDecl.sdk!)
@@ -94,7 +94,7 @@ class SwiftyArrayLinker {
             .compactMap({ $0 as? SwiftVarDecl })
             .first(where: { $0.name == "Options" })?
             .canonical as? SwiftFunctionParm,
-           let optionsDecl = optionsParm.type.canonical.asPointer?.pointeeType.asDeclRef?.decl.canonical {
+           let optionsDecl = optionsParm.type.canonical.asPointer?.pointeeType.asDeclRef?.decl.canonical as? SwiftDecl {
             link(maybeArrayBufferDecls: &maybeArrayBufferDecls, in: optionsDecl, invocationDecl: optionsParm)
         }
     }
@@ -190,15 +190,19 @@ class SwiftyArrayLinker {
     }
 
 
-    func link(array: SwiftVarDecl, num: SwiftVarDecl) {
+    func link(array: SwiftVarDecl, num: SwiftVarDecl, in decl: SwiftDecl) {
         array.link(.arrayLength, ref: num)
         num.link(.arrayBuffer, ref: array)
 
         array.sdk!.link(.arrayLength, ref: num.sdk!)
         num.sdk!.link(.arrayBuffer, ref: array.sdk!)
 
-        array.add(comment: "- array num: \(num.name)")
-        num.add(comment: "- array buffer: \(array.name)")
+//        if decl is SwiftFunction {
+//            decl.comment?.add(comment: "- Note: Array: ``\(array.name)``, ``\(num.name)``")
+//        } else {
+//            array.comment?.add(comment: "Array: ``\(array.name)``, ``\(num.name)``")
+//            num.comment?.add(comment: "Array: ``\(array.name)``, ``\(num.name)``")
+//        }
         os_log("array: %{public}s.%{public}s[%{public}s]", decl.name, array.name, num.name)
     }
 

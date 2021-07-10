@@ -8,6 +8,8 @@ public enum SwiftASTLinkType {
     case code
     case copiedFrom
     case copiedTo
+    case comment
+    case commented
     case expr
     case functionDeinit
     case functionInitFromSdkObject
