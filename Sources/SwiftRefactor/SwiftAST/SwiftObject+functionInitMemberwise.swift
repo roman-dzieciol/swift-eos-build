@@ -37,10 +37,14 @@ extension SwiftObject {
                 comment: member.comment)
 
             functionParm.link(.member, ref: member)
+            member.link(.initializer, ref: functionParm)
 
-            function.inner.append(functionParm)
+            function.append(functionParm)
 
-            statements.append(.self_(.string(member.name)).assign(.string(functionParm.name)))
+            let stmt = SwiftExprBuilder(expr: .self_(.string(member.name)).assign(.string(functionParm.name)))
+            stmt.link(ast: member)
+            stmt.link(ast: functionParm)
+            statements.append(stmt)
         }
 
         function.code = SwiftCodeBlock(statements: statements)

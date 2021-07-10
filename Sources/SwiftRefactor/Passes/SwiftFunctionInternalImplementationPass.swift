@@ -33,12 +33,14 @@ private class SwiftFunctionInternalImplementationPassVisitor: SwiftVisitor {
                 var args: [SwiftFunctionCallArgExpr] = []
 
                 for parm in function.parms {
-                    if parm.name.hasSuffix("Options"),
-                       let optionsObject = parm.type.canonical.asDeclRef?.decl.canonical as? SwiftObject,
+                    if let optionsObject = parm.type.canonical.asDeclRef?.decl.canonical as? SwiftObject,
+                       optionsObject.inSwiftEOS,
+                       !parm.isInOutParm,
                        let initFunc = optionsObject.linked(.functionInitMemberwise) as? SwiftFunction {
 
                         let optionsArgs = initFunc.parms
                             .filter { $0.defaultValue == nil }
+                            .filter { $0.linked(.arrayBuffer) == nil }
                             .map { $0.copy() }
 
                         function.replace(parm: parm, with: optionsArgs)

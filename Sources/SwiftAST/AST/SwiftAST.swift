@@ -18,9 +18,11 @@ public enum SwiftASTLinkType {
     case functionSendCompletionResult
     case functionSendCompletion
     case functionSendNotification
+    case initializer
     case invocation
     case member
     case module
+    case outer
     case releaseFunc
     case removeNotifyFunc
     case sdk
@@ -44,6 +46,9 @@ public class SwiftAST: SwiftOutputStreamable, CustomStringConvertible, CustomDeb
 
     public func link(_ linkType: SwiftASTLinkType, ref: SwiftAST) {
         SwiftASTLinker.shared.link(for: self, linkType, ref: ref)
+    }
+    public func unlink(_ linkType: SwiftASTLinkType, ref: SwiftAST) {
+        SwiftASTLinker.shared.unlink(for: self, linkType, ref: ref)
     }
 
     func linkCopy(from: SwiftAST, to: SwiftAST) {
@@ -150,5 +155,34 @@ public class SwiftAST: SwiftOutputStreamable, CustomStringConvertible, CustomDeb
                 innerFunction.name == function.name &&
                 innerFunction.parms.map { $0.name } == function.parms.map { $0.name }
             })
+    }
+
+    public func append(_ ast: SwiftAST) {
+        inner.append(ast)
+        ast.link(.outer, ref: self)
+    }
+
+    public func removeAll(_ array: [SwiftAST]) {
+        removeAll(Set(array.map { ObjectIdentifier($0) }) )
+        let comments = array.compactMap { $0.linked(.comment) }
+        if let decl = self as? SwiftDecl {
+            decl.comment?.removeAll(comments)
+        }
+    }
+
+    public func removeAll(_ objects: Set<ObjectIdentifier>) {
+        inner.removeAll { decl in
+            if objects.contains(ObjectIdentifier(decl)) {
+                decl.unlink(.outer, ref: self)
+                os_log("removing %{public}s.%{public}s", name, decl.name)
+                return true
+            }
+            return false
+        }
+    }
+
+    public func removeFromOuter() {
+        guard let outer = linked(.outer) else { fatalError() }
+        outer.removeAll([self])
     }
 }

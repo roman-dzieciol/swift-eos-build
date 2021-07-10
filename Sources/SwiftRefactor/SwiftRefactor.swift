@@ -37,6 +37,7 @@ public class SwiftRefactor {
             SwiftFunctionsPass(),
 //            //            SwiftUnionsPass(),
             SwiftActorsPass(),
+            SwiftArrayCleanupPass(),
             SwiftInitPass(),
             SwiftApiVersionPass(),
             SwiftFunctionInternalImplementationPass(),

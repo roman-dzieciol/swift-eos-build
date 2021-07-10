@@ -45,14 +45,20 @@ extension SwiftObject {
             let rhs = member
 
             do {
-                if let shimmed = try rhs.expr.shimmed(.immutableShims, lhs: lhs, rhs: rhs) {
+                if let rhsArrayBuffer = rhs.linked(.arrayBuffer) as? SwiftMember {
+                    let rhsExpr = rhsArrayBuffer.expr.member("count ?? .zero")
+                    if let shimmed = try rhsExpr.shimmed(.immutableShims, lhs: lhs, rhs: rhs) {
+                        args += [ shimmed.arg(.string(lhs.name)) ]
+                        continue
+                    }
+                }
+                else if let shimmed = try rhs.expr.shimmed(.immutableShims, lhs: lhs, rhs: rhs) {
                     args += [ shimmed.arg(.string(lhs.name)) ]
-                } else {
-                    args += [ .string("/* TODO: */ \(lhs.name)").arg(.string(lhs.name)) ]
+                    continue
                 }
             } catch {
-                args += [ .string("/* TODO: */ \(lhs.name)").arg(.string(lhs.name)) ]
             }
+            args += [ .string("/* TODO: */ \(lhs.name)").arg(.string(lhs.name)) ]
         }
 
         let sdkObjectInitCall = SwiftFunctionCallExpr(

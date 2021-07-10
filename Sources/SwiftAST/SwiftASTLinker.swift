@@ -21,6 +21,10 @@ public class SwiftASTLinker {
         links[ast.uuid, default: []].append(.init(type: linkType, ref: ref))
     }
 
+    public func unlink(for ast: SwiftAST, _ linkType: SwiftASTLinkType, ref: SwiftAST) {
+        links[ast.uuid]?.removeAll(where: { $0.type == linkType && $0.ref === ref })
+    }
+
     public func linkedRefs(for ast: SwiftAST, _ linkType: SwiftASTLinkType) -> [SwiftAST] {
         links(for: ast)
             .filter { $0.type == linkType }

@@ -71,4 +71,41 @@ extension SwiftObject: SwiftDeclContext {
     public func evaluateType() -> SwiftType? {
         SwiftDeclRefType(decl: self)
     }
+
+    public func removeArrayCounts() {
+
+        let arrayCounts = members
+            .filter {
+                $0.linked(.arrayBuffer) != nil &&
+                $0.linked(.invocation) == nil
+            }
+
+        if !arrayCounts.isEmpty {
+
+            arrayCounts.forEach { member in
+                member.linkedRefs(.initializer).forEach { $0.removeFromOuter() }
+                member.removeCode()
+
+                if let memberComments = member.comment?.inner,
+                   let arrayBuffer = member.linked(.arrayBuffer) {
+                    let sdkName = sdk.map { "EOS" + "/" + $0.name + "/" } ?? ""
+                    if arrayBuffer.comment?.inner.isEmpty == false {
+                        arrayBuffer.comment?.add(comment: " ")
+                        arrayBuffer.comment?.add(comment: "- Note: ``\(sdkName)\(member.name)``:")
+                    }
+                    arrayBuffer.comment?.inner.append(contentsOf: memberComments)
+                }
+            }
+
+            removeAll(arrayCounts)
+        }
+
+
+        for member in members {
+            if let memberObject = member.type.canonical.asDeclRef?.decl.canonical as? SwiftObject,
+               memberObject.inSwiftEOS {
+                memberObject.removeArrayCounts()
+            }
+        }
+    }
 }
