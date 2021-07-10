@@ -85,9 +85,6 @@ open class SwiftWriterStream<OutputStream>: SwiftOutputStream where OutputStream
 
     public func write(optRef: SwiftVarDecl) {
         write(name: optRef.name)
-//        if optRef.type.isOptional != false {
-//            write(token: "?")
-//        }
     }
 
 
@@ -127,28 +124,6 @@ extension SwiftWriterStream {
 
     private func format(token: String, _ action: () -> Void) {
 
-//        else if token == "->" {
-//            write(textIfNeeded: " ")
-//        } else if token == "=" {
-//            write(textIfNeeded: " ")
-//        } else if token == "[" && (stack.last is SwiftArrayType) && outputWasIdentifier() {
-//            write(textIfNeeded: " ")
-//        } else if token == "{" && (stack.last is SwiftObject ||
-//                                   stack.last is SwiftFunction ||
-//                                   stack.last is SwiftFunctionCode) {
-//            write(textIfNeeded: " ")
-//        }
-//
-//        if stack.last is SwiftCode || stack.last is SwiftOutput || stack.last is SwiftMember {
-//            if ["{", "!=", "==", "??"].contains(token) {
-//                write(textIfNeeded: " ")
-//            }
-//        }
-//
-//        if stack.last is SwiftFunctionCallArgListExpr {
-//
-//        }
-
         if let formatting = textPrefix(token: token, stack: stack) {
             write(textIfNeeded: formatting)
         }
@@ -162,28 +137,6 @@ extension SwiftWriterStream {
         if let formatting = textPostfix(token: token, stack: stack) {
             write(textIfNeeded: formatting)
         }
-
-
-//        if token == "->" {
-//            write(textIfNeeded: " ")
-//        } else if token == "=" {
-//            write(textIfNeeded: " ")
-//        } else if token == ":" && (stack.last is SwiftMember ||
-//                                   stack.last is SwiftFunctionParm ||
-//                                   stack.last is SwiftFunctionParmType ||
-//                                   stack.last is SwiftObject) {
-//            write(textIfNeeded: " ")
-//        }
-//
-//        if stack.last is SwiftCode || stack.last is SwiftOutput || stack.last is SwiftMember {
-//            if ["{", "!=", "==", ":", ",", "??"].contains(token) {
-//                write(textIfNeeded: " ")
-//            }
-//        } else if stack.last is SwiftGenericType {
-//            if [","].contains(token) {
-//                write(textIfNeeded: " ")
-//            }
-//        }
     }
 
     private func format(name: String, _ action: (String) -> Void) {
@@ -197,8 +150,6 @@ extension SwiftWriterStream {
         }
         else if outputWasIdentifier() {
             write(textIfNeeded: " ")
-            //        } else if stack.last is SwiftFunction {
-            //            write(textIfNeeded: " ")
         }
 
         action(handleReserved(name: name))
@@ -217,9 +168,6 @@ extension SwiftWriterStream {
     }
 
     private func format(_ inner: SwiftOutputStreamable, _ action: () -> Void) {
-//        if inner is SwiftDecl || inner is SwiftMember {
-//            write(textIfNeeded: "\n")
-//        }
 
         if let comment = inner as? SwiftComment {
 
@@ -261,10 +209,6 @@ extension SwiftWriterStream {
                 write(text: "\n")
             }
         }
-
-//        if (inner is SwiftDecl || inner is SwiftMember) && !(inner is SwiftFunctionParm) {
-//            write(textIfNeeded: "\n")
-//        }
     }
 
     private func format(nested opening: String, _ closing: String, _ action: () -> Void) {
@@ -272,23 +216,10 @@ extension SwiftWriterStream {
         indent.append(String(repeating: " ", count: indentSpacing))
         action()
         indent.removeLast(indentSpacing)
-
-//        if lastOutput != opening && stack.last is SwiftFunction {
-//            write(textIfNeeded: "\n")
-//        }
     }
 
     private func indentSpacing(for inner: SwiftOutputStreamable?) -> Int {
         return tabSpaces
-//        if inner is SwiftObject ||
-//            inner is SwiftMember ||
-//            inner is SwiftFunction ||
-//            inner is SwiftOutput ||
-//            inner is SwiftFunctionCode ||
-//            inner is SwiftFunctionCallCode {
-//            return tabSpaces
-//        }
-//        return .zero
     }
 
 
@@ -314,8 +245,6 @@ extension SwiftWriterStream {
         case ("}", is SwiftObject): return "\n"
         case ("}", is SwiftFunction): return "\n"
         case ("}", _): return " "
-//        case ("}", is SwiftFunctionCode): return "\n"
-//        case (")", let s as SwiftFunctionCallArgClauseExpr) where !s.list.items.isEmpty: return "\n" + indent
         case (")", let s as SwiftFunctionCallArgClauseExpr) where shouldUseMultilineFormat(s): return "\n"
         case (")", let s as SwiftFunction) where !s.parms.isEmpty: return "\n"
         case ("->", _): return " "

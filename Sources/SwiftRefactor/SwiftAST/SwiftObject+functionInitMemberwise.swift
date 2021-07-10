@@ -27,13 +27,14 @@ extension SwiftObject {
         for member in members {
 
             if let decl = member.type.canonical.asDeclRef?.decl.canonical, let memberObject = decl as? SwiftObject, memberObject.inSwiftEOS {
-                try memberObject.functionInitMemberwise()
+                _ = try memberObject.functionInitMemberwise()
             }
 
             let functionParm = SwiftFunctionParm(
                 label: member.name,
                 name: member.name,
-                type: member.type)
+                type: member.type,
+                comment: member.comment)
 
             functionParm.link(.member, ref: member)
 

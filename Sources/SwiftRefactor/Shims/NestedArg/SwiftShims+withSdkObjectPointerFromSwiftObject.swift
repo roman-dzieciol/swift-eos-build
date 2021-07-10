@@ -18,11 +18,19 @@ extension SwiftShims {
            !(rhsObject is SwiftEnum),
            lhsObject === rhsObject.sdk
         {
-            return .try(.function.withSdkObjectPointerFromSwiftObject(
-                rhs.expr,
-                managedBy: .string("pointerManager"),
-                pointerName: rhs.name,
-                nest: nested))
+            if lhsPointer.isMutable && rhs.name == "Options" {
+                return .try(.function.withSdkObjectMutablePointerFromSwiftObject(
+                    rhs.expr,
+                    managedBy: .string("pointerManager"),
+                    pointerName: rhs.name,
+                    nest: nested))
+            } else {
+                return .try(.function.withSdkObjectPointerFromSwiftObject(
+                    rhs.expr,
+                    managedBy: .string("pointerManager"),
+                    pointerName: rhs.name,
+                    nest: nested))
+            }
         }
         return nil
     }

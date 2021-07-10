@@ -45,25 +45,11 @@ extension SwiftObject {
             let rhs = member
 
             do {
-//                if try canAssign(lhs: lhs, rhs: rhs, options: [.withPointerManager, .allowUnions]) {
-//                    args += [ rhs.expr.arg(.string(lhs.name)) ]
-//                }
-//                else {
-
                 if let shimmed = try rhs.expr.shimmed(.immutableShims, lhs: lhs, rhs: rhs) {
-                        args += [ shimmed.arg(.string(lhs.name)) ]
+                    args += [ shimmed.arg(.string(lhs.name)) ]
                 } else {
                     args += [ .string("/* TODO: */ \(lhs.name)").arg(.string(lhs.name)) ]
                 }
-
-//                    let copyingInvocation = try copyingInvocation2(
-//                        lhs: lhs,
-//                        rhs: rhs,
-//                        rhsExpr: rhs.expr,
-//                        options: [.withPointerManager, .allowUnions])
-//
-//                    args += [ copyingInvocation.arg(.string(lhs.name)) ]
-//                }
             } catch {
                 args += [ .string("/* TODO: */ \(lhs.name)").arg(.string(lhs.name)) ]
             }
@@ -79,3 +65,4 @@ extension SwiftObject {
         return function
     }
 }
+

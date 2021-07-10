@@ -57,3 +57,4 @@ private class SwiftFunctionsPassVisitor: SwiftVisitor {
         return try super.visit(type: type)
     }
 }
+

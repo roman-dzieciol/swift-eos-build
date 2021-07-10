@@ -30,14 +30,42 @@ private class SwiftFunctionInternalImplementationPassVisitor: SwiftVisitor {
                     parm.label = nil
                 }
 
-                let args = internalFunction.parms
-                    .map { $0.isInOutParm ? SwiftInOutExpr(identifier: $0.expr).arg(nil) : $0.expr.arg(nil) }
+                var args: [SwiftFunctionCallArgExpr] = []
+
+                for parm in function.parms {
+                    if parm.name.hasSuffix("Options"),
+                       let optionsObject = parm.type.canonical.asDeclRef?.decl.canonical as? SwiftObject,
+                       let initFunc = optionsObject.linked(.functionInitMemberwise) as? SwiftFunction {
+
+                        let optionsArgs = initFunc.parms
+                            .filter { $0.defaultValue == nil }
+                            .map { $0.copy() }
+
+                        function.replace(parm: parm, with: optionsArgs)
+
+                        let optionsInit = SwiftExpr.string(".init").call(optionsArgs.map { optionArg in
+                            if let label = optionArg.label {
+                                return optionArg.expr.arg(label)
+                            } else {
+                                return optionArg.expr.arg(nil)
+                            }
+                        })
+                        args.append(optionsInit.arg(nil))
+
+                    } else {
+                        if parm.isInOutParm {
+                            args.append(.inout(parm.expr).arg(nil))
+                        } else {
+                            args.append(parm.expr.arg(nil))
+                        }
+                    }
+                }
 
                 var internalFunctionCall = internalFunction.call(args)
                 if function.isThrowing {
                     internalFunctionCall = .try(internalFunctionCall)
                 }
-                
+
                 function.code = internalFunctionCall
 
                 object.inner.append(internalFunction)

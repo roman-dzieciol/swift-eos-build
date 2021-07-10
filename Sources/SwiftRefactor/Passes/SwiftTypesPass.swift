@@ -180,6 +180,13 @@ private class SwiftTypesDeclPassVisitor: SwiftVisitor {
                 varDecl.type = SwiftArrayType(elementType: .string, qual: varDecl.type.qual.explicitlyOptional)
             }
         }
+        
+        // WORKAROUND: Options shouldn't be mutable
+        if ast.name == "Options",
+           let varDecl = ast as? SwiftVarDecl,
+           varDecl.isMutable {
+            varDecl.isMutable = false
+        }
 
         // inout var decl types are optional
         if let varDecl = ast as? SwiftVarDecl,

@@ -24,9 +24,11 @@ class SwiftCleanupPassVisitor: SwiftVisitor {
 
         if let function = ast as? SwiftFunction {
             function.parms.forEach { parm in
-                if parm.comment != nil, let parmComments = parm.comment?.comments {
+                if parm.comment != nil,
+                   let parmComments = parm.comment?.comments,
+                   function.comment?.comments.contains(where: { ($0 as? SwiftCommentParam)?.name == parm.name }) != true
+                {
                     function.comment = function.comment ?? SwiftComment("")
-
                     function.comment?.inner.append(SwiftCommentParam(name: parm.name, comments: parmComments))
                 }
             }
