@@ -3,10 +3,15 @@ import Foundation
 
 open class SwiftWriterStream<OutputStream>: SwiftOutputStream where OutputStream: TextOutputStream {
 
+    enum Alignment: Hashable {
+        case paragraph
+    }
+
     public var stack: [SwiftOutputStreamable] = []
 
     var outputStream: OutputStream
 
+    var currentColumn: Int = 0
     var lastOutput: String = ""
     var indent: String = ""
 
@@ -18,6 +23,8 @@ open class SwiftWriterStream<OutputStream>: SwiftOutputStream where OutputStream
 
     var indentIfNeeded: String { outputWasNewLine() ? indent : "" }
 
+    var columns: [Alignment: Int] = [:]
+
     public init(outputStream: OutputStream) {
         self.outputStream = outputStream
     }
@@ -27,6 +34,12 @@ open class SwiftWriterStream<OutputStream>: SwiftOutputStream where OutputStream
         let swift = swift + terminator
         if !swift.isEmpty {
             lastOutput = swift
+            if let index = lastOutput.lastIndex(where: { $0 == "\n" }) {
+                let distance = lastOutput.distance(from: lastOutput.startIndex, to: index)
+                currentColumn = lastOutput.count - (distance + 1)
+            } else {
+                currentColumn += lastOutput.count
+            }
         }
     }
 
@@ -250,9 +263,22 @@ extension SwiftWriterStream {
 
     func textPrefix(_ streamable: SwiftOutputStreamable, stack: [SwiftOutputStreamable]) -> String? {
         switch (streamable, stack.last) {
-        case (is SwiftCommentText, _): return nil
+        case (is SwiftCommentText, _):
+            guard let outerOuterComment = stack.dropLast().last as? SwiftComment else { fatalError() }
+            if let previousColumn = columns[.paragraph] {
+                let adjustment = previousColumn - currentColumn
+                if adjustment > 0 {
+                    return String(repeating: " ", count: adjustment)
+                }
+            } else {
+                columns[.paragraph] = currentColumn
+            }
+            return nil
         case (is SwiftCommentParam, _): return nil
         case (is SwiftCommentBlock, _): return nil
+        case (is SwiftCommentParagraph, _):
+            columns[.paragraph] = nil
+            return nil
         case (let c as SwiftComment, _) where c.isTopLevel:
             return ("\n" + indent + "/**") + (isMultiline(c) ? "\n" : " ")
         case (is SwiftDecl, _): return "\n"
@@ -262,7 +288,12 @@ extension SwiftWriterStream {
 
     func textPostfix(_ streamable: SwiftOutputStreamable, stack: [SwiftOutputStreamable]) -> String? {
         switch (streamable, stack.last) {
-        case (is SwiftCommentText, _): return nil
+        case (let c as SwiftCommentText, _):
+            guard let outerOuterComment = stack.dropLast().last as? SwiftComment else { fatalError() }
+            if let blockComment = outerOuterComment as? SwiftCommentBlock {
+                return "\n"
+            }
+            return nil
         case (is SwiftCommentParam, _): return nil
         case (is SwiftCommentBlock, _): return nil
         case (let c as SwiftCommentParagraph, _):
