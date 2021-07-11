@@ -71,7 +71,7 @@ extension SwiftExpr {
         if !(self is SwiftOptionalChainingExpr),
            !(expr is SwiftOptionalChainingExpr),
            let type = self.evaluateType(in: nil),
-           type.isOptional == true {
+           type.isOptional != false {
             return SwiftExplicitMemberExpr(expr: self.optional, identifier: expr, argumentNames: [])
         } else {
             return SwiftExplicitMemberExpr(expr: self, identifier: expr, argumentNames: [])
