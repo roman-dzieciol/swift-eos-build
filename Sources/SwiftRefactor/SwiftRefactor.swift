@@ -14,8 +14,9 @@ public class SwiftRefactor {
 
     }
 
-    public func refactor(module sdkModule: SwiftModule) throws -> SwiftModule {
+    public func refactor(module sdkModule: SwiftModule, apiNotesURL: URL) throws -> SwiftModule {
 
+        try SwiftApiNotesPass().refactor(module: sdkModule, apiNotesURL: apiNotesURL)
         try SwiftOpaquePass().refactor(module: sdkModule)
 
         os_log("Copying module for refactoring...")

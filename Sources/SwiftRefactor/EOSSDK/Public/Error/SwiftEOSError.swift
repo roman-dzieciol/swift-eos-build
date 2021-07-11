@@ -14,7 +14,7 @@ public enum SwiftEOSError: Error {
     case bufferCapacity(Int,EOS_EResult)
 
     public static func from(result: EOS_EResult) -> Self? {
-        guard result != EOS_Success else { return nil }
+        guard result != .EOS_Success else { return nil }
         return .result(result)
     }
 }

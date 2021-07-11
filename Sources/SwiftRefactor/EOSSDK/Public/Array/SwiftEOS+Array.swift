@@ -19,7 +19,7 @@ public func withArrayBuffer<Element, LengthType: BinaryInteger>(
         do {
             try nested(buffer.baseAddress,
                        &bufferLength)
-        } catch SwiftEOSError.result(EOS_LimitExceeded) where capacity == nil {
+        } catch SwiftEOSError.result(.EOS_LimitExceeded) where capacity == nil {
             try nested(buffer.baseAddress,
                        &bufferLength)
         }
@@ -59,7 +59,7 @@ public func withPointerForInOut<Element, LengthType: BinaryInteger, R>(
         do {
             returnValue = try nested(buffer.baseAddress,
                                      &bufferLength)
-        } catch SwiftEOSError.result(EOS_LimitExceeded) where capacity == nil {
+        } catch SwiftEOSError.result(.EOS_LimitExceeded) where capacity == nil {
             returnValue = try nested(buffer.baseAddress,
                                      &bufferLength)
         }
@@ -88,7 +88,7 @@ public func withPointerForInOut<Element, LengthType: BinaryInteger, R>(
         do {
             returnValue = try nested(buffer.baseAddress,
                                      &bufferLength)
-        } catch SwiftEOSError.result(EOS_LimitExceeded) where capacity == nil {
+        } catch SwiftEOSError.result(.EOS_LimitExceeded) where capacity == nil {
             returnValue = try nested(buffer.baseAddress,
                                      &bufferLength)
         }
