@@ -26,6 +26,12 @@ extension EOS_EResult: CustomStringConvertible {
     public func isComplete() throws -> Bool {
         try SwiftEOS_EResult_IsOperationComplete(Result: self)
     }
+
+    public func shouldProceed() throws -> Bool {
+        guard try isComplete() else { return false }
+        guard self == .EOS_Success else { throw SwiftEOSError.result(self) }
+        return true
+    }
 }
 
 extension EOS_EpicAccountId: CustomStringConvertible {
