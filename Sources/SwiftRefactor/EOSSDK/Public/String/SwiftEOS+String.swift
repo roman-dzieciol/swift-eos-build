@@ -121,8 +121,16 @@ public func stringArrayFromCCharPointerPointer<Integer: BinaryInteger>(
 public func withCCharPointerPointersReturnedAsOptionalString<LengthType: BinaryInteger>(
     nested: (UnsafeMutablePointer<CChar>?, UnsafeMutablePointer<LengthType>?) throws -> Void) rethrows -> Optional<String>
 {
-    var utf8Array = Array("".utf8CString)
-    try withPointerForInOut(array: &utf8Array, capacity: utf8Array.capacity, nested)
-    return String(cString: utf8Array)
+    var capacity: LengthType = .zero
+    do {
+        try nested(nil, &capacity)
+        return ""
+    } catch SwiftEOSError.result(.EOS_LimitExceeded) {
+        let utf8Array = try Array<CChar>(unsafeUninitializedCapacity: safeNumericCast(exactly: capacity)) { buffer, initializedCount in
+            try nested(buffer.baseAddress,  &capacity)
+            initializedCount = try safeNumericCast(exactly: capacity)
+        }
+        return String(cString: utf8Array)
+    }
 }
 
