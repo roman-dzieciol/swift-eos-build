@@ -50,8 +50,6 @@ let package = Package(
                 .target(name: "SwiftRefactor"),
                 .target(name: "SwiftPrinter"),
                 .product(name: "ArgumentParser", package: "swift-argument-parser")
-                           //,
-                            //.product(name: "SwiftSyntax", package: "swift-syntax")]
         ]),
         .target(
             name: "SwiftEOSBuildCore"

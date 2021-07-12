@@ -28,5 +28,4 @@ extension Logger {
         Logger(subsystem: subsystem, category: String(cString: eosLogMessage.Category))
             .log(level: .from(eosLogLevel: eosLogMessage.Level), "\(String(cString: eosLogMessage.Message), privacy: .public)")
     }
-
 }
