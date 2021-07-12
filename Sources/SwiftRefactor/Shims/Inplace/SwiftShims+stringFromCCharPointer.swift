@@ -10,7 +10,7 @@ extension SwiftShims {
 
         if lhs.type.canonical.asString != nil,
            rhs.type.canonical.asPointer?.pointeeType.asCChar != nil {
-            return .function.string(cString: nested)
+            return .function.stringFromOptionalCStringPointer(nested)
         }
 
         

@@ -134,3 +134,13 @@ public func withCCharPointerPointersReturnedAsOptionalString<LengthType: BinaryI
     }
 }
 
+public func stringFromOptionalCStringPointer(_ cString: UnsafePointer<CChar>?) -> String? {
+    guard let cString = cString else { return nil }
+    return String(cString: cString)
+}
+
+public func stringFromOptionalCStringPointer(_ cString: UnsafePointer<UInt8>?) -> String? {
+    guard let cString = cString else { return nil }
+    return String(cString: cString)
+}
+

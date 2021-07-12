@@ -10,8 +10,8 @@ extension SwiftExpr {
 
 extension SwiftExpr.function {
 
-    static func string(cString: SwiftExpr) -> SwiftExpr {
-        SwiftFunctionCallExpr.named("String", args: [ cString.arg("cString") ])
+    static func stringFromOptionalCStringPointer(_ cString: SwiftExpr) -> SwiftExpr {
+        SwiftFunctionCallExpr.named("stringFromOptionalCStringPointer", args: [ cString.arg(nil) ])
     }
 }
 
