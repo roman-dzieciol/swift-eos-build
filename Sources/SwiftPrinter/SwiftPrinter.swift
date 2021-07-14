@@ -103,6 +103,12 @@ public class SwiftPrinter {
 
         var outputUrl = outputDir
 
+        if let swiftObject = swiftAST as? SwiftObject, swiftObject.tagName == "extension", swiftObject.superTypes.contains("CustomStringConvertible") {
+            return outputUrl
+                .appendingPathComponent("EOS")
+                .appendingPathComponent("EOS+CustomStringConvertible.swift")
+        }
+
         for component in components {
             outputUrl.appendPathComponent(String(component))
         }

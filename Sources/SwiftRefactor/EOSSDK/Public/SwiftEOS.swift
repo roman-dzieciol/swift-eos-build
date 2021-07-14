@@ -34,27 +34,4 @@ extension EOS_EResult: CustomStringConvertible {
     }
 }
 
-extension EOS_EAuthTokenType: CustomStringConvertible {
-
-    public var description: String {
-        switch self {
-        case .EOS_ATT_Client: return "EOS_ATT_Client"
-        case .EOS_ATT_User: return "EOS_ATT_User"
-        default: return "\(self.rawValue)"
-        }
-    }
-}
-
-extension EOS_ELoginStatus: CustomStringConvertible {
-
-    public var description: String {
-        switch self {
-        case .EOS_LS_NotLoggedIn: return "EOS_LS_NotLoggedIn"
-        case .EOS_LS_UsingLocalProfile: return "EOS_LS_UsingLocalProfile"
-        case .EOS_LS_LoggedIn: return "EOS_LS_LoggedIn"
-        default: return "\(self.rawValue)"
-        }
-    }
-}
-
 #endif

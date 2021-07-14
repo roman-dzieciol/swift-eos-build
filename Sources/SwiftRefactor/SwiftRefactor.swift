@@ -53,6 +53,8 @@ public class SwiftRefactor {
             os_log("Refactored with %{public}s", "\(type(of: $0))")
         }
 
+        try SwiftToStringPass().refactor(module: sdkModule)
+
         return module
     }
 

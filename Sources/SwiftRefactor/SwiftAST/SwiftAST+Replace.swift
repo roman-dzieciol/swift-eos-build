@@ -20,7 +20,7 @@ extension SwiftAST {
         }
     }
 
-    func replaceWithSdkRefs(_ filter: @escaping (SwiftAST) -> Bool) {
+    func replaceWithSdkRefs(_ filter: @escaping (SwiftAST) -> Bool?) {
         try! SwiftGatheringVisitor.decls(in: self, astFilter: filter) { decls, types in
             assert(!decls.isEmpty)
             self.replace(refs: decls, with: .sdk)

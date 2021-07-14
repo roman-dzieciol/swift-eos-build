@@ -4,16 +4,16 @@ import SwiftAST
 
 public class SwiftGatheringVisitor: SwiftVisitor {
 
-    public let astFilter: (SwiftAST) -> Bool
-    public let typeFilter: ((SwiftType) -> Bool)?
+    public let astFilter: (SwiftAST) -> Bool?
+    public let typeFilter: ((SwiftType) -> Bool?)?
 
     public var astList: [SwiftAST] = []
     public var typeList: [SwiftType] = []
 
     public static func decls(
         in decl: SwiftAST,
-        astFilter: @escaping (SwiftAST) -> Bool,
-        typeFilter: ((SwiftType) -> Bool)? = nil,
+        astFilter: @escaping (SwiftAST) -> Bool?,
+        typeFilter: ((SwiftType) -> Bool?)? = nil,
         results: @escaping (_ decls: [SwiftAST], _ types: Set<SwiftType>) -> Void
     ) throws {
         let visitor = SwiftGatheringVisitor(astFilter: astFilter, typeFilter: typeFilter)
@@ -21,7 +21,7 @@ public class SwiftGatheringVisitor: SwiftVisitor {
         results(visitor.astList, Set(visitor.typeList))
     }
 
-    public init(astFilter: @escaping (SwiftAST) -> Bool, typeFilter: ((SwiftType) -> Bool)?) {
+    public init(astFilter: @escaping (SwiftAST) -> Bool?, typeFilter: ((SwiftType) -> Bool?)?) {
         self.astFilter = astFilter
         self.typeFilter = typeFilter
     }
@@ -29,7 +29,7 @@ public class SwiftGatheringVisitor: SwiftVisitor {
     public override func visit(type: SwiftType) throws -> SwiftType {
         guard let typeFilter = typeFilter else { return type }
 
-        if typeFilter(type) {
+        if typeFilter(type) == true {
             typeList.append(type)
         }
 
@@ -37,7 +37,7 @@ public class SwiftGatheringVisitor: SwiftVisitor {
     }
 
     public override func visit(ast: SwiftAST) throws {
-        if astFilter(ast) {
+        if astFilter(ast) == true {
             astList.append(ast)
         }
 

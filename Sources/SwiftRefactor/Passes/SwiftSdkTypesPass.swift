@@ -9,12 +9,12 @@ public class SwiftSdkTypesPass: SwiftRefactorPass {
 
         // EOS_UI_ReportKeyEventOptions is unused
         module.replaceWithSdkRefs { decl in
-            decl.sdk!.name.hasSuffix("EOS_UI_ReportKeyEventOptions")
+            decl.sdk?.name.hasSuffix("EOS_UI_ReportKeyEventOptions")
         }
 
         // EOS_UI_ReportKeyEventOptions is unused
         module.replaceWithSdkRefs { decl in
-            decl.sdk!.name.hasSuffix("EOS_UI_PrePresentOptions")
+            decl.sdk?.name.hasSuffix("EOS_UI_PrePresentOptions")
         }
 
         // *_Release funcs are present in SDK AST only
@@ -61,7 +61,7 @@ public class SwiftSdkTypesPass: SwiftRefactorPass {
 
         // EOS_P2P_PacketQueueInfo is present in SDK AST only
         module.replaceWithSdkRefs { decl in
-            (decl as? SwiftObject)?.sdk!.name.hasSuffix("EOS_P2P_PacketQueueInfo") == true
+            (decl as? SwiftObject)?.sdk?.name.hasSuffix("EOS_P2P_PacketQueueInfo") == true
         }
 
 
