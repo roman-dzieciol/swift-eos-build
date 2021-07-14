@@ -34,17 +34,6 @@ extension EOS_EResult: CustomStringConvertible {
     }
 }
 
-extension EOS_EpicAccountId: CustomStringConvertible {
-
-    public var description: String {
-        (try? SwiftEOS_EpicAccountId_ToString(AccountId: self)) ?? "nil"
-    }
-}
-
-extension EOS_EpicAccountId: Identifiable {
-    public var id: Int { Int(bitPattern: UnsafeRawPointer(self)) }
-}
-
 extension EOS_EAuthTokenType: CustomStringConvertible {
 
     public var description: String {
