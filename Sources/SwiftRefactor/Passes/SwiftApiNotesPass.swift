@@ -4,7 +4,7 @@ import SwiftAST
 
 public class SwiftApiNotesPass: SwiftRefactorPass {
 
-    public func refactor(module: SwiftModule, apiNotesURL: URL) throws {
+    public func refactor(module: SwiftModule, apiNotesURLs: [URL]) throws {
 
         var apiNotes: String = ""
 
@@ -21,6 +21,8 @@ public class SwiftApiNotesPass: SwiftRefactorPass {
                 print("  EnumKind: NSEnum", to: &apiNotes)
             }
 
-        try apiNotes.write(to: apiNotesURL, atomically: true, encoding: .utf8)
+        try apiNotesURLs.forEach { apiNotesURL in
+            try apiNotes.write(to: apiNotesURL, atomically: true, encoding: .utf8)
+        }
     }
 }

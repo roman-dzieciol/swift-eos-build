@@ -9,21 +9,21 @@ export LANG=C.UTF-8
 
 export SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
-export EOS_VERSION=$(cat "$SCRIPT_DIR/../eos-version.txt" | tr -d '[:space:]')
+export EOS_IOS_VERSION=$(cat "$SCRIPT_DIR/../eos-version.txt" | tr -d '[:space:]')
 export EOS_FW_SUB_DIR="SDK/Bin/IOS"
 export EOS_FW_NAME="EOSSDK.framework"
 export EOS_XCFW_NAME="EOSSDK.xcframework"
 
-export FW_PATH="$EOS_VERSION/$EOS_FW_SUB_DIR/$EOS_FW_NAME"
+export FW_PATH="$EOS_IOS_VERSION/$EOS_FW_SUB_DIR/$EOS_FW_NAME"
 export FW_DIR="$SCRIPT_DIR/../../$FW_PATH"
 export HEADERS_DIR="$FW_DIR/Headers"
 export OUTPUT_DIR="$SCRIPT_DIR/../Temp"
-export OUTPUT_FW_DIR="$OUTPUT_DIR/$EOS_VERSION/$EOS_FW_NAME"
-export OUTPUT_HEADERS_DIR="$OUTPUT_FW_DIR/Headers"
-export OUTPUT_XCFW_DIR="$OUTPUT_DIR/$EOS_VERSION/$EOS_XCFW_NAME"
-export OUTPUT_AST_DIR="$OUTPUT_DIR/$EOS_VERSION/AST"
+export OUTPUT_FW_IOS_ARM64_DIR="$OUTPUT_DIR/$EOS_IOS_VERSION/ios-arm64/$EOS_FW_NAME"
+export OUTPUT_HEADERS_DIR="$OUTPUT_FW_IOS_ARM64_DIR/Headers"
+export OUTPUT_XCFW_DIR="$OUTPUT_DIR/$EOS_IOS_VERSION/$EOS_XCFW_NAME"
+export OUTPUT_AST_DIR="$OUTPUT_DIR/$EOS_IOS_VERSION/AST"
 
-export CLANG_ARGS=" -femit-all-decls -Xpreprocessor -femit-all-decls -Xclang -femit-all-decls -Xpreprocessor -CC -Xpreprocessor -C -Xpreprocessor -dD  -Xclang -fno-eliminate-unused-debug-types -std=gnu11 -fparse-all-comments --verbose -F$OUTPUT_FW_DIR/../"
+export CLANG_ARGS=" -femit-all-decls -Xpreprocessor -femit-all-decls -Xclang -femit-all-decls -Xpreprocessor -CC -Xpreprocessor -C -Xpreprocessor -dD  -Xclang -fno-eliminate-unused-debug-types -std=gnu11 -fparse-all-comments --verbose -F$OUTPUT_FW_IOS_ARM64_DIR/../"
 
 # recreate AST dir
 if [[ -d "$OUTPUT_AST_DIR" ]]; then
