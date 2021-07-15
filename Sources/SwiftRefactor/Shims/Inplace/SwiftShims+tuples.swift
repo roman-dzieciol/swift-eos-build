@@ -11,8 +11,7 @@ extension SwiftShims {
         if let lhsBuiltin = lhs.type.canonical.asBuiltin,
            let rhsBuiltin = rhs.type.canonical.asBuiltin,
            lhsBuiltin == rhsBuiltin,
-           lhsBuiltin.builtinName.hasPrefix("("),
-           lhsBuiltin.builtinName.hasSuffix(")"),
+           lhsBuiltin.isTuple,
            lhs.name == "SocketName" {
             return nested
         }

@@ -41,6 +41,16 @@ extension SwiftExpr.function {
             .closure([pointerPointerName], nest: nest) ])
     }
 
+    static func withZeroInitializedCStruct(
+        type: SwiftExpr,
+        cstructVarName: String,
+        nest: SwiftExpr
+    ) -> SwiftExpr {
+        SwiftFunctionCallExpr.named("withZeroInitializedCStruct", args: [
+            type.arg("type"),
+            .closure([cstructVarName], nest: nest) ])
+    }
+
 }
 
 extension SwiftExpr.function {

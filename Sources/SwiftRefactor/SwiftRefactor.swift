@@ -44,6 +44,7 @@ public class SwiftRefactor {
             SwiftFunctionInternalImplementationPass(),
             SwiftCleanupPass(),
             SwiftNamespacePass(),
+            SwiftUnitTestsPass(),
         ]
 
 

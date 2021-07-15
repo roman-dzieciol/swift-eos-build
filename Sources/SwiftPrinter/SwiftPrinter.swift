@@ -6,9 +6,11 @@ import Darwin
 public class SwiftPrinter {
 
     let outputDir: URL
+    let testsDir: URL
 
-    public init(outputDir: URL) {
+    public init(outputDir: URL, testsDir: URL) {
         self.outputDir = outputDir
+        self.testsDir = testsDir
     }
 
     func writingToDisk(fileName: String, action: (SwiftOutputStream) throws -> Void) throws {
@@ -81,16 +83,40 @@ public class SwiftPrinter {
 
         try finalOutputs.forEach { (url, ast) in
             try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true, attributes: [:])
-            try writingToDisk(url: url) { swiftOutput in
-                swiftOutput.write(name: "import")
-                swiftOutput.write(name: "Foundation")
-                swiftOutput.write(text: "\n")
-                swiftOutput.write(name: "import")
-                swiftOutput.write(name: "EOSSDK")
-                swiftOutput.write(text: "\n")
-                swiftOutput.write(ast)
+            try writingToDisk(url: url) { swift in
+                if ast.contains(where: { isTestObject($0)}) {
+                    writeTestModuleImports(swift: swift)
+                } else {
+                    writeModuleImports(swift: swift)
+                }
+                swift.write(ast)
             }
         }
+    }
+
+    private func isTestObject(_ ast: SwiftAST) -> Bool {
+        if let swiftObject = ast as? SwiftObject, swiftObject.superTypes.contains("XCTestCase") {
+            return true
+        }
+        return false
+    }
+
+    private func writeModuleImports(swift: SwiftOutputStream) {
+        swift.write(name: "import Foundation")
+        swift.write(text: "\n")
+        swift.write(name: "import EOSSDK")
+        swift.write(text: "\n")
+        swift.write(text: "\n")
+    }
+
+    private func writeTestModuleImports(swift: SwiftOutputStream) {
+        swift.write(name: "import XCTest")
+        swift.write(text: "\n")
+        swift.write(name: "import EOSSDK")
+        swift.write(text: "\n")
+        swift.write(name: "@testable import SwiftEOS")
+        swift.write(text: "\n")
+        swift.write(text: "\n")
     }
 
     private func url(for swiftAST: SwiftAST) -> URL {
@@ -101,7 +127,13 @@ public class SwiftPrinter {
             components.removeFirst()
         }
 
+        if isTestObject(swiftAST) {
+            return testsDir
+                .appendingPathComponent("\(swiftAST.name).swift")
+        }
+
         var outputUrl = outputDir
+
 
         if let swiftObject = swiftAST as? SwiftObject, swiftObject.tagName == "extension", swiftObject.superTypes.contains("CustomStringConvertible") {
             return outputUrl

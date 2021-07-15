@@ -85,6 +85,11 @@ extension SwiftType {
     public var isEosBool: Bool {
         asDeclRef?.decl.canonical.name == "EOS_Bool"
     }
+
+    public var isTuple: Bool {
+        asBuiltin?.builtinName.hasPrefix("(") == true &&
+        asBuiltin?.builtinName.hasSuffix(")") == true
+    }
 }
 
 

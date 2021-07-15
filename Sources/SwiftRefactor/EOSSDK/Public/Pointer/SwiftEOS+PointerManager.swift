@@ -138,4 +138,16 @@ public func withPointerManager<Result>(_ body: (_ pointerManager: SwiftEOS__Poin
     return try withExtendedLifetime(SwiftEOS__PointerManager(), body)
 }
 
+public func withZeroInitializedCStruct<CStruct,R>(type: CStruct.Type, nested: (_ cstruct: CStruct) throws -> R) rethrows -> R {
+    let stride = MemoryLayout<CStruct>.stride
+    let alignment = MemoryLayout<CStruct>.alignment
+    let bytePointer = UnsafeMutableRawPointer.allocate(byteCount: stride, alignment: alignment)
+    bytePointer.initializeMemory(as: UInt8.self, repeating: .zero, count: stride)
+    let cstructPointer = bytePointer.bindMemory(to: CStruct.self, capacity: 1)
+    let cstruct = cstructPointer.pointee
+    defer {
+        cstructPointer.deallocate()
+    }
+    return try nested(cstruct)
+}
 
