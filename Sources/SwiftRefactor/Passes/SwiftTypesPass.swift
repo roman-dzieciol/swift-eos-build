@@ -87,6 +87,12 @@ private class SwiftTypesDeclPassVisitor: SwiftVisitor {
             varDecl.type = varDecl.type.optional
         }
 
+        // pointer members are optional
+        if let member = ast as? SwiftMember,
+           member.type.canonical.isPointer,
+           member.type.isOptional != true {
+            member.type = member.type.optional
+        }
 
         // function type members are optional
         if let member = ast as? SwiftMember,
