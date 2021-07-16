@@ -43,6 +43,7 @@ public class SwiftBuiltinType: SwiftType {
     public override var isTrivial: Bool {
         isInt
     }
+
 }
 
 
@@ -89,6 +90,11 @@ extension SwiftType {
     public var isTuple: Bool {
         asBuiltin?.builtinName.hasPrefix("(") == true &&
         asBuiltin?.builtinName.hasSuffix(")") == true
+    }
+
+    public var isUnion: Bool {
+        (asBuiltin?.builtinName.contains("__Unnamed_union") == true) ||
+        (asDeclRef?.decl.canonical is SwiftUnion)
     }
 }
 
