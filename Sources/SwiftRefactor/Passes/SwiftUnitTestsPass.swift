@@ -70,7 +70,8 @@ public class SwiftUnitTestsPass: SwiftRefactorPass {
             canonical.isPointer ||
             canonical.isFunction {
             return .string("XCTAssertNil(\(lhsText))")
-        } else {
+        }
+        else {
             if declCanonical is SwiftEnum {
                 return .string("XCTAssertEqual(\(lhsText), .init(rawValue: .zero)!)")
             } else if canonical.isTuple || canonical.isUnion || declCanonical is SwiftObject {

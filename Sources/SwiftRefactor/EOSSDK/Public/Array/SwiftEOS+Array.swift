@@ -107,3 +107,8 @@ public func withElementPointerPointersReturnedAsArray<LengthType: BinaryInteger,
     try withPointerForInOut(array: &array, capacity: array.capacity, nested)
     return array
 }
+
+public func byteArray(from buffer: UnsafeRawBufferPointer) -> [UInt8]? {
+    guard buffer.baseAddress != nil else { return nil }
+    return Array(buffer)
+}

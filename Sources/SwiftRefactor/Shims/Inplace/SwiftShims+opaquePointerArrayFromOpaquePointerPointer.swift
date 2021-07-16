@@ -27,7 +27,7 @@ extension SwiftShims {
 
                 let rhsArrayCountExpr: SwiftExpr = .function.safeNumericCast(exactly: nested.outer().map { $0.member(rhsArrayCount.expr) } ?? rhsArrayCount.expr)
 
-                return .function.array(.function.unsafeBufferPointer(start: nested, count: rhsArrayCountExpr))
+                return .function.byteArray(.function.unsafeBufferPointer(start: nested, count: rhsArrayCountExpr))
             }
         }
 

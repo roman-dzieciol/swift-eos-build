@@ -26,8 +26,8 @@ extension SwiftExpr.function {
     }
 
 
-    static func array(_ nested: SwiftExpr) -> SwiftExpr {
-           SwiftFunctionCallExpr.named("Array", args: [ nested.arg(nil) ])
+    static func byteArray(_ nested: SwiftExpr) -> SwiftExpr {
+           SwiftFunctionCallExpr.named("byteArray", args: [ nested.arg("from") ])
     }
 
     static func unsafeRawBufferPointer(start: SwiftExpr, count: SwiftExpr) -> SwiftExpr {

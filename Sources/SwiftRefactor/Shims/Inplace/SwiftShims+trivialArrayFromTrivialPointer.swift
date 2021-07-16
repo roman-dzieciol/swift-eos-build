@@ -28,6 +28,8 @@ extension SwiftShims {
                 let rhsArrayCountExpr: SwiftExpr = nested.outer().map { $0.member(rhsArrayCount.expr) } ?? rhsArrayCount.expr
 
                 if rhsPointer.pointeeType.isOptional != false || rhsPointer.pointeeType.isOpaquePointer() {
+                    return .try(.function.trivialOptionalArrayFromOptionalTrivialOptionalPointer(start: nested, count: rhsArrayCountExpr))
+                } else if rhsPointer.isOptional != false {
                     return .try(.function.trivialOptionalArrayFromTrivialOptionalPointer(start: nested, count: rhsArrayCountExpr))
                 } else {
                     return .try(.function.trivialArrayFromTrivialPointer(start: nested, count: rhsArrayCountExpr))
@@ -41,6 +43,10 @@ extension SwiftShims {
 extension SwiftExpr.function {
 
     /// `Optional<[Trivial]>` = `Pointer<Optional<Trivial>>, Int`
+    static func trivialOptionalArrayFromOptionalTrivialOptionalPointer(start: SwiftExpr, count: SwiftExpr) -> SwiftExpr {
+        SwiftFunctionCallExpr.named("trivialOptionalArrayFromOptionalTrivialOptionalPointer", args: [ start.arg("start"), count.arg("count") ])
+    }
+
     static func trivialOptionalArrayFromTrivialOptionalPointer(start: SwiftExpr, count: SwiftExpr) -> SwiftExpr {
         SwiftFunctionCallExpr.named("trivialOptionalArrayFromTrivialOptionalPointer", args: [ start.arg("start"), count.arg("count") ])
     }

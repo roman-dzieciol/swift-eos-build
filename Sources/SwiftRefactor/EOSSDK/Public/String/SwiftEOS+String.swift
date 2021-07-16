@@ -112,8 +112,8 @@ public func stringArrayFromCCharPointerPointer<Integer: BinaryInteger>(
     pointer: UnsafePointer<UnsafePointer<CChar>?>?,
     count: Integer
 ) throws -> [String]? {
-    UnsafeBufferPointer(start: pointer,
-                        count: try safeNumericCast(exactly: count))
+    guard let pointer = pointer else { return nil }
+    return UnsafeBufferPointer(start: pointer, count: try safeNumericCast(exactly: count))
         .compactMap { $0 }
         .map { String(cString: $0) }
 }
