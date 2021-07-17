@@ -55,31 +55,31 @@ public class SwiftUnitTestsPass: SwiftRefactorPass {
 
     func assertNil(member: SwiftMember, lhsString: String) -> SwiftExpr {
 
-        let lhsString = "\(lhsString).\(member.name)"
+        let lhsMemberString = "\(lhsString).\(member.name)"
         let canonical = member.type.canonical
         let declCanonical = canonical.asDeclRef?.decl.canonical
 
         if canonical.isOptional != false ||
             canonical.isPointer ||
             canonical.isFunction {
-            return .string("XCTAssertNil(\(lhsString))")
+            return .string("XCTAssertNil(\(lhsMemberString))")
         }
         if declCanonical is SwiftEnum {
-            return .string("XCTAssertEqual(\(lhsString), .init(rawValue: .zero)!)")
+            return .string("XCTAssertEqual(\(lhsMemberString), .init(rawValue: .zero)!)")
         }
         if let swiftObject = declCanonical as? SwiftObject {
-            return assertNil(object: swiftObject, lhsString: lhsString)
+            return assertNil(object: swiftObject, lhsString: lhsMemberString)
         }
         if canonical.isUnion, let sdkMember = member.sdk as? SwiftMember {
             return assertNil(member: sdkMember, lhsString: lhsString)
         }
         if canonical.isBool {
-            return .string("XCTAssertEqual(\(lhsString), false)")
+            return .string("XCTAssertEqual(\(lhsMemberString), false)")
         }
         if canonical.isNumeric {
-            return .string("XCTAssertEqual(\(lhsString), .zero)")
+            return .string("XCTAssertEqual(\(lhsMemberString), .zero)")
         }
 
-        return .string("XCTFail(\"TODO: \(lhsString)\")")
+        return .string("XCTFail(\"TODO: \(lhsMemberString)\")")
     }
 }
