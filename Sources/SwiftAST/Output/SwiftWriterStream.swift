@@ -233,7 +233,7 @@ extension SwiftWriterStream {
         case ("}", is SwiftObject): return "\n"
         case ("}", is SwiftFunction): return "\n"
         case ("}", is SwiftMember): return "\n"
-        case ("}", _): return " "
+        case ("}", _): return outputWasNewLine() ? nil : " "
         case (")", let s as SwiftFunctionCallArgClauseExpr) where shouldUseMultilineFormat(s): return "\n"
         case (")", let s as SwiftFunction) where !s.parms.isEmpty: return "\n"
         case ("->", _): return " "

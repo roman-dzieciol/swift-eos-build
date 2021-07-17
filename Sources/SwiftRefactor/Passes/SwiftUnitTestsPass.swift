@@ -17,44 +17,21 @@ public class SwiftUnitTestsPass: SwiftRefactorPass {
                         let testObject = SwiftObject(name: object.name + "Tests", tagName: "class", superTypes: ["XCTestCase"])
                         var asserts: [SwiftStmt] = []
 
-                        sdkObject.members.forEach { sdkMember in
-                            let lhsText = "cstruct.\(sdkMember.name)"
-                            let canonical = sdkMember.type.canonical
-                            let declCanonical = canonical.asDeclRef?.decl.canonical
-                            let assertExpr = self.assertNil(
-                                lhsText: lhsText,
-                                type: sdkMember.type,
-                                canonical: canonical,
-                                declCanonical: declCanonical
-                            )
-                            asserts.append(assertExpr)
-                        }
+                        asserts.append(self.assertNil(object: sdkObject, lhsString: "cstruct"))
 
                         asserts.append(.string("let swiftObject = try XCTUnwrap(try \(object.name)(sdkObject: cstruct))"))
 
-                        object.members.forEach { member in
-                            let lhsText = "swiftObject.\(member.name)"
-                            let canonical = member.type.canonical
-                            let declCanonical = canonical.asDeclRef?.decl.canonical
-                            let assertExpr = self.assertNil(
-                                lhsText: lhsText,
-                                type: member.type,
-                                canonical: canonical,
-                                declCanonical: declCanonical
-                            )
-                            asserts.append(assertExpr)
-                        }
+                        asserts.append(self.assertNil(object: object, lhsString: "swiftObject"))
 
                         statements.append(.try(.function.withZeroInitializedCStruct(
                             type: .string(sdkObject.name).member("self"),
                             cstructVarName: "cstruct",
                             nest: SwiftCodeBlock(statements: asserts))))
 
-                        let code = SwiftCodeBlock(statements: statements)
                         let function = SwiftFunction(
                             name: "testItZeroInitializesFrom" + sdkObject.name,
                             returnType: .void,
-                            code: code)
+                            code: SwiftCodeBlock(statements: statements))
                         function.isThrowing = true
                         testObject.append(function)
                         module.append(testObject)
@@ -64,23 +41,45 @@ public class SwiftUnitTestsPass: SwiftRefactorPass {
         }
     }
 
-    func assertNil(lhsText: String, type: SwiftType, canonical: SwiftType, declCanonical: SwiftAST?) -> SwiftExpr {
+    func assertNil(object: SwiftObject, lhsString: String) -> SwiftExpr {
+        var asserts: [SwiftStmt] = []
+        object.members.forEach { member in
+            let assertExpr = self.assertNil(
+                member: member,
+                lhsString: lhsString
+            )
+            asserts.append(assertExpr)
+        }
+        return SwiftCodeBlock(statements: asserts)
+    }
+
+    func assertNil(member: SwiftMember, lhsString: String) -> SwiftExpr {
+
+        let lhsString = "\(lhsString).\(member.name)"
+        let canonical = member.type.canonical
+        let declCanonical = canonical.asDeclRef?.decl.canonical
 
         if canonical.isOptional != false ||
             canonical.isPointer ||
             canonical.isFunction {
-            return .string("XCTAssertNil(\(lhsText))")
+            return .string("XCTAssertNil(\(lhsString))")
         }
-        else {
-            if declCanonical is SwiftEnum {
-                return .string("XCTAssertEqual(\(lhsText), .init(rawValue: .zero)!)")
-            } else if canonical.isTuple || canonical.isUnion || declCanonical is SwiftObject {
-                return .string("XCTFail(\"TODO: \(lhsText)\")")
-            } else if canonical.isBool {
-                return .string("XCTAssertEqual(\(lhsText), false)")
-            } else {
-                return .string("XCTAssertEqual(\(lhsText), .zero)")
-            }
+        if declCanonical is SwiftEnum {
+            return .string("XCTAssertEqual(\(lhsString), .init(rawValue: .zero)!)")
         }
+        if let swiftObject = declCanonical as? SwiftObject {
+            return assertNil(object: swiftObject, lhsString: lhsString)
+        }
+        if canonical.isUnion, let sdkMember = member.sdk as? SwiftMember {
+            return assertNil(member: sdkMember, lhsString: lhsString)
+        }
+        if canonical.isBool {
+            return .string("XCTAssertEqual(\(lhsString), false)")
+        }
+        if !canonical.isTuple {
+            return .string("XCTAssertEqual(\(lhsString), .zero)")
+        }
+
+        return .string("XCTFail(\"TODO: \(lhsString)\")")
     }
 }
