@@ -143,4 +143,3 @@ public func stringFromOptionalCStringPointer(_ cString: UnsafePointer<UInt8>?) -
     guard let cString = cString else { return nil }
     return String(cString: cString)
 }
-

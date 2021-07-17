@@ -51,6 +51,8 @@ extension SwiftShims {
 
     static let inplaceShims: SwiftShims = [
 
+        SwiftShims.tuples,
+
         SwiftShims.assignable,
         SwiftShims.intFromAnotherInt,
 
@@ -85,8 +87,6 @@ extension SwiftShims {
 
         SwiftShims.sdkUnionFromSwiftUnion,
         SwiftShims.swiftUnionFromSdkUnion,
-
-        SwiftShims.tuples,
     ]
 
     static let immutableShims: SwiftShims = .inplaceShims

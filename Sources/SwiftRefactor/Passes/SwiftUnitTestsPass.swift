@@ -67,6 +67,13 @@ public class SwiftUnitTestsPass: SwiftRefactorPass {
         if declCanonical is SwiftEnum {
             return .string("XCTAssertEqual(\(lhsMemberString), .init(rawValue: .zero)!)")
         }
+        if canonical.isFixedWidthString, let builtin = canonical.asBuiltin {
+            if member.inSwiftEOS {
+                return .string("XCTAssertEqual(\(lhsMemberString), .zero)")
+            } else {
+                return .string("XCTAssertEqual(\(builtin.builtinName)(tuple: \(lhsMemberString)), .zero)")
+            }
+        }
         if let swiftObject = declCanonical as? SwiftObject {
             return assertNil(object: swiftObject, lhsString: lhsMemberString)
         }

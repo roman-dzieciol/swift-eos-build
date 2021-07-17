@@ -227,7 +227,7 @@ public class SwiftFromClang {
         case "uint64_t": return SwiftBuiltinType(name: "UInt64", qual: .none)
         case "char [33]":
             // TODO
-            return SwiftBuiltinType(name: "(\(Array<String>(repeating: "CChar", count: 33).joined(separator: ", ")))", qual: .with(isOptional: false))
+            return SwiftBuiltinType(name: "String_33", qual: .with(isOptional: false))
         default:
             let tokens = text.split(separator: " ")
             if tokens.count == 3, tokens[0] == "const", tokens[2] == "*" {

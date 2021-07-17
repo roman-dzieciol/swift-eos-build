@@ -10,7 +10,7 @@ extension SwiftShims {
         if let lhsPointer = lhs.type.canonical.asPointer,
            let lhsBuiltin = lhsPointer.pointeeType.asBuiltin,
            let lhsArrayCount = lhs.linked(.arrayLength) as? SwiftVarDecl,
-           let rhsArrayCount = lhsArrayCount.swifty,
+           lhsArrayCount.swifty != nil,
            lhsBuiltin.isCChar,
            let rhsBuiltin = rhs.type.canonical.asBuiltin,
            rhsBuiltin.isString,
