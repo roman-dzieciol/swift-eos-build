@@ -54,12 +54,17 @@ extension SwiftType {
     }
 
     public var isNumeric: Bool {
-        isInt
+        isInt || isFloatingPoint
     }
 
     public var isInt: Bool {
         asBuiltin?.builtinName.hasPrefix("UInt") == true ||
         asBuiltin?.builtinName.hasPrefix("Int") == true
+    }
+
+    public var isFloatingPoint: Bool {
+        asBuiltin?.builtinName == "Double" ||
+        asBuiltin?.builtinName == "Float"
     }
 
     public var isByte: Bool {

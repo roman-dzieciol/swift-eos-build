@@ -76,7 +76,7 @@ public class SwiftUnitTestsPass: SwiftRefactorPass {
         if canonical.isBool {
             return .string("XCTAssertEqual(\(lhsString), false)")
         }
-        if !canonical.isTuple {
+        if canonical.isNumeric {
             return .string("XCTAssertEqual(\(lhsString), .zero)")
         }
 
