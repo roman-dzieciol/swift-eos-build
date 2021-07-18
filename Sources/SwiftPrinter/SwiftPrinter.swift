@@ -122,13 +122,13 @@ public class SwiftPrinter {
             components.removeFirst()
         }
 
-        if isTestObject(swiftAST) {
-            return testsDir
-                .appendingPathComponent("\(swiftAST.name).swift")
-        }
-
-        var outputUrl = outputDir
-
+        var outputUrl: URL = {
+            if isTestObject(swiftAST) {
+                return testsDir
+            } else {
+                return outputDir
+            }
+        }()
 
         if let swiftObject = swiftAST as? SwiftObject, swiftObject.tagName == "extension", swiftObject.superTypes.contains("CustomStringConvertible") {
             return outputUrl
