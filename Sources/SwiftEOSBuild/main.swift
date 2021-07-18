@@ -188,10 +188,10 @@ class SwiftEOSBuildImpl {
         guard FileManager.default.fileExists(atPath: url.path, isDirectory: &outIsDirectory) else { return }
 
         if allowDelete {
-            logger.log("Output item already exists, trashing: \(url.absoluteString, privacy: .public)")
+            logger.log("Output item already exists, trashing: \(url.path, privacy: .public)")
             try FileManager.default.trashItem(at: url, resultingItemURL: nil)
         } else {
-            throw ValidationError("Output item already exists, please remove: \(url.absoluteString)")
+            throw ValidationError("Output item already exists, please remove: \(url.path)")
         }
     }
 
@@ -209,7 +209,8 @@ class SwiftEOSBuildImpl {
         try FileManager.default.createDirectory(at: handwrittenCodeTargetURL.deletingLastPathComponent(), withIntermediateDirectories: true, attributes: [:])
 
         if emitSourcesSymlink {
-            try FileManager.default.createSymbolicLink(at: packageTargetURL.appendingPathComponent("SourcesLink"), withDestinationURL: packageTargetURL.appendingPathComponent("Sources"))
+            try FileManager.default.createSymbolicLink(atPath: packageTargetURL.appendingPathComponent("SourcesLink").path,
+                                                       withDestinationPath: "Sources")
         }
 
         logger.log("Copying handwritten code to \(self.handwrittenCodeTargetURL.path, privacy: .public)...")
