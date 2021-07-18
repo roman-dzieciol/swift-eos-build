@@ -9,7 +9,7 @@ open class SwiftWriterStream<OutputStream>: SwiftOutputStream where OutputStream
 
     public var stack: [SwiftOutputStreamable] = []
 
-    var outputStream: OutputStream
+    public private(set) var outputStream: OutputStream
 
     var currentColumn: Int = 0
     var lastOutput: String = ""

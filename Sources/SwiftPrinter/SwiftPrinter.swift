@@ -1,7 +1,6 @@
 
 import Foundation
 import SwiftAST
-import Darwin
 
 public class SwiftPrinter {
 
@@ -13,17 +12,13 @@ public class SwiftPrinter {
         self.testsDir = testsDir
     }
 
-    func writingToDisk(fileName: String, action: (SwiftOutputStream) throws -> Void) throws {
-        let url = outputDir.appendingPathComponent(fileName)
-        try writingToDisk(url: url, action: action)
-    }
-
     func writingToDisk(url: URL, action: (SwiftOutputStream) throws -> Void) throws {
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true, attributes: [:])
-        FileManager.default.createFile(atPath: url.path, contents: nil, attributes: [:])
-        let fileHandle = try FileHandle(forWritingTo: url)
-        let outputStream = SwiftWriterStream(outputStream: FileHandlerOutputStream(fileHandle))
+        var output = ""
+        output.reserveCapacity(1024 * 70)
+        let outputStream = SwiftWriterStream(outputStream: output)
         try action(outputStream)
+        try outputStream.outputStream.write(to: url, atomically: true, encoding: .utf8)
     }
 
     public func write(module: SwiftModule) throws {
@@ -148,17 +143,5 @@ public class SwiftPrinter {
         outputUrl.appendPathExtension("swift")
 
         return outputUrl
-    }
-}
-
-struct FileHandlerOutputStream: TextOutputStream {
-    private let fileHandle: FileHandle
-
-    init(_ fileHandle: FileHandle) {
-        self.fileHandle = fileHandle
-    }
-
-    mutating func write(_ string: String) {
-        string.data(using: .utf8).map { fileHandle.write($0) }
     }
 }
