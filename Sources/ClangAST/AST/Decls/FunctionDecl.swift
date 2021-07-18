@@ -9,6 +9,8 @@ public class FunctionDecl: NamedDecl {
         return type["qualType"] as! String
     }()
 
+    public var parms: [ParmVarDecl] { inner.compactMap { $0 as? ParmVarDecl } }
+
     public lazy var returnType: String = {
         type.prefix(while: { $0 != "("}).trimmingCharacters(in: .whitespaces)
     }()

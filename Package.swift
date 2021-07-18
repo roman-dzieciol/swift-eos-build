@@ -49,6 +49,7 @@ let package = Package(
                 .target(name: "SwiftFromClang"),
                 .target(name: "SwiftRefactor"),
                 .target(name: "SwiftPrinter"),
+                .target(name: "CTestableImpl"),
                 .product(name: "ArgumentParser", package: "swift-argument-parser")
         ]),
         .target(
@@ -71,6 +72,13 @@ let package = Package(
         .target(
             name: "CTestHelpers",
             dependencies: [
+            ]
+        ),
+        .target(
+            name: "CTestableImpl",
+            dependencies: [
+                .target(name: "ClangAST"),
+                .target(name: "SwiftEOSBuildCore")
             ]
         ),
         .target(

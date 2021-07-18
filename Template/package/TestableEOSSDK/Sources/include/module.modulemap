@@ -1,0 +1,8 @@
+module EOSSDK [extern_c] {
+    requires c11
+    umbrella header "../EOSSDK/eos_umbrella.h"
+    textual header "../EOSSDK/eos_result.h"
+    textual header "../EOSSDK/eos_ui_keys.h"
+    header "TestableEOSSDK.h"
+    export *
+}
