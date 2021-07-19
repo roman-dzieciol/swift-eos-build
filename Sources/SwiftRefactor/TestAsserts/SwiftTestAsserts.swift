@@ -33,6 +33,10 @@ struct TestAsserts {
         let canonical = varDecl.type.canonical
         let declCanonical = canonical.asDeclRef?.decl.canonical
 
+        if varDecl.name == "ApiVersion", let apiVersionExpr = (varDecl.linked(.apiVersion) as? SwiftExprRef)?.expr {
+            return .string("XCTAssertEqual(\(lhsMemberString), \(SwiftWriterString.description(for: apiVersionExpr)))")
+        }
+
         if canonical.isOptional == false {
             if canonical.isFixedWidthString, let builtin = canonical.asBuiltin {
                 if varDecl.inSwiftEOS {

@@ -16,12 +16,20 @@ public class SwiftApiVersionPass: SwiftRefactorPass {
                         for parm in function.parms {
                             if let member = parm.linked(.member), member.name == "ApiVersion" {
 
-                                if object.sdk!.name.hasSuffix("EOS_IOS_Auth_CredentialsOptions") {
-                                    parm.defaultValue = "EOS_IOS_AUTH_CREDENTIALSOPTIONS_API_LATEST"
-                                    return
-                                }
+                                let defaultValue: String? = {
+                                    if object.sdk!.name.hasSuffix("EOS_IOS_Auth_CredentialsOptions") {
+                                        return "EOS_IOS_AUTH_CREDENTIALSOPTIONS_API_LATEST"
+                                    }
+                                    return latestApiVersionToken(from: member.sdk?.comment)
+                                }()
 
-                                parm.defaultValue = latestApiVersionToken(from: member.sdk?.comment)
+                                parm.defaultValue = defaultValue
+                                if let defaultValue = defaultValue {
+                                    parm.link(.apiVersion, ref: SwiftExprRef(expr: .string(defaultValue)))
+                                    parm.sdk?.link(.apiVersion, ref: SwiftExprRef(expr: .string(defaultValue)))
+                                    member.link(.apiVersion, ref: SwiftExprRef(expr: .string(defaultValue)))
+                                    member.sdk?.link(.apiVersion, ref: SwiftExprRef(expr: .string(defaultValue)))
+                                }
                                 return
                             }
                         }

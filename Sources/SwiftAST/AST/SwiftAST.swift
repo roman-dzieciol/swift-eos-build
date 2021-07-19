@@ -3,6 +3,7 @@ import Foundation
 import os.log
 
 public enum SwiftASTLinkType {
+    case apiVersion
     case arrayBuffer
     case arrayLength
     case code
