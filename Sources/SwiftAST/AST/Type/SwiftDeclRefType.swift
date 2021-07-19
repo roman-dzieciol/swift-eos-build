@@ -64,7 +64,7 @@ public class SwiftDeclRefType: SwiftType {
             return nilExpr
         }
         if decl.canonical is SwiftEnum {
-            return .string(".init(rawValue: .zero)!")
+            return .string(".zero")
         }
         return nil
     }

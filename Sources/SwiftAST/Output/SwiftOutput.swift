@@ -106,9 +106,7 @@ public class SwiftCode: SwiftOutputStreamable {
             skipPrefix = false
             return ""
         }
-        return
-        (withReturn ? "return " : "") +
-        (isThrowing ? "try " : "") 
+        return (withReturn ? "return " : "") + (isThrowing ? "try " : "")
 
     }
 

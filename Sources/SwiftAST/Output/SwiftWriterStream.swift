@@ -1,11 +1,25 @@
 
 import Foundation
 
+public struct SwiftWriterOptions: OptionSet {
+
+    public static let compact = SwiftWriterOptions(rawValue: 1 << 1)
+
+    public let rawValue: Int
+
+    public init(rawValue: Int) {
+        self.rawValue = rawValue
+    }
+}
+
+
 open class SwiftWriterStream<OutputStream>: SwiftOutputStream where OutputStream: TextOutputStream {
 
     enum Alignment: Hashable {
         case paragraph
     }
+
+    public let options: SwiftWriterOptions
 
     public var stack: [SwiftOutputStreamable] = []
 
@@ -26,8 +40,9 @@ open class SwiftWriterStream<OutputStream>: SwiftOutputStream where OutputStream
     var columns: [Alignment: Int] = [:]
     let alignColumns: Bool = true
 
-    public init(outputStream: OutputStream) {
+    public init(outputStream: OutputStream, options: SwiftWriterOptions = []) {
         self.outputStream = outputStream
+        self.options = options
     }
 
     private func write(_ swift: String, terminator: String, to stream: inout OutputStream) {
@@ -230,6 +245,7 @@ extension SwiftWriterStream {
         switch (token, stack.last) {
         case ("=", _): return " "
         case ("{", _) where !lastOutput.hasSuffix("\n"): return " "
+        case ("}", _) where !options.contains(.compact): return outputWasNewLine() ? nil : "\n"
         case ("}", is SwiftObject): return "\n"
         case ("}", is SwiftFunction): return "\n"
         case ("}", is SwiftMember): return "\n"
@@ -301,7 +317,7 @@ extension SwiftWriterStream {
 
     func textPostfix(_ streamable: SwiftOutputStreamable, stack: [SwiftOutputStreamable]) -> String? {
         switch (streamable, stack.last) {
-        case (let c as SwiftCommentText, _):
+        case (is SwiftCommentText, _):
             guard let outerOuterComment = stack.dropLast().last as? SwiftComment else { fatalError() }
             if outerOuterComment.isTopLevel {
                 if isMultiline(outerOuterComment){

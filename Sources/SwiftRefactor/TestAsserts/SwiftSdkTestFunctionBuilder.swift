@@ -8,40 +8,75 @@ class SdkTestFunctionBuilder {
     let swiftFunctionParms: [SwiftFunctionParm]
 
     let sdkFunction: SwiftFunction
-    let sdkFunctionParms: [SwiftFunctionParm]
 
     var swiftFunctionCallExpr: SwiftExpr = .string("")
 
-    var preconditions: [SwiftExpr] = []
-    var statements: [SwiftExpr] = []
-    var postconditions: [SwiftExpr] = []
+    var preconditions: SwiftStatementsBuilder
+    var statements: SwiftStatementsBuilder
+    var postconditions: SwiftStatementsBuilder
+    var postconditionsGroup: SwiftExpr
+    var autoreleaseAsserts: SwiftStatementsBuilder
 
+    var sdkReceived: [String] = []
 
     init(swiftFunction: SwiftFunction) {
         self.swiftFunction = swiftFunction
         self.swiftFunctionParms = swiftFunction.parms
 
         self.sdkFunction = swiftFunction.sdk as! SwiftFunction
-        self.sdkFunctionParms = sdkFunction.parms
+
+        self.preconditions = SwiftStatementsBuilder()
+        self.statements = SwiftStatementsBuilder()
+        self.postconditions = SwiftStatementsBuilder()
+        self.postconditionsGroup = postconditions
+        self.autoreleaseAsserts = SwiftStatementsBuilder()
     }
 
     func build() -> SwiftFunction {
 
-        preconditions += [.string("TestGlobals.reset()")]
+        preconditions += [.string("TestGlobals.current.reset()")]
 
         let swiftFunctionCall = buildSwiftFunctionCall()
         swiftFunctionCallExpr = swiftFunctionCall
 
-        statements += [buildSdkImplementation()]
-
+        statements += [
+            .string(""),
+            .string("// Given implementation for SDK function"),
+            buildSdkImplementation(sdkFunction: sdkFunction),
+            .string("defer { __on_\(sdkFunction.name) = nil }"),
+        ]
         addActorReference()
-        addReturnTypeAssert()
-        addFunctionCallAsserts()
+        addPostconditionAsserts()
+
+        let innerStatements = [
+            preconditions,
+            statements,
+            .string(""),
+            .string("// When SDK function is called"),
+            swiftFunctionCallExpr,
+            .string(""),
+            .string("// Then"),
+            postconditionsGroup
+        ]
+
+        let autoreleasepoolExpr: SwiftExpr = .try(.string("autoreleasepool").call([
+            .closure(nest: SwiftStatementsBuilder(statements: innerStatements))
+        ], useTrailingClosures: true))
+
+        var testFunctionImpl: [SwiftExpr] = [autoreleasepoolExpr]
+
+        if !autoreleaseAsserts.statements.isEmpty {
+            testFunctionImpl += [
+                .string(""),
+                .string("// Then"),
+                autoreleaseAsserts,
+            ]
+        }
 
         let testFunction = SwiftFunction(
             name: "test" + sdkFunction.name + "_Null",
             returnType: .void,
-            code: SwiftCodeBlock(statements: preconditions + statements + [swiftFunctionCallExpr] + postconditions))
+            code: SwiftCodeBlock(statements: testFunctionImpl))
         testFunction.isThrowing = true
 
         return testFunction
@@ -67,7 +102,9 @@ class SdkTestFunctionBuilder {
         return swiftFunction.call(swiftFunctionArgs, useTrailingClosures: false)
     }
 
-    func buildSdkImplementation() -> SwiftExpr {
+    func buildSdkImplementation(sdkFunction: SwiftFunction ) -> SwiftExpr {
+
+        let sdkFunctionParms = sdkFunction.parms
 
         var implementation: [SwiftExpr] = []
         let sdkParamNames = sdkFunctionParms.map({ $0.name })
@@ -75,12 +112,22 @@ class SdkTestFunctionBuilder {
         for sdkParam in sdkFunctionParms {
 
             if sdkParam.name == "Handle" {
-                implementation += [.string("XCTAssertEqual(\(sdkParam.name), OpaquePointer(bitPattern: Int(1))!)")]
+                implementation += [.string("XCTAssertEqual(\(sdkParam.name), .nonZeroPointer)")]
+            }
+
+            else if sdkParam.name == "ClientData" {
+                implementation += [.string("XCTAssertNotNil(\(sdkParam.name))")]
             }
 
             else if let functionType = sdkParam.type.canonical.asFunction {
                 let args = functionType.paramTypes.map { paramType -> SwiftFunctionCallArgExpr in
-                    TestAsserts.nilOrSomeExpr(paramType).arg(nil)
+
+                    if let object = paramType.canonical.asPointer?.pointeeType.asDeclRef?.decl.canonical as? SwiftObject {
+                        let objectInit = TestAsserts.nilInitialize(object: object, passthrough: ["ClientData"])
+                        return .arg(nil, .function.pointerToTestObject(objectInit, type: paramType))
+                    }
+
+                    return TestAsserts.nilOrSomeExpr(paramType).arg(nil)
                 }
 
                 implementation += [
@@ -97,7 +144,8 @@ class SdkTestFunctionBuilder {
             }
         }
 
-        implementation += [.string("TestGlobals.sdkReceived.append(\"\(sdkFunction.name)\")")]
+        sdkReceived += [sdkFunction.name]
+        implementation += [.string("TestGlobals.current.sdkReceived.append(\(sdkFunction.name.quoted))")]
 
         if !sdkFunction.returnType.isVoid {
             let nilExpr = TestAsserts.nilOrSomeExpr(sdkFunction.returnType)
@@ -115,39 +163,88 @@ class SdkTestFunctionBuilder {
         )
 
         return .string("__on_\(sdkFunction.name)").assign(implementationClosure)
-
     }
 
     func addActorReference() {
         if let outer = swiftFunction.linked(.outer) as? SwiftObject {
-            let outerInit = outer.expr.call([.string("OpaquePointer(bitPattern: Int(1))!").arg("Handle")])
-            statements += [.let("object", type: outer.declRefType()).assign(outerInit)]
+            let outerInit = outer.expr.call([.string(".nonZeroPointer").arg("Handle")])
+            statements += [
+                .string(""),
+                .string("// Given Actor"),
+                .let("object", type: outer.declRefType()).assign(outerInit)
+            ]
             swiftFunctionCallExpr = .string("object").member(swiftFunctionCallExpr)
+
+            outer.members.forEach { member in
+                if let releaseFunc = member.type.asDeclRef?.decl.linked(.releaseFunc) as? SwiftFunction {
+                    preconditions += [
+                        .string(""),
+                        .string("// Given implementation for SDK release function"),
+                        buildSdkImplementation(sdkFunction: releaseFunc),
+                    ]
+                    autoreleaseAsserts += [
+                        .string("__on_\(releaseFunc.name) = nil"),
+                    ]
+                }
+            }
         }
     }
 
-    func addReturnTypeAssert() {
+    func addPostconditionAsserts() {
 
         if swiftFunction.isThrowing {
             swiftFunctionCallExpr = .try(swiftFunctionCallExpr)
         }
 
+        postconditions += [sdkReceivedAssert()]
+
+        swiftFunctionParms
+            .filter(\.type.canonical.isFunction)
+            .forEach { param in
+                preconditions += [
+                    .string("let waitFor\(param.name) = expectation(description: \"waitFor\(param.name)\")")
+                ]
+                postconditions += [.string("wait(for: [waitFor\(param.name)], timeout: 0.5)")]
+            }
+
         if !swiftFunction.returnType.isVoid {
+
             let resultVar: SwiftVarDeclRefExpr = .let("result", type: swiftFunction.returnType)
             swiftFunctionCallExpr = resultVar.assign(swiftFunctionCallExpr)
-            postconditions += [TestAsserts.assertNil(varDecl: resultVar.varDecl)]
+
+            if swiftFunction.returnType.canonical.asGeneric?.genericType.asBuiltin?.builtinName.hasPrefix("SwiftEOS_Notification") == true {
+
+                guard let removeNotifyFunc = sdkFunction.linked(.removeNotifyFunc) as? SwiftFunction else { fatalError() }
+
+                postconditions += [
+                    .string(""),
+                    .string("// Given implementation for SDK remove notify function"),
+                    buildSdkImplementation(sdkFunction: removeNotifyFunc)
+                ]
+
+                var notifyBuilder = SwiftStatementsBuilder()
+                notifyBuilder += [
+                    .string("withExtendedLifetime").call([
+                        .arg(nil, .string("result")),
+                        .closure(captures: [], ["result"], nest: self.postconditionsGroup, identifier: nil)
+                    ], useTrailingClosures: true),
+                ]
+                self.postconditionsGroup = notifyBuilder
+
+                autoreleaseAsserts += [
+                    .string("__on_\(removeNotifyFunc.name) = nil"),
+                    sdkReceivedAssert(),
+                ]
+
+            } else {
+                postconditions += [TestAsserts.assertNil(varDecl: resultVar.varDecl)]
+            }
         }
     }
 
-    func addFunctionCallAsserts() {
-
-        postconditions += [.string("XCTAssertEqual(TestGlobals.sdkReceived, [\"\(sdkFunction.name)\"])")]
-
-        let functionTypeParmNames = swiftFunctionParms
-            .filter(\.type.canonical.isFunction)
-            .map { "\"\($0.name)\"" }
-            .joined(separator: ", ")
-        postconditions += [.string("XCTAssertEqual(TestGlobals.swiftReceived, [\(functionTypeParmNames)])")]
+    func sdkReceivedAssert() -> SwiftExpr {
+        let resolved = "XCTAssertEqual(TestGlobals.current.sdkReceived, [\(sdkReceived.map(\.quoted).joined(separator: ", "))])"
+        return .string(resolved)
     }
 
 }

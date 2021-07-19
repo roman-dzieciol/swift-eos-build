@@ -4,6 +4,17 @@ import SwiftAST
 
 struct TestAsserts {
 
+    static func nilInitialize(object: SwiftObject, passthrough: Set<String> = []) -> SwiftFunctionCallExpr {
+        let args = object.members.map { member -> SwiftFunctionCallArgExpr in
+            if passthrough.contains(member.name) {
+                return .arg(member.name, member.expr)
+            } else {
+                return TestAsserts.nilArg(varDecl: member)
+            }
+        }
+        return object.expr.call(args)
+    }
+
     static func assertNil(object: SwiftObject, lhsString: String = "") -> SwiftExpr {
         var asserts: [SwiftStmt] = []
         object.members.forEach { member in
@@ -54,7 +65,7 @@ struct TestAsserts {
         }
 
         if canonical.asDeclRef?.decl.canonical is SwiftEnum {
-            return .string("XCTAssertEqual(\(lhsMemberString), .init(rawValue: .zero)!)")
+            return .string("XCTAssertEqual(\(lhsMemberString), .zero)")
         }
 
         return .string("XCTFail(\" TODO: \(lhsMemberString) \(canonical)\")")
@@ -64,6 +75,8 @@ struct TestAsserts {
 
     static func nilArg(varDecl: SwiftVarDecl) -> SwiftFunctionCallArgExpr {
 
+        let canonical = varDecl.type.canonical
+
         let labelExpr: SwiftExpr? = {
             if let parm = varDecl as? SwiftFunctionParm {
                 return parm.label.map { SwiftExpr.string($0) }
@@ -72,20 +85,20 @@ struct TestAsserts {
             }
         }()
 
-        if let nilExpr = varDecl.type.canonical.nilExpr {
+        if let nilExpr = canonical.nilExpr {
             return nilExpr.arg(labelExpr)
         }
 
-        else if varDecl.type.canonical.isOpaquePointer() {
-            return .string("OpaquePointer(bitPattern: Int(1))!").arg(labelExpr)
+        else if canonical.isOpaquePointer() {
+            return .string(".nonZeroPointer").arg(labelExpr)
         }
 
-        else if let declCanonical = varDecl.type.canonical.asDeclRef?.decl.canonical, let object = declCanonical as? SwiftObject {
+        else if let declCanonical = canonical.asDeclRef?.decl.canonical, let object = declCanonical as? SwiftObject {
             let args = object.members.map { nilArg(varDecl: $0) }
             return object.expr.call(args).arg(labelExpr)
         }
 
-        else if let functionType = varDecl.type.canonical.asFunction {
+        else if let functionType = canonical.asFunction {
 
             var closureStatements: [SwiftStmt] = []
             var argNames: [String] = []
@@ -106,7 +119,7 @@ struct TestAsserts {
             }
 
             closureStatements += [
-                .string("TestGlobals.swiftReceived.append(\"\(varDecl.name)\")")
+                .string("waitFor\(varDecl.name).fulfill()")
             ]
 
             let closure = SwiftClosureExpr(
@@ -120,6 +133,14 @@ struct TestAsserts {
             )
 
             return closure.arg(labelExpr)
+        }
+
+        else if canonical.asPointer?.pointeeType.isCChar == true {
+            return .function.pointerToTestString(.string(".empty"), type: .string).arg(labelExpr)
+        }
+
+        else if canonical.isPointer == true {
+            return .string(".nonZeroPointer").arg(labelExpr)
         }
 
         else {
@@ -136,7 +157,7 @@ struct TestAsserts {
         }
 
         if canonical.isOpaquePointer(), canonical.isOptional == false {
-            return .string("OpaquePointer(bitPattern: Int(1))!")
+            return .string(".nonZeroPointer")
         }
         return .string("TODO: \(canonical)")
     }

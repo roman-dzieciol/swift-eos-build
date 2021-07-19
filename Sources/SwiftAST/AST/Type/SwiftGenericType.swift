@@ -59,3 +59,10 @@ public class SwiftGenericType: SwiftType {
         swift.write(text: Self.token(isOptional: isOptional))
     }
 }
+
+extension SwiftType {
+
+    public var asGeneric: SwiftGenericType? {
+        self as? SwiftGenericType
+    }
+}

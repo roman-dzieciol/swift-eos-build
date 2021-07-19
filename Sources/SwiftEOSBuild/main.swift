@@ -254,15 +254,30 @@ class SwiftEOSBuildImpl {
 
         let refactoredModules = try SwiftRefactor().refactor(module: swiftAST, apiNotesURLs: apiNotesURLs)
 
-        func output(module: SwiftModule, to url: URL, imports: [String]) throws {
+        func output(module: SwiftModule, to url: URL, imports: [String], options: SwiftWriterOptions) throws {
             logger.log("Printing \(module.name) to \(url.path, privacy: .public)...")
-            try SwiftPrinter(outputDir: url, imports: imports).write(module: module)
+            try SwiftPrinter(outputDir: url, imports: imports, options: options).write(module: module)
             logger.log("Printed \(module.name) to \(url.path, privacy: .public)")
         }
 
-        try output(module: refactoredModules.swiftModule, to: swiftModuleOutputURL, imports: Defaults.swiftModuleImports())
-        try output(module: refactoredModules.swiftTestsModule, to: swiftTestsModuleOutputURL, imports: Defaults.swiftTestModuleImports())
-        try output(module: refactoredModules.swiftSdkTestsModule, to: swiftSdkTestsModuleOutputURL, imports: Defaults.swiftSdkTestModuleImports())
+        try output(
+            module: refactoredModules.swiftModule,
+            to: swiftModuleOutputURL,
+            imports: Defaults.swiftModuleImports(),
+            options: [.compact]
+        )
+        try output(
+            module: refactoredModules.swiftTestsModule,
+            to: swiftTestsModuleOutputURL,
+            imports: Defaults.swiftTestModuleImports(),
+            options: [.compact]
+        )
+        try output(
+            module: refactoredModules.swiftSdkTestsModule,
+            to: swiftSdkTestsModuleOutputURL,
+            imports: Defaults.swiftSdkTestModuleImports(),
+            options: []
+        )
 
         print("Bindings written to: \(self.packageTargetURL.path)")
     }

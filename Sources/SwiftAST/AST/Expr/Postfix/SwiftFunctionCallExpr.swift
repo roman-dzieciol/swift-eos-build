@@ -209,4 +209,12 @@ extension SwiftFunctionCallArgExpr {
     public static func closure(captures: [String] = [], _ params: [String] = [], nest: SwiftExpr, identifier: SwiftExpr? = nil) -> SwiftFunctionCallArgExpr {
         return SwiftClosureExpr(captures: captures, params: params, statements: nest).arg(identifier)
     }
+
+    public static func arg(_ label: String?, _ expr: SwiftExpr) -> SwiftFunctionCallArgExpr {
+        if let label = label {
+            return SwiftFunctionCallArgExpr(identifier: .string(label), expr: expr)
+        } else {
+            return SwiftFunctionCallArgExpr(identifier: nil, expr: expr)
+        }
+    }
 }

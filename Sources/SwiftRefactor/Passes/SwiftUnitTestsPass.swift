@@ -23,6 +23,7 @@ public class SwiftUnitTestsPass: SwiftRefactorPass {
                 .compactMap { $0 as? SwiftObject }
                 .forEach { object in
                     if object.linked(.functionInitFromSdkObject) != nil, let sdkObject = object.sdk as? SwiftObject {
+
                         var statements: [SwiftStmt] = []
                         let testObject = SwiftObject(name: object.name + "Tests", tagName: "class", superTypes: ["XCTestCase"])
                         var asserts: [SwiftStmt] = []
@@ -57,6 +58,9 @@ public class SwiftUnitTestsPass: SwiftRefactorPass {
             sdkFunctions
                 .compactMap { $0 as? SwiftFunction }
                 .forEach { sdkFunction in
+
+                    guard sdkFunction.name != "EOS_Logging_SetCallback" else { return }
+
                     guard let function = sdkFunction.swifty as? SwiftFunction, function.inModule else { return }
                     let testObject = SwiftObject(name: "Swift" + sdkFunction.name + "Tests", tagName: "class", superTypes: ["XCTestCase"])
                     let result = SdkTestFunctionBuilder(swiftFunction: function).build()

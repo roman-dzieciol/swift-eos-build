@@ -7,18 +7,20 @@ public class SwiftPrinter {
     let outputDir: URL
     let imports: [String]
     let importsString: String
+    let options: SwiftWriterOptions
 
-    public init(outputDir: URL, imports: [String]) {
+    public init(outputDir: URL, imports: [String], options: SwiftWriterOptions) {
         self.outputDir = outputDir
         self.imports = imports
         self.importsString = imports.joined(separator: "\n") + "\n\n"
+        self.options = options
     }
 
     func writingToDisk(url: URL, action: (SwiftOutputStream) throws -> Void) throws {
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true, attributes: [:])
         var output = ""
         output.reserveCapacity(1024 * 70)
-        let outputStream = SwiftWriterStream(outputStream: output)
+        let outputStream = SwiftWriterStream(outputStream: output, options: options)
         try action(outputStream)
         try outputStream.outputStream.write(to: url, atomically: true, encoding: .utf8)
     }

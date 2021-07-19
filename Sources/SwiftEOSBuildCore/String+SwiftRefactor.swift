@@ -22,6 +22,10 @@ public extension String {
         guard hasSuffix(suffix) else { return Substring(self) }
         return dropLast(suffix.count)
     }
+
+    @inlinable var quoted: String {
+        "\"\(self)\""
+    }
     
 }
 
