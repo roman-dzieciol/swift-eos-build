@@ -5,6 +5,11 @@ public class SwiftTypeDecl: SwiftDecl {
 
     public var type: SwiftType
 
+    public override var innerType: SwiftType? {
+        get { type }
+        set { newValue.map { type = $0 } }
+    }
+
     public override var expr: SwiftDeclRefExpr {
         self.declRefType(qual: type.qual).declRefExpr
     }
@@ -15,6 +20,10 @@ public class SwiftTypeDecl: SwiftDecl {
 
     public override var canonicalType: SwiftType? {
         type.canonical
+    }
+
+    public override func declType() -> SwiftType? {
+        type
     }
 
     public init(name: String, inner: [SwiftAST] = [], attributes: Set<String> = [], type: SwiftType, comment: SwiftComment? = nil) {

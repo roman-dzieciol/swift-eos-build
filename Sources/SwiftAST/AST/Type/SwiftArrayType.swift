@@ -52,6 +52,10 @@ public class SwiftArrayType: SwiftType {
         }
         swift.write(text: Self.token(isOptional: isOptional))
     }
+
+    public override var nilExpr: SwiftExpr? {
+        super.nilExpr ?? .string("[]")
+    }
 }
 
 

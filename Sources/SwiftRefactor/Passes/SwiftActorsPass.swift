@@ -15,7 +15,7 @@ public class SwiftActorsPass: SwiftRefactorPass {
             }
 
             let object = objectsByName[objectName] ?? SwiftObject(name: objectName, tagName: "class", superTypes: ["SwiftEOSActor"])
-            module.inner.append(object)
+            module.append(object)
             objectsByName[objectName] = object
             return object
         }
@@ -58,7 +58,7 @@ public class SwiftActorsPass: SwiftRefactorPass {
             if object.inner.isEmpty {
 
                 let handle = SwiftMember(name: handleParm.name, type: handleParm.type, isMutable: false, getter: nil, comment: handleParm.comment)
-                object.inner.append(handle)
+                object.append(handle)
 
                 let initializer = try object.functionInitMemberwise()
                 initializer.attributes.formUnion(["required"])
@@ -72,7 +72,7 @@ public class SwiftActorsPass: SwiftRefactorPass {
             _ = try object.functionDeinit()
 
             function.removeAll([handleParm])
-            object.inner.append(function)
+            object.append(function)
 
             return function
 

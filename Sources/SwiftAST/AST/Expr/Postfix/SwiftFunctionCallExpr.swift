@@ -175,7 +175,7 @@ extension SwiftFunctionParm {
 
 extension SwiftExpr {
 
-    public func call(_ args: [SwiftFunctionCallArgExpr], useTrailingClosures: Bool = true) -> SwiftExpr {
+    public func call(_ args: [SwiftFunctionCallArgExpr], useTrailingClosures: Bool = true) -> SwiftFunctionCallExpr {
         SwiftFunctionCallExpr(
             expr: self,
             args: SwiftFunctionCallArgClauseExpr(
@@ -190,7 +190,7 @@ extension SwiftExpr {
 
 
 extension SwiftFunction {
-    public func call(_ args: [SwiftFunctionCallArgExpr], useTrailingClosures: Bool = true) -> SwiftExpr {
+    public func call(_ args: [SwiftFunctionCallArgExpr], useTrailingClosures: Bool = true) -> SwiftFunctionCallExpr {
         self.expr.call(args, useTrailingClosures: useTrailingClosures)
     }
 }
@@ -200,7 +200,7 @@ extension SwiftFunctionCallExpr {
     public static func named(_ name: @autoclosure @escaping () -> String,
                              args: [SwiftFunctionCallArgExpr],
                              useTrailingClosures: Bool = true
-    ) -> SwiftExpr {
+    ) -> SwiftFunctionCallExpr {
         return SwiftFunctionCallExpr(expr: .string(name()), args: args, useTrailingClosures: useTrailingClosures)
     }
 }

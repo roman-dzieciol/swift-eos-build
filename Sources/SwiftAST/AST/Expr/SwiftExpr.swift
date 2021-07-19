@@ -11,6 +11,13 @@ import Foundation
  */
 public class SwiftExpr: SwiftOutputStreamable, CustomStringConvertible {
 
+    public static let `nil` = SwiftExpr.string("nil")
+    public static let `false` = SwiftExpr.string("false")
+    public static let `true` = SwiftExpr.string("true")
+    public static let `empty` = SwiftExpr.string(".empty")
+    public static let `zero` = SwiftExpr.string(".zero")
+    public static let todo = SwiftExpr.string("/* TODO: this */")
+
     public var description: String {
         SwiftWriterString.description(for: self)
     }

@@ -2,10 +2,26 @@
 import Foundation
 
 
-public protocol SwiftVar {
+public class SwiftVar: SwiftVarDecl {
 
-    var type: SwiftType { get }
+    public var varDeclExpr: SwiftVarDeclRefExpr {
+        SwiftVarDeclRefExpr(varDecl: self)
+    }
 
-    var isMutable: Bool { get }
+    public init(name: String, type: SwiftType, isMutable: Bool = false) {
+        super.init(name: name, type: type, isMutable: isMutable)
+    }
+
+    public override func copy() -> SwiftVar {
+        let copy = SwiftVar(name: name, type: type, isMutable: isMutable)
+        linkCopy(from: self, to: copy)
+        return copy
+    }
+
+    public override func write(to swift: SwiftOutputStream) {
+        swift.write(name: isMutable ? "var" : "let")
+        swift.write(name: name)
+        swift.write(token: ":")
+        swift.write(type)
+    }
 }
-

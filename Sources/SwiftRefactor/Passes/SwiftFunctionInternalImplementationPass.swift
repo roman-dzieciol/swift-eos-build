@@ -63,7 +63,7 @@ private class SwiftFunctionInternalImplementationPassVisitor: SwiftVisitor {
                     }
                 }
 
-                var internalFunctionCall = internalFunction.call(args)
+                var internalFunctionCall: SwiftExpr = internalFunction.call(args)
                 if function.isThrowing {
                     internalFunctionCall = .try(internalFunctionCall)
                 }

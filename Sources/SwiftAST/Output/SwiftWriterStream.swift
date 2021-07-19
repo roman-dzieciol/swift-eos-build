@@ -259,6 +259,7 @@ extension SwiftWriterStream {
         case ("(", let s as SwiftFunction) where !s.parms.isEmpty: return "\n"
         case ("(", let s as SwiftFunctionCallArgClauseExpr) where shouldUseMultilineFormat(s): return "\n"
         case (",", let s as SwiftFunctionCallArgListExpr): return shouldUseMultilineFormat(s) ? "\n": " "
+        case (",", is SwiftClosureParameterListExpr): return " "
         case ("]", is SwiftCaptureListExpr): return " "
         case (":", _): return " "
         case ("->", _): return " "

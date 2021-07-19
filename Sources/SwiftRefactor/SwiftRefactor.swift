@@ -5,6 +5,13 @@ import os.log
 
 public class SwiftRefactor {
 
+    public struct Modules {
+        public let sdkModule: SwiftModule
+        public let swiftModule: SwiftModule
+        public let swiftTestsModule: SwiftModule
+        public let swiftSdkTestsModule: SwiftModule
+    }
+
     public static let sdkNamespace = "EOSSDK"
 
     var passes: [SwiftRefactorPass]
@@ -14,7 +21,10 @@ public class SwiftRefactor {
 
     }
 
-    public func refactor(module sdkModule: SwiftModule, apiNotesURLs: [URL]) throws -> SwiftModule {
+    public func refactor(module sdkModule: SwiftModule, apiNotesURLs: [URL]) throws -> Modules {
+
+        let swiftTestsModule = SwiftModule(name: "SwiftEOSTests")
+        let swiftSdkTestsModule = SwiftModule(name: "SwiftEOSWithTestableSDKTests")
 
         try SwiftApiNotesPass().refactor(module: sdkModule, apiNotesURLs: apiNotesURLs)
         try SwiftOpaquePass().refactor(module: sdkModule)
@@ -44,7 +54,7 @@ public class SwiftRefactor {
             SwiftFunctionInternalImplementationPass(),
             SwiftCleanupPass(),
             SwiftNamespacePass(),
-            SwiftUnitTestsPass(),
+            SwiftUnitTestsPass(swiftTestsModule: swiftTestsModule, swiftSdkTestsModule: swiftSdkTestsModule),
         ]
 
 
@@ -56,7 +66,12 @@ public class SwiftRefactor {
 
         try SwiftToStringPass().refactor(module: sdkModule)
 
-        return module
+        return Modules(
+            sdkModule: sdkModule,
+            swiftModule: module,
+            swiftTestsModule: swiftTestsModule,
+            swiftSdkTestsModule: swiftSdkTestsModule
+        )
     }
 
     private func copy(sdkModule: SwiftModule) throws -> SwiftModule {
@@ -72,6 +87,16 @@ public class SwiftRefactor {
         try SwiftCopyLinksVisitor(from: .copiedTo, to: .swifty).visit(ast: sdkModule)
         try link(module: sdkModule)
         try link(module: module)
+
+        sdkModule.inner.forEach { ast in
+            ast.unlink(all: .outer)
+            ast.link(.outer, ref: sdkModule)
+        }
+
+        module.inner.forEach { ast in
+            ast.unlink(all: .outer)
+            ast.link(.outer, ref: module)
+        }
 
         // After all decls are copied, update SwiftResolvedType's so that they point to copied decls
         try SwiftUpdateDeclsInTypesVisitor().visit(ast: module)

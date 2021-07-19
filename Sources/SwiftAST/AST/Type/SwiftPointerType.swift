@@ -86,7 +86,6 @@ public class SwiftPointerType: SwiftType {
     public override var isTrivial: Bool {
         pointeeType.isOpaque == true
     }
-
 }
 
 extension SwiftType {

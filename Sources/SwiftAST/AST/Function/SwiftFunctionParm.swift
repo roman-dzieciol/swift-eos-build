@@ -62,6 +62,14 @@ extension SwiftFunctionParm {
         self.init(label: member.name, name: member.name, type: member.type, isMutable: member.isMutable, comment: member.comment)
         link(.sdk, ref: member)
     }
+
+    public var toMember: SwiftMember {
+        SwiftMember(name: name, type: type, isMutable: isMutable, getter: nil, comment: nil)
+    }
+
+    public var toVar: SwiftVar {
+        SwiftVar(name: name, type: type, isMutable: isMutable)
+    }
 }
 
 extension SwiftOutputStream {

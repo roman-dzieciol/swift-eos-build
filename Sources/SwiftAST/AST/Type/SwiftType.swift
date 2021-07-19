@@ -108,4 +108,8 @@ public class SwiftType: SwiftOutputStreamable, CustomDebugStringConvertible, Equ
     public var isHandlePointer: Bool {
         canonical.asOpaquePointer?.pointeeType.asOpaque?.typeName.hasSuffix("Handle") == true
     }
+
+    public var nilExpr: SwiftExpr? {
+        isOptional == false ? nil : SwiftExpr.nil
+    }
 }

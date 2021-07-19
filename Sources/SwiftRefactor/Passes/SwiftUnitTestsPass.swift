@@ -4,10 +4,20 @@ import SwiftAST
 
 public class SwiftUnitTestsPass: SwiftRefactorPass {
 
-    public override init() {}
+    let swiftTestsModule: SwiftModule
+    let swiftSdkTestsModule: SwiftModule
+
+    public init(swiftTestsModule: SwiftModule, swiftSdkTestsModule: SwiftModule) {
+        self.swiftTestsModule = swiftTestsModule
+        self.swiftSdkTestsModule = swiftSdkTestsModule
+    }
 
     public override func refactor(module: SwiftModule) throws {
+        try addObjectTests(for: module)
+        try addFunctionTests(for: module)
+    }
 
+    func addObjectTests(for module: SwiftModule) throws {
         try SwiftGatheringVisitor.decls(in: module, astFilter: { $0 is SwiftObject && $0.inSwiftEOS }, typeFilter: nil) { objects, types in
             objects
                 .compactMap { $0 as? SwiftObject }
@@ -17,11 +27,11 @@ public class SwiftUnitTestsPass: SwiftRefactorPass {
                         let testObject = SwiftObject(name: object.name + "Tests", tagName: "class", superTypes: ["XCTestCase"])
                         var asserts: [SwiftStmt] = []
 
-                        asserts.append(self.assertNil(object: sdkObject, lhsString: "cstruct"))
+                        asserts.append(TestAsserts.assertNil(object: sdkObject, lhsString: "cstruct"))
 
                         asserts.append(.string("let swiftObject = try XCTUnwrap(try \(object.name)(sdkObject: cstruct))"))
 
-                        asserts.append(self.assertNil(object: object, lhsString: "swiftObject"))
+                        asserts.append(TestAsserts.assertNil(object: object, lhsString: "swiftObject"))
 
                         statements.append(.try(.function.withZeroInitializedCStruct(
                             type: .string(sdkObject.name).member("self"),
@@ -34,59 +44,26 @@ public class SwiftUnitTestsPass: SwiftRefactorPass {
                             code: SwiftCodeBlock(statements: statements))
                         function.isThrowing = true
                         testObject.append(function)
-                        module.append(testObject)
-                        
+                        self.swiftTestsModule.append(testObject)
+
                     }
-            }
+                }
+        }
+        }
+
+    func addFunctionTests(for module: SwiftModule) throws {
+        guard let sdkModule = module.sdk else { return }
+        try SwiftGatheringVisitor.decls(in: sdkModule, astFilter: { $0 is SwiftFunction }, typeFilter: nil) { sdkFunctions, types in
+            sdkFunctions
+                .compactMap { $0 as? SwiftFunction }
+                .forEach { sdkFunction in
+                    guard let function = sdkFunction.swifty as? SwiftFunction, function.inModule else { return }
+                    let testObject = SwiftObject(name: "Swift" + sdkFunction.name + "Tests", tagName: "class", superTypes: ["XCTestCase"])
+                    let result = SdkTestFunctionBuilder(swiftFunction: function).build()
+                    testObject.append(result)
+                    self.swiftSdkTestsModule.append(testObject)
+                }
         }
     }
 
-    func assertNil(object: SwiftObject, lhsString: String) -> SwiftExpr {
-        var asserts: [SwiftStmt] = []
-        object.members.forEach { member in
-            let assertExpr = self.assertNil(
-                member: member,
-                lhsString: lhsString
-            )
-            asserts.append(assertExpr)
-        }
-        return SwiftCodeBlock(statements: asserts)
-    }
-
-    func assertNil(member: SwiftMember, lhsString: String) -> SwiftExpr {
-
-        let lhsMemberString = "\(lhsString).\(member.name)"
-        let canonical = member.type.canonical
-        let declCanonical = canonical.asDeclRef?.decl.canonical
-
-        if canonical.isOptional != false ||
-            canonical.isPointer ||
-            canonical.isFunction {
-            return .string("XCTAssertNil(\(lhsMemberString))")
-        }
-        if declCanonical is SwiftEnum {
-            return .string("XCTAssertEqual(\(lhsMemberString), .init(rawValue: .zero)!)")
-        }
-        if canonical.isFixedWidthString, let builtin = canonical.asBuiltin {
-            if member.inSwiftEOS {
-                return .string("XCTAssertEqual(\(lhsMemberString), .zero)")
-            } else {
-                return .string("XCTAssertEqual(\(builtin.builtinName)(tuple: \(lhsMemberString)), .zero)")
-            }
-        }
-        if let swiftObject = declCanonical as? SwiftObject {
-            return assertNil(object: swiftObject, lhsString: lhsMemberString)
-        }
-        if canonical.isUnion, let sdkMember = member.sdk as? SwiftMember {
-            return assertNil(member: sdkMember, lhsString: lhsString)
-        }
-        if canonical.isBool {
-            return .string("XCTAssertEqual(\(lhsMemberString), false)")
-        }
-        if canonical.isNumeric {
-            return .string("XCTAssertEqual(\(lhsMemberString), .zero)")
-        }
-
-        return .string("XCTFail(\"TODO: \(lhsMemberString)\")")
-    }
 }

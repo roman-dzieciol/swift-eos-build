@@ -4,8 +4,6 @@ import Foundation
 
 public class SwiftCodeBlock: SwiftExpr {
 
-    public static let empty = SwiftCodeBlock(statements: [])
-
     public let statements: [SwiftStmt]
 
     public init(

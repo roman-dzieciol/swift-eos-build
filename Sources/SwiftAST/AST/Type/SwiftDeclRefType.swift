@@ -58,6 +58,16 @@ public class SwiftDeclRefType: SwiftType {
     public override var isTrivial: Bool {
         decl.canonical is SwiftEnum
     }
+
+    public override var nilExpr: SwiftExpr? {
+        if let nilExpr = super.nilExpr {
+            return nilExpr
+        }
+        if decl.canonical is SwiftEnum {
+            return .string(".init(rawValue: .zero)!")
+        }
+        return nil
+    }
 }
 
 

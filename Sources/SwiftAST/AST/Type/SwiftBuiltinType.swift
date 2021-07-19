@@ -44,6 +44,26 @@ public class SwiftBuiltinType: SwiftType {
         isInt
     }
 
+    public override var nilExpr: SwiftExpr? {
+        if let nilExpr = super.nilExpr {
+            return nilExpr
+        }
+        if isBool {
+            return .false
+        }
+        if isNumeric {
+            return .zero
+        }
+        if isString {
+            return .string("\"\"")
+        }
+        if isUnion {
+            return .string(".init()")
+        }
+
+        return nil
+    }
+
 }
 
 

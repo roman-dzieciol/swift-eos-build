@@ -27,6 +27,7 @@ public enum SwiftASTLinkType {
     case removeNotifyFunc
     case sdk
     case swifty
+    case uniqueName
 }
 
 public struct SwiftASTLink {
@@ -99,7 +100,14 @@ public class SwiftAST: SwiftOutputStreamable, CustomStringConvertible, CustomDeb
     }
 
     public var inSwiftEOS: Bool {
-        linked(.module)?.name == "SwiftEOS"
+        linked(.module)?.name != "EOS"
+    }
+
+    public var inModule: Bool {
+        if let outer = linked(.outer) {
+            return outer.inModule
+        }
+        return self is SwiftModule
     }
 
     public var asSource: Self? {
@@ -159,6 +167,7 @@ public class SwiftAST: SwiftOutputStreamable, CustomStringConvertible, CustomDeb
 
     public func append(_ ast: SwiftAST) {
         inner.append(ast)
+        ast.unlink(all: .outer)
         ast.link(.outer, ref: self)
     }
 
