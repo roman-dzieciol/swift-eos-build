@@ -17,7 +17,8 @@ class SdkTestFunctionBuilder {
     var postconditionsGroup: SwiftExpr
     var autoreleaseAsserts: SwiftStatementsBuilder
 
-    var sdkReceived: [String] = []
+    var postconditionCalls: [String] = []
+    var autoreleaseCalls: [String] = []
 
     init(swiftFunction: SwiftFunction) {
         self.swiftFunction = swiftFunction
@@ -45,6 +46,9 @@ class SdkTestFunctionBuilder {
             buildSdkImplementation(sdkFunction: sdkFunction),
             .string("defer { __on_\(sdkFunction.name) = nil }"),
         ]
+
+        postconditionCalls += [sdkFunction.name]
+
         addActorReference()
         addPostconditionAsserts()
 
@@ -64,6 +68,10 @@ class SdkTestFunctionBuilder {
         ], useTrailingClosures: true))
 
         var testFunctionImpl: [SwiftExpr] = [autoreleasepoolExpr]
+
+        autoreleaseAsserts += [
+            sdkReceivedAssert(self.postconditionCalls + self.autoreleaseCalls)
+        ]
 
         if !autoreleaseAsserts.statements.isEmpty {
             testFunctionImpl += [
@@ -111,11 +119,7 @@ class SdkTestFunctionBuilder {
 
         for sdkParam in sdkFunctionParms {
 
-            if sdkParam.name == "Handle" {
-                implementation += [.string("XCTAssertEqual(\(sdkParam.name), .nonZeroPointer)")]
-            }
-
-            else if sdkParam.name == "ClientData" {
+            if sdkParam.name == "ClientData" {
                 implementation += [.string("XCTAssertNotNil(\(sdkParam.name))")]
             }
 
@@ -144,7 +148,6 @@ class SdkTestFunctionBuilder {
             }
         }
 
-        sdkReceived += [sdkFunction.name]
         implementation += [.string("TestGlobals.current.sdkReceived.append(\(sdkFunction.name.quoted))")]
 
         if !sdkFunction.returnType.isVoid {
@@ -167,7 +170,7 @@ class SdkTestFunctionBuilder {
 
     func addActorReference() {
         if let outer = swiftFunction.linked(.outer) as? SwiftObject {
-            let outerInit = outer.expr.call([.string(".nonZeroPointer").arg("Handle")])
+            let outerInit = outer.expr.call([.arg("Handle", .nil)])
             statements += [
                 .string(""),
                 .string("// Given Actor"),
@@ -182,6 +185,7 @@ class SdkTestFunctionBuilder {
                         .string("// Given implementation for SDK release function"),
                         buildSdkImplementation(sdkFunction: releaseFunc),
                     ]
+                    autoreleaseCalls += [releaseFunc.name]
                     autoreleaseAsserts += [
                         .string("__on_\(releaseFunc.name) = nil"),
                     ]
@@ -196,7 +200,7 @@ class SdkTestFunctionBuilder {
             swiftFunctionCallExpr = .try(swiftFunctionCallExpr)
         }
 
-        postconditions += [sdkReceivedAssert()]
+        postconditions += [sdkReceivedAssert(self.postconditionCalls)]
 
         swiftFunctionParms
             .filter(\.type.canonical.isFunction)
@@ -221,6 +225,7 @@ class SdkTestFunctionBuilder {
                     .string("// Given implementation for SDK remove notify function"),
                     buildSdkImplementation(sdkFunction: removeNotifyFunc)
                 ]
+                autoreleaseCalls += [removeNotifyFunc.name]
 
                 var notifyBuilder = SwiftStatementsBuilder()
                 notifyBuilder += [
@@ -233,7 +238,6 @@ class SdkTestFunctionBuilder {
 
                 autoreleaseAsserts += [
                     .string("__on_\(removeNotifyFunc.name) = nil"),
-                    sdkReceivedAssert(),
                 ]
 
             } else {
@@ -242,9 +246,8 @@ class SdkTestFunctionBuilder {
         }
     }
 
-    func sdkReceivedAssert() -> SwiftExpr {
-        let resolved = "XCTAssertEqual(TestGlobals.current.sdkReceived, [\(sdkReceived.map(\.quoted).joined(separator: ", "))])"
-        return .string(resolved)
+    func sdkReceivedAssert(_ calls: @autoclosure @escaping () -> [String]) -> SwiftExpr {
+        return .string("XCTAssertEqual(TestGlobals.current.sdkReceived, [\(calls().map(\.quoted).joined(separator: ", "))])")
     }
 
 }
