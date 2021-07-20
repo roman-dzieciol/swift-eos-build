@@ -33,6 +33,10 @@ struct TestAsserts {
         let canonical = varDecl.type.canonical
         let declCanonical = canonical.asDeclRef?.decl.canonical
 
+        if (varDecl.swifty as? SwiftFunctionParm)?.isInOutParm == true {
+            return .string("XCTAssertNotNil(\(lhsMemberString))")
+        }
+
         if varDecl.name == "ApiVersion", let apiVersionExpr = (varDecl.linked(.apiVersion) as? SwiftExprRef)?.expr {
             return .string("XCTAssertEqual(\(lhsMemberString), \(SwiftWriterString.description(for: apiVersionExpr)))")
         }
