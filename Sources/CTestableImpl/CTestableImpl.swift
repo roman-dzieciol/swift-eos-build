@@ -28,10 +28,14 @@ public class CTestableImpl {
         headersString += "\n"
         headersString += "\n"
 
+
         implString = "\n"
-        implString += "#include \"include/TestableEOSSDK.h\""
+        implString += "#include <stdio.h>\n"
+        implString += "#include <stdlib.h>\n"
+        implString += "#include <assert.h>\n"
+        implString += "#include \"include/TestableEOSSDK.h\"\n"
         implString += "\n"
-        implString += "\n"
+
 
         functions = []
 
@@ -45,38 +49,25 @@ public class CTestableImpl {
 
             let functionPointerString = printFunctionSignature(function: function, name: "(*" + testPointName + ")")
 
-            headersString += "extern"
-            headersString += " "
-            headersString += functionPointerString
-            headersString += ";"
-            headersString += "\n"
-            headersString += "\n"
+            headersString += "extern \(functionPointerString);\n\n"
 
-            implString += functionPointerString
-            implString += " "
-            implString += "="
-            implString += " "
-            implString += "NULL"
-            implString += ";"
-            implString += "\n"
+            let returnString = function.returnType != "void" ? "return " : ""
 
-            implString += printFunctionSignature(function: function, name: function.name)
-            implString += " "
-            implString += "{"
-            implString += "\n"
+            implString +=
+"""
+\(functionPointerString) = NULL;
 
-            implString += indent
-            if function.returnType != "void" {
-                implString += "return"
-                implString += " "
-            }
-            implString += printFunctionCall(function: function, name: testPointName)
-            implString += ";"
-            implString += "\n"
+\(printFunctionSignature(function: function, name: function.name)) {
+    if(NULL != \(testPointName)) {
+        \(returnString)\(printFunctionCall(function: function, name: testPointName));
+    } else {
+        assert(!"NULL == \(testPointName)");
+        exit(EXIT_FAILURE);
+    }
+}
 
-            implString += "}"
-            implString += "\n"
-            implString += "\n"
+
+"""
         }
 
         try headersString.write(to: headersURL, atomically: true, encoding: .utf8)
