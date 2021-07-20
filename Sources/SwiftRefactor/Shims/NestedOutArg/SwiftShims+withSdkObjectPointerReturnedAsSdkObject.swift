@@ -17,10 +17,12 @@ extension SwiftShims {
            !(rhsObject is SwiftEnum),
            lhsObject === rhsObject
         {
-            return .function.withPointeeReturned(
-                managedBy: .string("pointerManager"),
-                pointerName: rhs.name,
-                nest: nested)
+            return .function.throwingNilResult(
+                .function.withPointeeReturned(
+                    managedBy: .string("pointerManager"),
+                    pointerName: rhs.name,
+                    nest: nested
+                ))
         }
         return nil
     }

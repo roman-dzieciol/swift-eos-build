@@ -15,10 +15,12 @@ extension SwiftShims {
            try canAssign(lhsType: lhsPointer.pointeeType.copy({ $0.with(isOptional: lhs.type.isOptional)}),
                          rhsType: rhs.type, options: []) {
 
-            return .function.withPointeeReturned(
-                managedBy: .string("pointerManager"),
-                pointerName: rhs.name,
-                nest: nested)
+            return .function.throwingNilResult(
+                .function.withPointeeReturned(
+                    managedBy: .string("pointerManager"),
+                    pointerName: rhs.name,
+                    nest: nested
+                ))
         }
 
         return nil

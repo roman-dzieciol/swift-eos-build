@@ -21,12 +21,13 @@ extension SwiftShims {
                 fatalError()
             }
 
-            return .function.withSdkObjectPointerPointerReturnedAsSwiftObject(
-                managedBy: .string("pointerManager"),
-                pointerPointerName: lhs.name,
-                nest: nested,
-                release: releaseFunc.expr
-            )
+            return .function.throwingNilResult(
+                .function.withSdkObjectPointerPointerReturnedAsSwiftObject(
+                    managedBy: .string("pointerManager"),
+                    pointerPointerName: lhs.name,
+                    nest: nested,
+                    release: releaseFunc.expr
+                ))
         }
         return nil
     }

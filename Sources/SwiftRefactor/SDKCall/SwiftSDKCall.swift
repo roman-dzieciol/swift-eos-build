@@ -105,7 +105,7 @@ public class SwiftSDKCall {
                     os_log("shim out arg: %{public}s.%{public}s", function.name, rhs.name)
                     self.code = shimmed
                     self.sdkArgs += [lhs.arg(rhs.expr)]
-                    function.returnType = rhs.type
+                    function.returnType = rhs.type.nonOptional
 
                     if returnComment == nil {
 

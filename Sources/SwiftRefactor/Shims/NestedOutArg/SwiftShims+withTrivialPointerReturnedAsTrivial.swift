@@ -14,10 +14,12 @@ extension SwiftShims {
            rhs.type.canonical.isTrivial,
            lhsPointer.pointeeType.optional == rhs.type.canonical.optional {
 
-            return .function.withPointeeReturned(
-                managedBy: .string("pointerManager"),
-                pointerName: rhs.name,
-                nest: nested)
+            return .function.throwingNilResult(
+                .function.withPointeeReturned(
+                    managedBy: .string("pointerManager"),
+                    pointerName: rhs.name,
+                    nest: nested
+                ))
         }
 
         return nil

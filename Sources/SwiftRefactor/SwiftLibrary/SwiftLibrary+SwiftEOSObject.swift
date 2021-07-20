@@ -8,6 +8,10 @@ extension SwiftExpr.function {
         SwiftFunctionCallExpr.named("throwingSdkResult", args: [ .closure([], nest: sdkCall) ])
     }
 
+    static func throwingNilResult(_ sdkCall: SwiftExpr) -> SwiftExpr {
+        SwiftFunctionCallExpr.named("throwingNilResult", args: [ .closure([], nest: sdkCall) ])
+    }
+
     static func buildSdkObject(pointerManager: SwiftExpr = .string("pointerManager")) -> SwiftExpr {
         SwiftFunctionCallExpr.named("buildSdkObject", args: [ pointerManager.arg("pointerManager") ])
     }

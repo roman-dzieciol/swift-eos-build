@@ -16,10 +16,12 @@ extension SwiftShims {
            rhsBuiltin.isString,
            rhs.isInOutParm
         {
-            return .function.withCCharPointerPointersReturnedAsOptionalString(
-                bufferPointerName: rhs.name,
-                countPointerName: lhsArrayCount.name,
-                nest: nested)
+            return .function.throwingNilResult(
+                .function.withCCharPointerPointersReturnedAsOptionalString(
+                    bufferPointerName: rhs.name,
+                    countPointerName: lhsArrayCount.name,
+                    nest: nested
+                ))
         }
         return nil
     }

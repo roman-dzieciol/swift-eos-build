@@ -212,36 +212,57 @@ class SdkTestFunctionBuilder {
             }
 
         if !swiftFunction.returnType.isVoid {
+            if swiftFunction.returnType.canonical.isOptional == false,
+               let object = swiftFunction.returnType.canonical.asDeclRef?.decl.canonical as? SwiftObject,
+               !(object is SwiftEnum) {
 
-            let resultVar: SwiftVarDeclRefExpr = .let("result", type: swiftFunction.returnType)
-            swiftFunctionCallExpr = resultVar.assign(swiftFunctionCallExpr)
-
-            if swiftFunction.returnType.canonical.asGeneric?.genericType.asBuiltin?.builtinName.hasPrefix("SwiftEOS_Notification") == true {
-
-                guard let removeNotifyFunc = sdkFunction.linked(.removeNotifyFunc) as? SwiftFunction else { fatalError() }
-
-                postconditions += [
-                    .string(""),
-                    .string("// Given implementation for SDK remove notify function"),
-                    buildSdkImplementation(sdkFunction: removeNotifyFunc)
-                ]
-                autoreleaseCalls += [removeNotifyFunc.name]
-
-                var notifyBuilder = SwiftStatementsBuilder()
-                notifyBuilder += [
-                    .string("withExtendedLifetime").call([
-                        .arg(nil, .string("result")),
-                        .closure(captures: [], ["result"], nest: self.postconditionsGroup, identifier: nil)
-                    ], useTrailingClosures: true),
-                ]
-                self.postconditionsGroup = notifyBuilder
-
-                autoreleaseAsserts += [
-                    .string("__on_\(removeNotifyFunc.name) = nil"),
-                ]
+                swiftFunctionCallExpr = SwiftFunctionCallExpr(
+                    expr: .string("XCTAssertThrowsError"),
+                    args: [
+                        .arg(nil, swiftFunctionCallExpr),
+                        .closure(
+                            captures: [],
+                            ["error"],
+                            nest: .string("guard case SwiftEOSError.unexpectedNilResult = error else { return XCTFail(\"unexpected \\(error)\") }"),
+                            identifier: nil
+                        )
+                    ],
+                    useTrailingClosures: true
+                )
 
             } else {
-                postconditions += [TestAsserts.assertNil(varDecl: resultVar.varDecl)]
+
+                let resultVar: SwiftVarDeclRefExpr = .let("result", type: swiftFunction.returnType)
+                swiftFunctionCallExpr = resultVar.assign(swiftFunctionCallExpr)
+
+                if swiftFunction.returnType.canonical.asGeneric?.genericType.asBuiltin?.builtinName.hasPrefix("SwiftEOS_Notification") == true {
+
+                    guard let removeNotifyFunc = sdkFunction.linked(.removeNotifyFunc) as? SwiftFunction else { fatalError() }
+
+                    postconditions += [
+                        .string(""),
+                        .string("// Given implementation for SDK remove notify function"),
+                        buildSdkImplementation(sdkFunction: removeNotifyFunc)
+                    ]
+                    autoreleaseCalls += [removeNotifyFunc.name]
+
+                    var notifyBuilder = SwiftStatementsBuilder()
+                    notifyBuilder += [
+                        .string("withExtendedLifetime").call([
+                            .arg(nil, .string("result")),
+                            .closure(captures: [], ["result"], nest: self.postconditionsGroup, identifier: nil)
+                        ], useTrailingClosures: true),
+                    ]
+                    self.postconditionsGroup = notifyBuilder
+
+                    autoreleaseAsserts += [
+                        .string("__on_\(removeNotifyFunc.name) = nil"),
+                    ]
+
+                } else {
+
+                    postconditions += [TestAsserts.assertNil(varDecl: resultVar.varDecl)]
+                }
             }
         }
     }
