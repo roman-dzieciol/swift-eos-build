@@ -29,7 +29,7 @@ public class SwiftDeclRefType: SwiftType {
     }
 
     public override var canonical: SwiftType {
-        decl.canonicalType?.copy { _ in qual } ?? self
+        decl.canonicalType?.copy { $0.with(isOptional: $0.isOptional != false || qual.isOptional != false) } ?? self
     }
 
     public override var innerType: SwiftType { decl.innerType ?? self }

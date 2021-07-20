@@ -93,7 +93,7 @@ struct TestAsserts {
             return nilExpr.arg(labelExpr)
         }
 
-        else if canonical.isOpaquePointer() {
+        else if canonical.isOpaquePointer(), canonical.isOptional == false {
             return .string(".nonZeroPointer").arg(labelExpr)
         }
 

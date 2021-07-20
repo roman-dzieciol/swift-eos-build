@@ -13,8 +13,8 @@ public class SwiftUnitTestsPass: SwiftRefactorPass {
     }
 
     public override func refactor(module: SwiftModule) throws {
-        try addObjectTests(for: module)
         try addFunctionTests(for: module)
+        try addObjectTests(for: module)
     }
 
     func addObjectTests(for module: SwiftModule) throws {

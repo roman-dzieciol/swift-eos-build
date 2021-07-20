@@ -47,6 +47,11 @@ private class SwiftOptionalsPassVisitor: SwiftVisitor {
             return type.optional
         }
 
+        // Typealiases of pointers are optional, as pointer types in swift do not represent nullable pointers and C nullability is unspecified
+        if type.asTypealiasRef != nil, type.canonical.isPointer {
+            return type.optional
+        }
+
         // Types with unspecified optionality are optional so that it can be handled explicitly
         if type.qual.isOptional == nil {
             return type.optional
