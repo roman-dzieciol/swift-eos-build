@@ -19,7 +19,7 @@ extension SwiftExpr.function {
         _ object: SwiftExpr,
         type: SwiftType
     ) -> SwiftExpr {
-            .string("TestGlobals.current").member(
+            .string("GTest.current").member(
                 SwiftFunction(name: "pointer", returnType: type).call([.arg("object", object)])
             )
     }
@@ -28,7 +28,7 @@ extension SwiftExpr.function {
         _ string: SwiftExpr,
         type: SwiftType
     ) -> SwiftExpr {
-            .string("TestGlobals.current").member(
+            .string("GTest.current").member(
                 SwiftFunction(name: "pointer", returnType: type).call([.arg("string", string)])
             )
     }

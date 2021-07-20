@@ -35,7 +35,7 @@ class SdkTestFunctionBuilder {
 
     func build() -> SwiftFunction {
 
-        preconditions += [.string("TestGlobals.current.reset()")]
+        preconditions += [.string("GTest.current.reset()")]
 
         let swiftFunctionCall = buildSwiftFunctionCall()
         swiftFunctionCallExpr = swiftFunctionCall
@@ -148,7 +148,7 @@ class SdkTestFunctionBuilder {
             }
         }
 
-        implementation += [.string("TestGlobals.current.sdkReceived.append(\(sdkFunction.name.quoted))")]
+        implementation += [.string("GTest.current.sdkReceived.append(\(sdkFunction.name.quoted))")]
 
         if !sdkFunction.returnType.isVoid {
             let nilExpr = TestAsserts.nilOrSomeExpr(sdkFunction.returnType)
@@ -247,7 +247,7 @@ class SdkTestFunctionBuilder {
     }
 
     func sdkReceivedAssert(_ calls: @autoclosure @escaping () -> [String]) -> SwiftExpr {
-        return .string("XCTAssertEqual(TestGlobals.current.sdkReceived, [\(calls().map(\.quoted).joined(separator: ", "))])")
+        return .string("XCTAssertEqual(GTest.current.sdkReceived, [\(calls().map(\.quoted).joined(separator: ", "))])")
     }
 
 }
