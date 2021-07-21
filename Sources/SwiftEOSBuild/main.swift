@@ -126,6 +126,7 @@ struct SwiftEOSBuild: ParsableCommand {
     @Flag var allowDelete: Bool = false
     @Flag(inversion: .prefixedNo) var emitPackage: Bool = true
     @Flag(inversion: .prefixedNo) var emitSourcesSymlink: Bool = true
+    @Flag(inversion: .prefixedNo) var emitTestableSdk: Bool = true
 
     mutating func run() throws {
 
@@ -141,7 +142,8 @@ struct SwiftEOSBuild: ParsableCommand {
             bindingsURL: bindingsURL,
             allowDelete: allowDelete,
             emitPackage: emitPackage,
-            emitSourcesSymlink: emitSourcesSymlink
+            emitSourcesSymlink: emitSourcesSymlink,
+            emitTestableSdk: emitTestableSdk
         ).main()
     }
 }
@@ -152,6 +154,7 @@ class SwiftEOSBuildImpl {
     let allowDelete: Bool
     let emitPackage: Bool
     let emitSourcesSymlink: Bool
+    let emitTestableSdk: Bool
     let astURL: URL
     let bindingsURL: URL
     let handwrittenCodeSourceURL: URL
@@ -165,10 +168,11 @@ class SwiftEOSBuildImpl {
     let testableSdkImplURL: URL
     let apiNotesURLs: [URL]
 
-    init(astURL: URL, bindingsURL: URL, allowDelete: Bool, emitPackage: Bool, emitSourcesSymlink: Bool) throws {
+    init(astURL: URL, bindingsURL: URL, allowDelete: Bool, emitPackage: Bool, emitSourcesSymlink: Bool, emitTestableSdk: Bool) throws {
         self.allowDelete = allowDelete
         self.emitPackage = emitPackage
         self.emitSourcesSymlink = emitSourcesSymlink
+        self.emitTestableSdk = emitTestableSdk
         self.astURL = astURL
         self.bindingsURL = bindingsURL
         self.handwrittenCodeSourceURL = Defaults.sourceOfHandwrittenCodeURL()
@@ -204,8 +208,11 @@ class SwiftEOSBuildImpl {
         try apiNotesURLs.forEach { apiNotesURL in
             try checkOrRemoveItem(at: apiNotesURL, allowDelete: allowDelete, isDirectory: false)
         }
-        try checkOrRemoveItem(at: testableSdkImplURL, allowDelete: allowDelete, isDirectory: true)
-        try checkOrRemoveItem(at: testableSdkHeaderURL, allowDelete: allowDelete, isDirectory: true)
+
+        if emitTestableSdk {
+            try checkOrRemoveItem(at: testableSdkImplURL, allowDelete: allowDelete, isDirectory: true)
+            try checkOrRemoveItem(at: testableSdkHeaderURL, allowDelete: allowDelete, isDirectory: true)
+        }
     }
 
     private func checkOrRemoveItem(at url: URL, allowDelete: Bool, isDirectory: Bool) throws {
@@ -229,8 +236,11 @@ class SwiftEOSBuildImpl {
             try FileManager.default.copyItem(at: packageSourceURL.appendingPathComponent("Tests"), to: packageTargetURL.appendingPathComponent("Tests"))
         }
 
-        try FileManager.default.createDirectory(at: testableSdkImplURL, withIntermediateDirectories: true, attributes: [:])
-        try FileManager.default.createDirectory(at: testableSdkHeaderURL, withIntermediateDirectories: true, attributes: [:])
+        if emitTestableSdk {
+            try FileManager.default.createDirectory(at: testableSdkImplURL, withIntermediateDirectories: true, attributes: [:])
+            try FileManager.default.createDirectory(at: testableSdkHeaderURL, withIntermediateDirectories: true, attributes: [:])
+        }
+        
         try FileManager.default.createDirectory(at: handwrittenCodeTargetURL.deletingLastPathComponent(), withIntermediateDirectories: true, attributes: [:])
 
         if emitSourcesSymlink {
@@ -244,9 +254,11 @@ class SwiftEOSBuildImpl {
         
         let clangAST = try ClangAST.from(url: astURL)
 
-        logger.log("Emitting TestableEOSSDK...")
-        try CTestableImpl(ast: clangAST, headersURL: testableSdkHeaderURL, implURL: testableSdkImplURL).emit()
-        logger.log("Emitted TestableEOSSDK")
+        if emitTestableSdk {
+            logger.log("Emitting TestableEOSSDK...")
+            try CTestableImpl(ast: clangAST, headersURL: testableSdkHeaderURL, implURL: testableSdkImplURL).emit()
+            logger.log("Emitted TestableEOSSDK")
+        }
 
         logger.log("Building SwiftAST...")
         let swiftAST = try SwiftFromClang(ast: clangAST).swiftModule()
