@@ -28,7 +28,7 @@ public class SwiftRemoveOptionsPass: SwiftRefactorPass {
 
         module.inner.removeAll {
             if optionNames.contains($0.name) {
-                os_log("%{public}s removing %{public}s", "\(type(of: self))", $0.name)
+                os_log("%{public}s removing %{public}s", log: .disabled, "\(type(of: self))", $0.name)
                 return true
             }
             return false

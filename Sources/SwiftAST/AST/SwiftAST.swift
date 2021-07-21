@@ -190,7 +190,7 @@ public class SwiftAST: SwiftOutputStreamable, CustomStringConvertible, CustomDeb
         inner.removeAll { decl in
             if objects.contains(ObjectIdentifier(decl)) {
                 decl.unlink(.outer, ref: self)
-                os_log("removing %{public}s.%{public}s", name, decl.name)
+                os_log("removing %{public}s.%{public}s", log: .disabled, name, decl.name)
                 return true
             }
             return false

@@ -46,7 +46,7 @@ class SwiftDeclReplacePassVisitor: SwiftVisitor {
         if let swiftDecl = type.asDeclRef?.decl {
             let newDecl = transform(swiftDecl) as! SwiftDecl
             if newDecl !== swiftDecl {
-                os_log("replacing ref to %{public}s with %{public}s in %{public}s", swiftDecl.name, newDecl.name, stackPath)
+                os_log("replacing ref to %{public}s with %{public}s in %{public}s", log: .disabled, swiftDecl.name, newDecl.name, stackPath)
                 return SwiftDeclRefType(decl: newDecl, qual: type.qual)
             }
         }

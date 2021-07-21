@@ -203,7 +203,7 @@ class SwiftyArrayLinker {
 //            array.comment?.add(comment: "Array: ``\(array.name)``, ``\(num.name)``")
 //            num.comment?.add(comment: "Array: ``\(array.name)``, ``\(num.name)``")
 //        }
-        os_log("array: %{public}s.%{public}s[%{public}s]", decl.name, array.name, num.name)
+        os_log("array: %{public}s.%{public}s[%{public}s]", log: .disabled, decl.name, array.name, num.name)
     }
 
 }

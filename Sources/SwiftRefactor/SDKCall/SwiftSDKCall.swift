@@ -102,7 +102,7 @@ public class SwiftSDKCall {
                    inoutParms.count == 1,
                    function.returnType.isVoid,
                    let shimmed = try code.shimmed(.nestedOutShims, lhs: lhs, rhs: rhs) {
-                    os_log("shim out arg: %{public}s.%{public}s", function.name, rhs.name)
+                    os_log("shim out arg: %{public}s.%{public}s", log: .disabled, function.name, rhs.name)
                     self.code = shimmed
                     self.sdkArgs += [lhs.arg(rhs.expr)]
                     function.returnType = rhs.type.nonOptional
@@ -124,7 +124,7 @@ public class SwiftSDKCall {
                 }
                 else if rhs.isInOutParm {
                     if let shimmed = try code.shimmed(.nestedInOutShims, lhs: lhs, rhs: rhs) {
-                        os_log("shim arg: %{public}s.%{public}s", function.name, rhs.name)
+                        os_log("shim arg: %{public}s.%{public}s", log: .disabled, function.name, rhs.name)
                         self.code = shimmed
                         self.sdkArgs += [lhs.arg(rhs.expr)]
                         continue
@@ -138,7 +138,7 @@ public class SwiftSDKCall {
                     }
 
                     if let shimmed = try code.shimmed(.nestedShims, lhs: lhs, rhs: rhs) {
-                        os_log("shim nested: %{public}s.%{public}s", function.name, rhs.name)
+                        os_log("shim nested: %{public}s.%{public}s", log: .disabled, function.name, rhs.name)
                         self.code = shimmed
                         self.sdkArgs += [lhs.arg(rhs.expr)]
                     }
@@ -162,7 +162,7 @@ public class SwiftSDKCall {
             lhs: function.returnType.tempVar(),
             rhs: sdkFunction.returnType.tempVar()
         ) {
-            os_log("shim result: %{public}s -> %{public}s <> %{public}s", function.name, "\(function.returnType)", "\(sdkFunction.returnType)")
+            os_log("shim result: %{public}s -> %{public}s <> %{public}s", log: .disabled, function.name, "\(function.returnType)", "\(sdkFunction.returnType)")
             self.code = shimmed
         }
 
