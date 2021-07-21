@@ -8,6 +8,8 @@ public class SwiftPrinter {
     let imports: [String]
     let importsString: String
     let options: SwiftWriterOptions
+    let queue = DispatchQueue(label: "SwiftPrinter")
+    let parallelPrinting: Bool = true
 
     public init(outputDir: URL, imports: [String], options: SwiftWriterOptions) {
         self.outputDir = outputDir
@@ -80,11 +82,26 @@ public class SwiftPrinter {
             return (url, asts)
         }
 
-        try finalOutputs.forEach { (url, ast) in
-            try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true, attributes: [:])
-            try writingToDisk(url: url) { swift in
-                swift.write(text: importsString)
-                swift.write(ast)
+        if parallelPrinting {
+            DispatchQueue.concurrentPerform(iterations: finalOutputs.count) { index in
+                do {
+                    let (url, ast) = finalOutputs[index]
+                    try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true, attributes: [:])
+                    try writingToDisk(url: url) { swift in
+                        swift.write(text: importsString)
+                        swift.write(ast)
+                    }
+                } catch {
+                    print(error)
+                }
+            }
+        } else {
+            try finalOutputs.forEach { (url, ast) in
+                try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true, attributes: [:])
+                try writingToDisk(url: url) { swift in
+                    swift.write(text: importsString)
+                    swift.write(ast)
+                }
             }
         }
     }
