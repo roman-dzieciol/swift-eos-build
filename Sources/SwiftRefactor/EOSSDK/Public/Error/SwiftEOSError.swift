@@ -1,5 +1,4 @@
 
-
 import Foundation
 
 #if canImport(EOSSDK)

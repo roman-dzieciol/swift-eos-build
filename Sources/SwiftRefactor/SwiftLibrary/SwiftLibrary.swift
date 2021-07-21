@@ -6,12 +6,12 @@ import SwiftAST
 
 extension SwiftExpr.function {
 
-    static func withElementPointerPointersReturnedAsArray(
+    static func withBytePointersReturnedAsByteArray(
         bufferPointerName: String,
         countPointerName: String,
         nest: SwiftExpr
     ) -> SwiftExpr {
-        SwiftFunctionCallExpr.named("withElementPointerPointersReturnedAsArray", args: [
+        SwiftFunctionCallExpr.named("withBytePointersReturnedAsByteArray", args: [
             .closure([bufferPointerName, countPointerName], nest: nest) ])
     }
 

@@ -117,30 +117,45 @@ public func withOptionalTrivialMutablePointerFromInOutOptionalTrivial<Value, R>(
 }
 
 /// With nested `Pointer<Trivial>` from `inout Optional<Trivial>`
-public func withTrivialMutablePointerFromInOutOptionalTrivial<Value, R>(
+public func eos_withTrivialMutablePointerFromInOutOptionalTrivial<Value, R>(
     _ inoutOptionalValue: inout Optional<Value>,
     managedBy pointerManager: SwiftEOS__PointerManager,
-    nested: (UnsafeMutablePointer<Value>) throws -> R
+    nested: (UnsafeMutablePointer<Value>?) throws -> R
 ) rethrows -> R {
 
+    // Allocate space for value that's independent from input
     let pointer = UnsafeMutablePointer<Value>.allocate(capacity: 1)
+
+    // Store deallocation, after deinitialization
     defer {
         pointerManager.onDeinit {
             pointer.deallocate()
         }
     }
 
-    if let value = inoutOptionalValue {
-        pointer.initialize(to: value)
+    // When input provided
+    if let inoutValue = inoutOptionalValue {
+
+        // Initialize to input
+        pointer.initialize(to: inoutValue)
+
+        // Store deintialization
         pointerManager.onDeinit {
             pointer.deinitialize(count: 1)
         }
+    } else {
+
+        // Zero initialize
+        pointer.zeroInitialize()
     }
 
+    // With nested closure receiving pointer to allocated and initialized space
     let result = try nested(pointer)
 
+    // Update if no error
     inoutOptionalValue = pointer.pointee
 
+    // Return result of nested closure
     return result
 }
 

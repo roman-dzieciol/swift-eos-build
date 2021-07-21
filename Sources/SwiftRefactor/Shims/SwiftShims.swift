@@ -11,10 +11,10 @@ typealias SwiftShims = Array<SwiftShimFunc>
 extension SwiftShims {
 
     static let nestedOutShims: SwiftShims = [
-        SwiftShims.withSdkObjectPointerPointerReturnedAsSwiftObject,
-        SwiftShims.withCCharPointerPointersReturnedAsOptionalString,
+        SwiftShims.withSdkObjectOptionalPointerToOptionalPointerReturnedAsOptionalSwiftObject,
+        SwiftShims.withCCharPointerPointersReturnedAsString,
         SwiftShims.withHandleReturned,
-        SwiftShims.withBytePointerPointersReturnedAsByteArray,
+        SwiftShims.withBytePointersReturnedAsByteArray,
         SwiftShims.withTrivialPointerReturnedAsTrivial,
         SwiftShims.withIntegerPointerReturnedAsInteger,
         SwiftShims.withEosBoolPointerReturnedAsSwiftBool,
@@ -24,10 +24,10 @@ extension SwiftShims {
     static let nestedInOutShims: SwiftShims = [
         SwiftShims.withHandlePointerFromInOutHandle,
         SwiftShims.withCCharPointerPointersFromInOutString,
-        SwiftShims.withSdkObjectPointerPointerFromInOutSwiftObject,
+        SwiftShims.withSdkObjectOptionalPointerToOptionalPointerFromInOutOptionalSwiftObject,
         SwiftShims.withBytesPointerFromInOutBytesArray,
-        SwiftShims.withSdkObjectPointerFromInOutSwiftObject,
-        SwiftShims.withSdkObjectPointerFromInOutSdkObject,
+        SwiftShims.withSdkObjectOptionalPointerFromInOutOptionalSwiftObject,
+        SwiftShims.withSdkObjectOptionalPointerFromInOutSdkObject,
         SwiftShims.withIntPointerFromInOutInt,
         SwiftShims.withEosBoolPointerFromInOutSwiftBool,
         SwiftShims.withTrivialMutablePointerFromInOutTrivial,
@@ -35,7 +35,7 @@ extension SwiftShims {
 
     static let nestedShims: SwiftShims = [
         SwiftShims.withTrivialPointersFromOptionalTrivialArray,
-        SwiftShims.withSdkObjectPointerFromSwiftObject,
+        SwiftShims.withSdkObjectOptionalPointerFromOptionalSwiftObject,
         SwiftShims.withTransformed,
     ]
 

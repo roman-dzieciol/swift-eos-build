@@ -21,26 +21,26 @@ extension SwiftExpr.function {
     }
 
 
-    static func withSdkObjectPointerFromInOutSwiftObject(
+    static func withSdkObjectOptionalPointerFromInOutOptionalSwiftObject(
         _ inoutSwiftObject: SwiftExpr,
         managedBy pointerManager: SwiftExpr,
         pointerName: String,
         nest: SwiftExpr
     ) -> SwiftExpr {
-        SwiftFunctionCallExpr.named("withSdkObjectPointerFromInOutSwiftObject", args: [
+        SwiftFunctionCallExpr.named("withSdkObjectOptionalPointerFromInOutOptionalSwiftObject", args: [
             inoutSwiftObject.arg(nil),
             pointerManager.arg("managedBy"),
             .closure([pointerName], nest: nest) ])
     }
 
-    static func withSdkObjectPointerPointerReturnedAsSwiftObject(
+    static func withSdkObjectOptionalPointerToOptionalPointerReturnedAsOptionalSwiftObject(
         managedBy pointerManager: SwiftExpr,
         pointerPointerName: String,
         nest: SwiftExpr,
         release: SwiftExpr
     ) -> SwiftExpr {
         SwiftFunctionCallExpr.named(
-            "withSdkObjectPointerPointerReturnedAsSwiftObject",
+            "withSdkObjectOptionalPointerToOptionalPointerReturnedAsOptionalSwiftObject",
             args: [
                 pointerManager.arg("managedBy"),
                 .closure([pointerPointerName], nest: nest).arg("nest"),
@@ -51,25 +51,25 @@ extension SwiftExpr.function {
 
 
 
-    static func withSdkObjectPointerFromInOutSdkObject(
+    static func withSdkObjectOptionalPointerFromInOutSdkObject(
         _ inoutSdkObject: SwiftExpr,
         managedBy pointerManager: SwiftExpr,
         pointerName: String,
         nest: SwiftExpr
     ) -> SwiftExpr {
-        SwiftFunctionCallExpr.named("withSdkObjectPointerFromInOutSdkObject", args: [
+        SwiftFunctionCallExpr.named("withSdkObjectOptionalPointerFromInOutSdkObject", args: [
             inoutSdkObject.arg(nil),
             pointerManager.arg("managedBy"),
             .closure([pointerName], nest: nest) ])
     }
 
-    static func withSdkObjectPointerFromInOutOptionalSdkObject(
+    static func withSdkObjectOptionalPointerFromInOutOptionalSdkObject(
         _ inoutOptionalSdkObject: SwiftExpr,
         managedBy pointerManager: SwiftExpr,
         pointerName: String,
         nest: SwiftExpr
     ) -> SwiftExpr {
-        SwiftFunctionCallExpr.named("withSdkObjectPointerFromInOutOptionalSdkObject", args: [
+        SwiftFunctionCallExpr.named("withSdkObjectOptionalPointerFromInOutOptionalSdkObject", args: [
             inoutOptionalSdkObject.arg(nil),
             pointerManager.arg("managedBy"),
             .closure([pointerName], nest: nest) ])

@@ -24,14 +24,14 @@ extension SwiftShims {
                 let arrayCountExpr = inOutArrayCountInvocationDecl.expr.member(.string(lhsArrayCount.name))
 
                 if rhs.type.isOptional != false {
-                    return .function.withCCharPointerFromInOutOptionalString(
-                        inoutOptionalString: rhs.expr.inout,
+                    return .function.eos_withCCharPointerForOutOptionalString(
+                        outOptionalString: rhs.expr.inout,
                         bufferPointerName: rhs.name,
                         arrayCount: arrayCountExpr,
                         nest: nested)
                 } else {
-                    return .function.withCCharPointerFromInOutString(
-                        inoutString: rhs.expr.inout,
+                    return .function.eos_withCCharPointerForOutString(
+                        outString: rhs.expr.inout,
                         bufferPointerName: rhs.name,
                         arrayCount: arrayCountExpr,
                         nest: nested)
@@ -63,27 +63,27 @@ extension SwiftShims {
 extension SwiftExpr.function {
 
     /// With nested `Pointer<CChar>` from `inout String`
-    static func withCCharPointerFromInOutString(
-        inoutString: SwiftExpr,
+    static func eos_withCCharPointerForOutString(
+        outString: SwiftExpr,
         bufferPointerName: String,
         arrayCount: SwiftExpr,
         nest: SwiftExpr
     ) -> SwiftExpr {
-        SwiftFunctionCallExpr.named("withCCharPointerFromInOutString", args: [
-            inoutString.arg("inoutString"),
+        SwiftFunctionCallExpr.named("eos_withCCharPointerForOutString", args: [
+            outString.arg("outString"),
             arrayCount.arg("capacity"),
             .closure([bufferPointerName], nest: nest) ])
     }
 
     /// With nested `Pointer<CChar>` from `inout Optional<String>`
-    static func withCCharPointerFromInOutOptionalString(
-        inoutOptionalString: SwiftExpr,
+    static func eos_withCCharPointerForOutOptionalString(
+        outOptionalString: SwiftExpr,
         bufferPointerName: String,
         arrayCount: SwiftExpr,
         nest: SwiftExpr
     ) -> SwiftExpr {
-        SwiftFunctionCallExpr.named("withCCharPointerFromInOutOptionalString", args: [
-            inoutOptionalString.arg("inoutOptionalString"),
+        SwiftFunctionCallExpr.named("eos_withCCharPointerForOutOptionalString", args: [
+            outOptionalString.arg("outOptionalString"),
             arrayCount.arg("capacity"),
             .closure([bufferPointerName], nest: nest) ])
     }

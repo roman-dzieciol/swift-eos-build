@@ -6,7 +6,7 @@ import SwiftAST
 extension SwiftShims {
 
     /// With nested `Pointer<SdkObject>` from `SwiftObject`
-    static func withSdkObjectPointerFromSwiftObject(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
+    static func withSdkObjectOptionalPointerFromOptionalSwiftObject(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
 
         if !rhs.isInOutParm,
            let lhsPointer = lhs.type.canonical.asPointer,
@@ -19,13 +19,13 @@ extension SwiftShims {
            lhsObject === rhsObject.sdk
         {
             if lhsPointer.isMutable && rhs.name == "Options" {
-                return .try(.function.withSdkObjectMutablePointerFromSwiftObject(
+                return .try(.function.withSdkObjectOptionalMutablePointerFromSwiftObject(
                     rhs.expr,
                     managedBy: .string("pointerManager"),
                     pointerName: rhs.name,
                     nest: nested))
             } else {
-                return .try(.function.withSdkObjectPointerFromSwiftObject(
+                return .try(.function.withSdkObjectOptionalPointerFromOptionalSwiftObject(
                     rhs.expr,
                     managedBy: .string("pointerManager"),
                     pointerName: rhs.name,
@@ -39,26 +39,26 @@ extension SwiftShims {
 extension SwiftExpr.function {
 
     /// With nested `Pointer<SdkObject>` from `SwiftObject`
-    static func withSdkObjectPointerFromSwiftObject(
+    static func withSdkObjectOptionalPointerFromOptionalSwiftObject(
         _ swiftObject: SwiftExpr,
         managedBy pointerManager: SwiftExpr,
         pointerName: String,
         nest: SwiftExpr
     ) -> SwiftExpr {
-        SwiftFunctionCallExpr.named("withSdkObjectPointerFromSwiftObject", args: [
+        SwiftFunctionCallExpr.named("withSdkObjectOptionalPointerFromOptionalSwiftObject", args: [
             swiftObject.arg(nil),
             pointerManager.arg("managedBy"),
             .closure([pointerName], nest: nest) ])
     }
 
     /// With nested `Pointer<SdkObject>` from `SwiftObject`
-    static func withSdkObjectMutablePointerFromSwiftObject(
+    static func withSdkObjectOptionalMutablePointerFromSwiftObject(
         _ swiftObject: SwiftExpr,
         managedBy pointerManager: SwiftExpr,
         pointerName: String,
         nest: SwiftExpr
     ) -> SwiftExpr {
-        SwiftFunctionCallExpr.named("withSdkObjectMutablePointerFromSwiftObject", args: [
+        SwiftFunctionCallExpr.named("withSdkObjectOptionalMutablePointerFromSwiftObject", args: [
             swiftObject.arg(nil),
             pointerManager.arg("managedBy"),
             .closure([pointerName], nest: nest) ])

@@ -25,17 +25,17 @@ extension SwiftExpr.function {
         nest: SwiftExpr
     ) -> SwiftExpr {
         SwiftFunctionCallExpr.named("withPointersToInOutArray", args: [
-            inoutArray.arg("inoutArray"),
+            inoutArray.arg("inoutOptionalArray"),
             .closure([bufferPointerName, countPointerName], nest: nest) ])
     }
 
-    static func withSdkObjectPointerPointerFromInOutSwiftObject(
+    static func withSdkObjectOptionalPointerToOptionalPointerFromInOutOptionalSwiftObject(
         inoutSwiftObject: SwiftExpr,
         pointerManager: SwiftExpr,
         pointerPointerName: String,
         nest: SwiftExpr
     ) -> SwiftExpr {
-        SwiftFunctionCallExpr.named("withSdkObjectPointerPointerFromInOutSwiftObject", args: [
+        SwiftFunctionCallExpr.named("withSdkObjectOptionalPointerToOptionalPointerFromInOutOptionalSwiftObject", args: [
             inoutSwiftObject.arg(nil),
             pointerManager.arg("managedBy"),
             .closure([pointerPointerName], nest: nest) ])

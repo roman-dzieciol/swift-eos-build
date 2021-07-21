@@ -23,7 +23,7 @@ extension SwiftShims {
                         pointerName: rhs.name,
                         nest: nested)
                 } else {
-                    return .function.withTrivialMutablePointerFromInOutOptionalTrivial(
+                    return .function.eos_withTrivialMutablePointerFromInOutOptionalTrivial(
                         .inout(rhs.expr),
                         managedBy: .string("pointerManager"),
                         pointerName: rhs.name,

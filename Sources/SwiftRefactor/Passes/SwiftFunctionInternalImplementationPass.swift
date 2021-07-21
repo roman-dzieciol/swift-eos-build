@@ -69,6 +69,7 @@ private class SwiftFunctionInternalImplementationPassVisitor: SwiftVisitor {
                 }
 
                 function.code = internalFunctionCall
+                function.link(.implementation, ref: internalFunction)
 
                 object.inner.append(internalFunction)
             }

@@ -34,17 +34,15 @@ public func withIntPointerFromInOutOptionalInt<Pointee: BinaryInteger, Integer: 
     _ inoutOptionalInteger: inout Optional<Integer>,
     nested: (UnsafeMutablePointer<Pointee>?) throws -> R
 ) rethrows -> R {
-    guard var integer = inoutOptionalInteger else {
-        return try nested(nil)
-    }
-    let result = try withTransformedInOut(inoutValue: &integer) { value in
+    var initialValue = inoutOptionalInteger ?? .zero
+    let result = try withTransformedInOut(inoutValue: &initialValue) { value in
         try safeNumericCast(exactly: value)
     } valueFromTransformed: { transformed in
         try safeNumericCast(exactly: transformed)
     } nested: { transformed in
         try withUnsafeMutablePointer(to: &transformed, nested)
     }
-    inoutOptionalInteger = integer
+    inoutOptionalInteger = initialValue
     return result
 }
 

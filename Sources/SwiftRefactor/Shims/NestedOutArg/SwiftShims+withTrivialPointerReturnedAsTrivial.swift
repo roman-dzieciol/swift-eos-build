@@ -14,14 +14,26 @@ extension SwiftShims {
            rhs.type.canonical.isTrivial,
            lhsPointer.pointeeType.optional == rhs.type.canonical.optional {
 
-            return .function.throwingNilResult(
-                .function.withPointeeReturned(
-                    managedBy: .string("pointerManager"),
-                    pointerName: rhs.name,
-                    nest: nested
-                ))
+            return .function.withTrivialPointerReturnedAsTrivial(
+                managedBy: .string("pointerManager"),
+                pointerName: rhs.name,
+                nest: nested
+            )
         }
 
         return nil
+    }
+}
+
+extension SwiftExpr.function {
+
+    static func withTrivialPointerReturnedAsTrivial(
+        managedBy pointerManager: SwiftExpr,
+        pointerName: String,
+        nest: SwiftExpr
+    ) -> SwiftExpr {
+        SwiftFunctionCallExpr.named("withTrivialPointerReturnedAsTrivial", args: [
+            pointerManager.arg("managedBy"),
+            .closure([pointerName], nest: nest) ])
     }
 }

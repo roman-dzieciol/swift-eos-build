@@ -16,7 +16,7 @@ extension SwiftShims {
                          rhsType: rhs.type, options: []) {
 
             return .function.throwingNilResult(
-                .function.withPointeeReturned(
+                .function.withHandleReturned(
                     managedBy: .string("pointerManager"),
                     pointerName: rhs.name,
                     nest: nested
@@ -24,5 +24,18 @@ extension SwiftShims {
         }
 
         return nil
+    }
+}
+
+extension SwiftExpr.function {
+
+    static func withHandleReturned(
+        managedBy pointerManager: SwiftExpr,
+        pointerName: String,
+        nest: SwiftExpr
+    ) -> SwiftExpr {
+        SwiftFunctionCallExpr.named("withHandleReturned", args: [
+            pointerManager.arg("managedBy"),
+            .closure([pointerName], nest: nest) ])
     }
 }

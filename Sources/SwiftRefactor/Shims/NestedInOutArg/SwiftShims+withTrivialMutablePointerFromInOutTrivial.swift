@@ -25,7 +25,7 @@ extension SwiftShims {
                         pointerName: rhs.name,
                         nest: nested)
                 } else {
-                    return .function.withTrivialMutablePointerFromInOutOptionalTrivial(
+                    return .function.eos_withTrivialMutablePointerFromInOutOptionalTrivial(
                         .inout(rhs.expr),
                         managedBy: .string("pointerManager"),
                         pointerName: rhs.name,
@@ -74,13 +74,13 @@ extension SwiftExpr.function {
     }
 
     /// With nested `Pointer<Trivial>` from `inout Optional<Trivial>`
-    static func withTrivialMutablePointerFromInOutOptionalTrivial(
+    static func eos_withTrivialMutablePointerFromInOutOptionalTrivial(
         _ inoutOptionalValue: SwiftExpr,
         managedBy pointerManager: SwiftExpr,
         pointerName: String,
         nest: SwiftExpr
     ) -> SwiftExpr {
-        SwiftFunctionCallExpr.named("withTrivialMutablePointerFromInOutOptionalTrivial", args: [
+        SwiftFunctionCallExpr.named("eos_withTrivialMutablePointerFromInOutOptionalTrivial", args: [
             inoutOptionalValue.arg(nil),
             pointerManager.arg("managedBy"),
             .closure([pointerName], nest: nest) ])

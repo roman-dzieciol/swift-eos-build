@@ -6,105 +6,132 @@ import Foundation
 import EOSSDK
 #endif
 
+extension String {
 
-public func withPointer<R>(toStringsCopy strings: [String], _ body: (UnsafePointer<UnsafePointer<CChar>?>) throws -> R) rethrows -> R {
-    let charPtrs = strings.map { strdup($0) }
-    defer {
-        charPtrs.forEach { free($0) }
+    public static func eos_repairing(cString: UnsafePointer<CChar>?) -> String? {
+        return eos_repairing(cString: cString?.asUInt8)
     }
-    return try body(charPtrs.map { UnsafePointer($0) })
-}
 
+    public static func eos_repairing(cString: UnsafePointer<UInt8>?) -> String? {
 
-public func withPointers<R>(toStringsCopy strings: [String], _ body: (UnsafePointer<UnsafePointer<CChar>?>, Int) throws -> R) rethrows -> R {
-    let charPtrs = strings.map { strdup($0) }
-    defer {
-        charPtrs.forEach { free($0) }
+        guard let cString = cString else { return nil }
+
+        if let decoded = String.decodeCString(cString, as: UTF8.self, repairingInvalidCodeUnits: true) {
+            if decoded.repairsMade {
+                print("repaired UTF8 in: " + decoded.result)
+            }
+            return decoded.result
+        }
+        return nil
     }
-    return try body(charPtrs.map { UnsafePointer($0) }, charPtrs.count)
-}
-
-public func withStringBuffer<LengthType: BinaryInteger>(
-    capacity: Int? = nil,
-    _ nested: (UnsafeMutablePointer<CChar>?, UnsafeMutablePointer<LengthType>?) throws -> Void) rethrows -> String
-{
-    String(cString: try withArrayBuffer(capacity: capacity, nested))
-}
-
-public func withPointer(
-    outString: inout String,
-    capacity: Int,
-    _ nested: (UnsafeMutablePointer<CChar>?) throws -> Void) rethrows
-{
-    let array = try Array<CChar>(unsafeUninitializedCapacity: capacity) { buffer, initializedCount in
-        try nested(buffer.baseAddress)
-        guard let indexOfZero = buffer.firstIndex(of: .zero) else { fatalError() }
-        guard indexOfZero <= capacity else { fatalError() }
-        initializedCount = indexOfZero + 1
-    }
-    outString = String(cString: array)
 }
 
 
 /// With nested `Pointer<CChar>` from `inout String`
-public func withCCharPointerFromInOutString<R>(
-    inoutString: inout String,
+public func eos_withCCharPointerForOutString<R>(
+    outString: inout String,
     capacity: Int,
     nested: (UnsafeMutablePointer<CChar>?) throws -> R) rethrows -> R
 {
+    do {
+        var outOptionalString: String? = outString
+        let result = try eos_withCCharPointerForOutOptionalString(outOptionalString: &outOptionalString, capacity: capacity, nested: nested)
+        outString = outOptionalString ?? ""
+        return result
+    }
+    catch {
 
-    assert(inoutString.count >= capacity)
-
-    var utf8Array = Array(inoutString.utf8CString)
-
-    let result = try nested(&utf8Array)
-
-    inoutString = String(cString: utf8Array)
-
-    return result
+        // Set out string to empty on error and rethrow
+        outString = ""
+        throw error
+    }
 }
 
-/// With nested `Pointer<CChar>` from `inout Optional<String>`
-public func withCCharPointerFromInOutOptionalString<R>(
-    inoutOptionalString: inout String?,
+/// With nested `Pointer<CChar>` from `inout String?`
+public func eos_withCCharPointerForOutOptionalString<R>(
+    outOptionalString: inout String?,
     capacity: Int,
     nested: (UnsafeMutablePointer<CChar>?) throws -> R) rethrows -> R
 {
-    if let inoutString = inoutOptionalString {
+    do {
+        // Nested closure result
+        var result: R!
 
-        assert(inoutString.count >= capacity)
+        // Set out string to string from pointer
+        outOptionalString = try String(unsafeUninitializedCapacity: capacity) { (buffer: UnsafeMutableBufferPointer<UInt8>) throws -> Int in
 
-        var utf8Array = Array(inoutString.utf8CString)
+            // If buffer is empty or capacity zero
+            guard let baseAddress = buffer.baseAddress, capacity != .zero else {
 
-        let result = try nested(&utf8Array)
+                // With nested closure receiving nil pointer when no buffer or capacity zero
+                result = try nested(nil)
 
-        inoutOptionalString = String(cString: utf8Array)
+                // Return length of C string without NUL character
+                return .zero
+            }
 
+            // Rebind as CChar
+            // Return length of C string without NUL character
+            return try baseAddress.withMemoryRebound(to: CChar.self, capacity: buffer.count) { (charPointer: UnsafeMutablePointer<CChar>) throws -> Int in
+
+                // With nested closure receiving pointer to buffer
+                result = try nested(charPointer)
+
+                // Return length of C string without NUL character
+                return strnlen(charPointer, buffer.count)
+            }
+        }
+
+        // Return result of nested closure
         return result
-    } else {
+    }
+    catch {
 
-        var utf8Array = Array<CChar>.init(repeating: 0, count: capacity)
-
-        let result = try nested(&utf8Array)
-
-        inoutOptionalString = String(cString: utf8Array)
-
-        return result
+        // Set out string to empty on error and rethrow
+        outOptionalString = ""
+        throw error
     }
 }
 
-/// With nested `Pointer<Pointer<CChar>>, Int` from `inout Optional<String>`
-public func withCCharPointerPointersFromInOutOptionalString<LengthType: BinaryInteger, R>(
-    inoutOptionalString: inout String?,
-    nested: (UnsafeMutablePointer<CChar>?, UnsafeMutablePointer<LengthType>?) throws -> R) rethrows -> R
+public func withCCharPointerPointersReturnedAsString<SdkInteger: BinaryInteger>(
+    nested: (UnsafeMutablePointer<CChar>?, UnsafeMutablePointer<SdkInteger>?) throws -> Void) rethrows -> String
 {
-    guard let string = inoutOptionalString else {
-        return try nested(nil, nil)
+    // Initialize capacity to zero
+    var sdkCapacity: SdkInteger = .zero
+
+    // SDK will update capacity and throw EOS_LimitExceeded
+    do {
+        // With nested closure receiving nil pointer and zero capacity
+        try nested(nil, &sdkCapacity)
+
+        // Fallback if nested closure does not update capacity & throw EOS_LimitExceeded
+        return ""
     }
-    var utf8Array = Array(string.utf8CString)
-    let result = try withPointerForInOut(array: &utf8Array, capacity: utf8Array.capacity, nested)
-    inoutOptionalString = String(cString: utf8Array)
-    return result
+    catch SwiftEOSError.result(.EOS_LimitExceeded) {
+
+        // Return string from pointers
+        return try String(unsafeUninitializedCapacity: safeNumericCast(exactly: sdkCapacity)) { (buffer: UnsafeMutableBufferPointer<UInt8>) throws -> Int in
+
+            // If buffer is empty or capacity still zero, rethrow
+            guard let baseAddress = buffer.baseAddress, sdkCapacity != .zero else {
+                throw SwiftEOSError.result(.EOS_LimitExceeded)
+            }
+
+            // Rebind as CChar
+            // Return length of C string without NUL character
+            return try baseAddress.withMemoryRebound(to: CChar.self, capacity: buffer.count) { (charPointer: UnsafeMutablePointer<CChar>) throws -> Int in
+
+                // Update capacity if needed
+                sdkCapacity = try safeNumericCast(exactly: buffer.count)
+
+                // With nested closure receiving pointer to buffer
+                try nested(charPointer, &sdkCapacity)
+
+                // Return length of C string without NUL character
+                return strnlen(charPointer, buffer.count)
+            }
+        }
+    }
 }
 
 /// `[String]` = `Pointer<Pointer<CChar>>`
@@ -115,31 +142,15 @@ public func stringArrayFromCCharPointerPointer<Integer: BinaryInteger>(
     guard let pointer = pointer else { return nil }
     return UnsafeBufferPointer(start: pointer, count: try safeNumericCast(exactly: count))
         .compactMap { $0 }
-        .map { String(cString: $0) }
-}
-
-public func withCCharPointerPointersReturnedAsOptionalString<LengthType: BinaryInteger>(
-    nested: (UnsafeMutablePointer<CChar>?, UnsafeMutablePointer<LengthType>?) throws -> Void) rethrows -> Optional<String>
-{
-    var capacity: LengthType = .zero
-    do {
-        try nested(nil, &capacity)
-        return ""
-    } catch SwiftEOSError.result(.EOS_LimitExceeded) {
-        let utf8Array = try Array<CChar>(unsafeUninitializedCapacity: safeNumericCast(exactly: capacity)) { buffer, initializedCount in
-            try nested(buffer.baseAddress,  &capacity)
-            initializedCount = try safeNumericCast(exactly: capacity)
-        }
-        return String(cString: utf8Array)
-    }
+        .map { String.eos_repairing(cString: $0) ?? "" }
 }
 
 public func stringFromOptionalCStringPointer(_ cString: UnsafePointer<CChar>?) -> String? {
     guard let cString = cString else { return nil }
-    return String(cString: cString)
+    return String.eos_repairing(cString: cString)
 }
 
 public func stringFromOptionalCStringPointer(_ cString: UnsafePointer<UInt8>?) -> String? {
     guard let cString = cString else { return nil }
-    return String(cString: cString)
+    return String.eos_repairing(cString: cString)
 }

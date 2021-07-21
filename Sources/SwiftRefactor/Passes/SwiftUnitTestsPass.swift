@@ -18,6 +18,9 @@ public class SwiftUnitTestsPass: SwiftRefactorPass {
     }
 
     func addObjectTests(for module: SwiftModule) throws {
+
+        let testOptions: TestOptions = [.nilApiVersion, .nilClientData]
+
         try SwiftGatheringVisitor.decls(in: module, astFilter: { $0 is SwiftObject && $0.inSwiftEOS }, typeFilter: nil) { objects, types in
             objects
                 .compactMap { $0 as? SwiftObject }
@@ -28,11 +31,11 @@ public class SwiftUnitTestsPass: SwiftRefactorPass {
                         let testObject = SwiftObject(name: object.name + "Tests", tagName: "class", superTypes: ["XCTestCase"])
                         var asserts: [SwiftStmt] = []
 
-                        asserts.append(TestAsserts.assertNil(object: sdkObject, lhsString: "cstruct"))
+                        asserts.append(TestAsserts.assertNil(object: sdkObject, lhsString: "cstruct", options: testOptions))
 
                         asserts.append(.string("let swiftObject = try XCTUnwrap(try \(object.name)(sdkObject: cstruct))"))
 
-                        asserts.append(TestAsserts.assertNil(object: object, lhsString: "swiftObject"))
+                        asserts.append(TestAsserts.assertNil(object: object, lhsString: "swiftObject", options: testOptions))
 
                         statements.append(.try(.function.withZeroInitializedCStruct(
                             type: .string(sdkObject.name).member("self"),

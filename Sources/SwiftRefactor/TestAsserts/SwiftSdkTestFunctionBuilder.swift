@@ -43,11 +43,9 @@ class SdkTestFunctionBuilder {
         statements += [
             .string(""),
             .string("// Given implementation for SDK function"),
-            buildSdkImplementation(sdkFunction: sdkFunction),
+            buildSdkImplementation(sdkFunction: sdkFunction, calls: &postconditionCalls),
             .string("defer { __on_\(sdkFunction.name) = nil }"),
         ]
-
-        postconditionCalls += [sdkFunction.name]
 
         addActorReference()
         addPostconditionAsserts()
@@ -100,7 +98,7 @@ class SdkTestFunctionBuilder {
             if parm.isInOutParm {
                 let nilExpr = TestAsserts.nilOrSomeExpr(parm.type)
                 preconditions += [.var(parm.name, type: parm.type).assign(nilExpr)]
-                postconditions += [TestAsserts.assertNil(varDecl: parm)]
+                postconditions += [TestAsserts.assertNil(swiftParam: parm, swiftFunction: swiftFunction, sdkFunction: sdkFunction)]
                 swiftFunctionArgs += [parm.expr.inout.arg(parm.label.map { .string($0) })]
             } else {
                 swiftFunctionArgs += [TestAsserts.nilArg(varDecl: parm)]
@@ -110,12 +108,15 @@ class SdkTestFunctionBuilder {
         return swiftFunction.call(swiftFunctionArgs, useTrailingClosures: false)
     }
 
-    func buildSdkImplementation(sdkFunction: SwiftFunction ) -> SwiftExpr {
+    func buildSdkImplementation(sdkFunction: SwiftFunction, calls: inout [String]) -> SwiftExpr {
 
         let sdkFunctionParms = sdkFunction.parms
 
         var implementation: [SwiftExpr] = []
         let sdkParamNames = sdkFunctionParms.map({ $0.name })
+
+        implementation += [.string("GTest.current.sdkReceived.append(\(sdkFunction.name.quoted))")]
+        calls += [sdkFunction.name]
 
         for sdkParam in sdkFunctionParms {
 
@@ -140,15 +141,53 @@ class SdkTestFunctionBuilder {
             }
 
             else if sdkParam.name.hasSuffix("Options"), let optionsObject = sdkParam.type.canonical.asPointer?.pointeeType.asDeclRef?.decl.canonical as? SwiftObject {
-                implementation += [TestAsserts.assertNil(object: optionsObject, lhsString: "\(sdkParam.name)!.pointee")]
+
+                let lhsString = "\(sdkParam.name)!.pointee"
+
+                optionsObject.members.forEach { member in
+                    if let functionType = member.type.canonical.asFunction {
+                        let args = functionType.paramTypes.map { paramType -> SwiftFunctionCallArgExpr in
+
+                            if let object = paramType.canonical.asPointer?.pointeeType.asDeclRef?.decl.canonical as? SwiftObject {
+                                let objectInit = TestAsserts.nilInitialize(object: object, passthrough: ["ClientData"])
+                                return .arg(nil, .function.pointerToTestObject(objectInit, type: paramType))
+                            }
+
+                            return TestAsserts.nilOrSomeExpr(paramType).arg(nil)
+                        }
+
+                        let invocation: SwiftExpr = .string(lhsString).member(member.expr.optional).call(args)
+
+                        if !functionType.returnType.isVoid {
+                            let resultVarName = "resultOf\(sdkParam.name)\(member.name)"
+                            implementation += [
+                                .string("let \(resultVarName)").assign(invocation),
+                                TestAsserts.assertNil(varDecl: functionType.returnType.toVar(named: resultVarName)),
+                            ]
+                        } else {
+                            implementation += [
+                                invocation,
+                            ]
+                        }
+
+                        if functionType.qual.attributes.contains("@convention(c)") {
+                            calls += [member.name]
+                        }
+                    }
+                    else {
+                        let assertExpr = TestAsserts.assertNil(
+                            varDecl: member,
+                            lhsString: lhsString
+                        )
+                        implementation += [assertExpr]
+                    }
+                }
             }
 
             else {
-                implementation += [TestAsserts.assertNil(varDecl: sdkParam)]
+                implementation += [TestAsserts.assertNil(sdkParam: sdkParam, swiftFunction: swiftFunction, sdkFunction: sdkFunction)]
             }
         }
-
-        implementation += [.string("GTest.current.sdkReceived.append(\(sdkFunction.name.quoted))")]
 
         if !sdkFunction.returnType.isVoid {
             let nilExpr = TestAsserts.nilOrSomeExpr(sdkFunction.returnType)
@@ -183,9 +222,8 @@ class SdkTestFunctionBuilder {
                     preconditions += [
                         .string(""),
                         .string("// Given implementation for SDK release function"),
-                        buildSdkImplementation(sdkFunction: releaseFunc),
+                        buildSdkImplementation(sdkFunction: releaseFunc, calls: &autoreleaseCalls),
                     ]
-                    autoreleaseCalls += [releaseFunc.name]
                     autoreleaseAsserts += [
                         .string("__on_\(releaseFunc.name) = nil"),
                     ]
@@ -200,22 +238,25 @@ class SdkTestFunctionBuilder {
             swiftFunctionCallExpr = .try(swiftFunctionCallExpr)
         }
 
-        postconditions += [sdkReceivedAssert(self.postconditionCalls)]
-
         swiftFunctionParms
             .filter(\.type.canonical.isFunction)
             .forEach { param in
-                preconditions += [
-                    .string("let waitFor\(param.name) = expectation(description: \"waitFor\(param.name)\")")
-                ]
-                postconditions += [.string("wait(for: [waitFor\(param.name)], timeout: 0.5)")]
+
+                if param.type.canonical.asFunction?.qual.attributes.contains("@convention(c)") == true {
+//                    self.postconditionCalls += [param.name]
+                } else {
+                    preconditions += [
+                        .string("let waitFor\(param.name) = expectation(description: \"waitFor\(param.name)\")")
+                    ]
+                    postconditions += [.string("wait(for: [waitFor\(param.name)], timeout: 0.5)")]
+                }
             }
 
-        if !swiftFunction.returnType.isVoid {
-            if swiftFunction.returnType.canonical.isOptional == false,
-               let object = swiftFunction.returnType.canonical.asDeclRef?.decl.canonical as? SwiftObject,
-               !(object is SwiftEnum) {
+        postconditions += [sdkReceivedAssert(self.postconditionCalls)]
 
+        if !swiftFunction.returnType.isVoid {
+
+            if (swiftFunction.linked(.implementation) as? SwiftFunction)?.isThrowingNilResult() == true {
                 swiftFunctionCallExpr = SwiftFunctionCallExpr(
                     expr: .string("XCTAssertThrowsError"),
                     args: [
@@ -242,9 +283,8 @@ class SdkTestFunctionBuilder {
                     postconditions += [
                         .string(""),
                         .string("// Given implementation for SDK remove notify function"),
-                        buildSdkImplementation(sdkFunction: removeNotifyFunc)
+                        buildSdkImplementation(sdkFunction: removeNotifyFunc, calls: &autoreleaseCalls)
                     ]
-                    autoreleaseCalls += [removeNotifyFunc.name]
 
                     var notifyBuilder = SwiftStatementsBuilder()
                     notifyBuilder += [
@@ -269,6 +309,24 @@ class SdkTestFunctionBuilder {
 
     func sdkReceivedAssert(_ calls: @autoclosure @escaping () -> [String]) -> SwiftExpr {
         return .string("XCTAssertEqual(GTest.current.sdkReceived, [\(calls().map(\.quoted).joined(separator: ", "))])")
+    }
+
+}
+
+extension SwiftFunction {
+
+    func isThrowingNilResult() -> Bool {
+        let isThrowingNilResult: Bool? = code?.perform { expr in
+            if let functionCall = expr as? SwiftFunctionCallExpr,
+               let literalIdentifier = functionCall.expr as? SwiftLiteralExpr,
+               literalIdentifier.literalType == .string,
+               literalIdentifier.literal() == "throwingNilResult"
+            {
+                return true
+            }
+            return nil
+        }
+        return isThrowingNilResult == true
     }
 
 }

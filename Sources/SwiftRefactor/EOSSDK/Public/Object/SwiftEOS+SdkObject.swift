@@ -1,193 +1,314 @@
 
 import Foundation
 
-public func withSdkObjectPointerPointerFromInOutSwiftObject<SwiftObject: SwiftEOSObject, R>(
+public func withSdkObjectOptionalPointerToOptionalPointerFromInOutOptionalSwiftObject<SwiftObject: SwiftEOSObject, R>(
     _ inoutSwiftObject: inout SwiftObject?,
     managedBy pointerManager: SwiftEOS__PointerManager,
     nested: (UnsafeMutablePointer<UnsafeMutablePointer<SwiftObject.SdkObject>?>?) throws -> R
 ) throws -> R {
 
-    guard let swiftObject = inoutSwiftObject else {
-        return try nested(nil)
-    }
-
-    let sdkObject: SwiftObject.SdkObject = try swiftObject.buildSdkObject(pointerManager: pointerManager)
-
+    // Allocate space for object that's independent from input
     let pointer = UnsafeMutablePointer<SwiftObject.SdkObject>.allocate(capacity: 1)
+
+    // Store deallocation, after deinitialization
     defer {
         pointerManager.onDeinit {
             pointer.deallocate()
         }
     }
 
-    pointer.initialize(to: sdkObject)
-    pointerManager.onDeinit {
-        pointer.deinitialize(count: 1)
+    // When input provided
+    if let inoutValue = inoutSwiftObject {
+
+        // Build sdk object
+        let sdkObject: SwiftObject.SdkObject = try inoutValue.buildSdkObject(pointerManager: pointerManager)
+
+        // Initialize to input
+        pointer.initialize(to: sdkObject)
+
+        // Store deintialization of pointer
+        pointerManager.onDeinit {
+            pointer.deinitialize(count: 1)
+        }
+    } else {
+
+        // Zero initialize
+        pointer.zeroInitialize()
     }
 
-    let pointerPointer = UnsafeMutablePointer<UnsafeMutablePointer<SwiftObject.SdkObject>?>.allocate(capacity: 1)
+    // Allocate space for pointer to pointer that's independent from input
+    let pointerToPointer = UnsafeMutablePointer<UnsafeMutablePointer<SwiftObject.SdkObject>?>.allocate(capacity: 1)
+
+    // Store deallocation of pointer to pointer, after deinitialization
     defer {
         pointerManager.onDeinit {
-            pointerPointer.deallocate()
+            pointerToPointer.deallocate()
         }
     }
 
-    pointerPointer.initialize(to: pointer)
+    // Initialize pointer to pointer
+    pointerToPointer.initialize(to: pointer)
+
+    // Store deintialization of pointer to pointer
     pointerManager.onDeinit {
-        pointerPointer.deinitialize(count: 1)
+        pointerToPointer.deinitialize(count: 1)
     }
 
-    let result = try nested(pointerPointer)
+    // With nested closure receiving pointer to allocated and initialized pointer
+    let result = try nested(pointerToPointer)
 
-    guard let sdkObjectPointer = pointerPointer.pointee else {
-        inoutSwiftObject = nil
-        return result
-    }
+    // Update to swift object
+    inoutSwiftObject = try SwiftObject(sdkObject: pointerToPointer.pointee?.pointee)
 
-    inoutSwiftObject = try SwiftObject(sdkObject: sdkObjectPointer.pointee)
+    // Return result of nested closure
     return result
 }
 
-public func withSdkObjectPointerPointerReturnedAsSwiftObject<SwiftObject: SwiftEOSObject>(
+public func withSdkObjectOptionalPointerToOptionalPointerReturnedAsOptionalSwiftObject<SwiftObject: SwiftEOSObject>(
     managedBy pointerManager: SwiftEOS__PointerManager,
     nest: (UnsafeMutablePointer<UnsafeMutablePointer<SwiftObject.SdkObject>?>?) throws -> Void,
     release: (UnsafeMutablePointer<SwiftObject.SdkObject>) -> Void
 ) throws -> SwiftObject? {
 
-    let pointerPointer = UnsafeMutablePointer<UnsafeMutablePointer<SwiftObject.SdkObject>?>.allocate(capacity: 1)
+    // Allocate space for object that's independent from input
+    let pointer = UnsafeMutablePointer<SwiftObject.SdkObject>.allocate(capacity: 1)
+
+    // Store deallocation, after deinitialization
     defer {
         pointerManager.onDeinit {
-            pointerPointer.deallocate()
+            pointer.deallocate()
         }
     }
 
-    pointerPointer.initialize(to: nil)
+    // Zero initialize
+    pointer.zeroInitialize()
 
-    try nest(pointerPointer)
+    // Allocate space for pointer to pointer that's independent from input
+    let pointerToPointer = UnsafeMutablePointer<UnsafeMutablePointer<SwiftObject.SdkObject>?>.allocate(capacity: 1)
 
-    guard let sdkObjectPointer = pointerPointer.pointee else {
+    // Store deallocation of pointer to pointer, after deinitialization
+    defer {
+        pointerManager.onDeinit {
+            pointerToPointer.deallocate()
+        }
+    }
+
+    // Initialize pointer to pointer
+    pointerToPointer.initialize(to: nil)
+
+    // Store deintialization of pointer to pointer
+    pointerManager.onDeinit {
+        pointerToPointer.deinitialize(count: 1)
+    }
+
+    // With nested closure receiving pointer to nil pointer
+    try nest(pointerToPointer)
+
+
+    // Return nil if sdk set or kept nil
+    guard let sdkObjectPointer = pointerToPointer.pointee else {
         return nil
     }
 
-    let result = try SwiftObject(sdkObject: sdkObjectPointer.pointee)
+    // Build swift object from sdk object
+    let swiftObject = try SwiftObject(sdkObject: sdkObjectPointer.pointee)
 
+    // Release sdk object if needed
     release(sdkObjectPointer)
 
-    return result
+    // Return swift object
+    return swiftObject
 }
 
-public func withSdkObjectPointerFromInOutSwiftObject<SwiftObject: SwiftEOSObject, R>(
+public func withSdkObjectOptionalPointerFromInOutOptionalSwiftObject<SwiftObject: SwiftEOSObject, R>(
     _ inoutSwiftObject: inout SwiftObject?,
     managedBy pointerManager: SwiftEOS__PointerManager,
     nested: (UnsafeMutablePointer<SwiftObject.SdkObject>?) throws -> R
 ) throws -> R {
 
-    guard let swiftObject = inoutSwiftObject else {
-        return try nested(nil)
-    }
-
-    let sdkObject: SwiftObject.SdkObject = try swiftObject.buildSdkObject(pointerManager: pointerManager)
-
+    // Allocate space for object that's independent from input
     let pointer = UnsafeMutablePointer<SwiftObject.SdkObject>.allocate(capacity: 1)
+
+    // Store deallocation, after deinitialization
     defer {
         pointerManager.onDeinit {
             pointer.deallocate()
         }
     }
 
+    // When input provided
+    if let inoutValue = inoutSwiftObject {
+
+        // Build sdk object
+        let sdkObject: SwiftObject.SdkObject = try inoutValue.buildSdkObject(pointerManager: pointerManager)
+
+        // Initialize to input
+        pointer.initialize(to: sdkObject)
+
+        // Store deintialization of pointer
+        pointerManager.onDeinit {
+            pointer.deinitialize(count: 1)
+        }
+    } else {
+
+        // Zero initialize
+        pointer.zeroInitialize()
+    }
+
+    // With nested closure receiving pointer to allocated and initialized pointee
+    let result = try nested(pointer)
+
+    // Update to swift object
+    inoutSwiftObject = try SwiftObject(sdkObject: pointer.pointee)
+
+    // Return result of nested closure
+    return result
+}
+
+public func withSdkObjectOptionalPointerFromOptionalSwiftObject<SwiftObject: SwiftEOSObject, R>(
+    _ swiftObject: SwiftObject?,
+    managedBy pointerManager: SwiftEOS__PointerManager,
+    nested: (UnsafePointer<SwiftObject.SdkObject>?) throws -> R
+) throws -> R {
+
+    // Allocate space for object that's independent from input
+    let pointer = UnsafeMutablePointer<SwiftObject.SdkObject>.allocate(capacity: 1)
+
+    // Store deallocation, after deinitialization
+    defer {
+        pointerManager.onDeinit {
+            pointer.deallocate()
+        }
+    }
+
+    // When input provided
+    if let swiftObject = swiftObject {
+
+        // Build sdk object
+        let sdkObject: SwiftObject.SdkObject = try swiftObject.buildSdkObject(pointerManager: pointerManager)
+
+        // Initialize to input
+        pointer.initialize(to: sdkObject)
+
+        // Store deintialization of pointer
+        pointerManager.onDeinit {
+            pointer.deinitialize(count: 1)
+        }
+    } else {
+
+        // Zero initialize
+        pointer.zeroInitialize()
+    }
+
+    // With nested closure receiving pointer to allocated and initialized pointee
+    return try nested(pointer)
+}
+
+public func withSdkObjectOptionalMutablePointerFromSwiftObject<SwiftObject: SwiftEOSObject, R>(
+    _ swiftObject: SwiftObject,
+    managedBy pointerManager: SwiftEOS__PointerManager,
+    nested: (UnsafeMutablePointer<SwiftObject.SdkObject>?) throws -> R
+) throws -> R {
+
+    // Allocate space for object that's independent from input
+    let pointer = UnsafeMutablePointer<SwiftObject.SdkObject>.allocate(capacity: 1)
+
+    // Store deallocation, after deinitialization
+    defer {
+        pointerManager.onDeinit {
+            pointer.deallocate()
+        }
+    }
+
+    // Build sdk object
+    let sdkObject: SwiftObject.SdkObject = try swiftObject.buildSdkObject(pointerManager: pointerManager)
+
+    // Initialize to input
     pointer.initialize(to: sdkObject)
+
+    // Store deintialization of pointer
     pointerManager.onDeinit {
         pointer.deinitialize(count: 1)
     }
 
-    let result = try nested(pointer)
-
-    inoutSwiftObject = try SwiftObject(sdkObject: pointer.pointee)
-    return result
-}
-
-public func withSdkObjectPointerFromSwiftObject<SwiftObject: SwiftEOSObject, R>(
-    _ swiftObject: Optional<SwiftObject>,
-    managedBy pointerManager: SwiftEOS__PointerManager,
-    nested: (Optional<UnsafePointer<SwiftObject.SdkObject>>) throws -> R
-) throws -> R {
-    let sdkObjectPointer = try pointerManager.managedPointer(copyingValueOrNilPointer: swiftObject?.buildSdkObject(pointerManager: pointerManager))
-    return try nested(sdkObjectPointer)
-}
-
-public func withSdkObjectMutablePointerFromSwiftObject<SwiftObject: SwiftEOSObject, R>(
-    _ swiftObject: SwiftObject,
-    managedBy pointerManager: SwiftEOS__PointerManager,
-    nested: (Optional<UnsafeMutablePointer<SwiftObject.SdkObject>>) throws -> R
-) throws -> R {
-
-    let sdkObjectPointer = UnsafeMutablePointer<SwiftObject.SdkObject>.allocate(capacity: 1)
-    defer {
-        pointerManager.onDeinit {
-            sdkObjectPointer.deallocate()
-        }
-    }
-
-    try sdkObjectPointer.initialize(to: swiftObject.buildSdkObject(pointerManager: pointerManager))
-    pointerManager.onDeinit {
-        sdkObjectPointer.deinitialize(count: 1)
-    }
-
-    return try nested(sdkObjectPointer)
+    // With nested closure receiving pointer to allocated and initialized pointee
+    return try nested(pointer)
 }
 
 
-public func withSdkObjectPointerFromInOutOptionalSdkObject<SdkObject, R>(
+public func withSdkObjectOptionalPointerFromInOutOptionalSdkObject<SdkObject, R>(
     _ inoutOptionalSdkObject: inout SdkObject?,
     managedBy pointerManager: SwiftEOS__PointerManager,
     nested: (UnsafeMutablePointer<SdkObject>?) throws -> R
 ) throws -> R {
 
-    guard let sdkObject = inoutOptionalSdkObject else {
-        return try nested(nil)
-    }
-
+    // Allocate space for object that's independent from input
     let pointer = UnsafeMutablePointer<SdkObject>.allocate(capacity: 1)
+
+    // Store deallocation, after deinitialization
     defer {
         pointerManager.onDeinit {
             pointer.deallocate()
         }
     }
 
-    pointer.initialize(to: sdkObject)
-    pointerManager.onDeinit {
-        pointer.deinitialize(count: 1)
+    // When input provided
+    if let sdkObject = inoutOptionalSdkObject {
+
+        // Initialize to input
+        pointer.initialize(to: sdkObject)
+
+        // Store deintialization of pointer
+        pointerManager.onDeinit {
+            pointer.deinitialize(count: 1)
+        }
+    } else {
+
+        // Zero initialize
+        pointer.zeroInitialize()
     }
 
+    // With nested closure receiving pointer to allocated and initialized pointee
     let result = try nested(pointer)
 
+    // Update to pointee
     inoutOptionalSdkObject = pointer.pointee
 
+    // Return result of nested closure
     return result
 }
 
 
-public func withSdkObjectPointerFromInOutSdkObject<SdkObject, R>(
+public func withSdkObjectOptionalPointerFromInOutSdkObject<SdkObject, R>(
     _ inoutSdkObject: inout SdkObject,
     managedBy pointerManager: SwiftEOS__PointerManager,
     nested: (UnsafeMutablePointer<SdkObject>?) throws -> R
 ) throws -> R {
 
+    // Allocate space for object that's independent from input
     let pointer = UnsafeMutablePointer<SdkObject>.allocate(capacity: 1)
+
+    // Store deallocation, after deinitialization
     defer {
         pointerManager.onDeinit {
             pointer.deallocate()
         }
     }
 
+    // Initialize to input
     pointer.initialize(to: inoutSdkObject)
+
+    // Store deintialization of pointer
     pointerManager.onDeinit {
         pointer.deinitialize(count: 1)
     }
 
+    // With nested closure receiving pointer to allocated and initialized pointee
     let result = try nested(pointer)
 
+    // Update to pointee
     inoutSdkObject = pointer.pointee
 
+    // Return result of nested closure
     return result
 }

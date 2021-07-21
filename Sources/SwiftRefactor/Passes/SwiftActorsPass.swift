@@ -64,7 +64,7 @@ public class SwiftActorsPass: SwiftRefactorPass {
                 initializer.attributes.formUnion(["required"])
 
                 if let acquireFunc = functionsReturningHandle.first(where: { $0.returnType.canonical == handle.type.canonical }) {
-                    acquireFunc.returnType = SwiftDeclRefType(decl: object, qual: .optional)
+                    acquireFunc.returnType = SwiftDeclRefType(decl: object)
                     acquireFunc.code = .function.returningActorFromHandle(nest: acquireFunc.code!)
                 }
             }

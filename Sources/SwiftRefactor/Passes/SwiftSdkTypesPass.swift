@@ -27,6 +27,23 @@ public class SwiftSdkTypesPass: SwiftRefactorPass {
             (decl as? SwiftFunction)?.name.contains("RemoveNotify") == true
         }
 
+        // *ProtectMessage* funcs are present in SDK AST only
+        module.replaceWithSdkRefs { decl in
+            (decl as? SwiftFunction)?.name.contains("ProtectMessage") == true
+        }
+
+        // *UnprotectMessage* funcs are present in SDK AST only
+        module.replaceWithSdkRefs { decl in
+            (decl as? SwiftFunction)?.name.contains("UnprotectMessage") == true
+        }
+
+        // *ReceivePacket* funcs are present in SDK AST only
+        module.replaceWithSdkRefs { decl in
+            (decl as? SwiftFunction)?.name.contains("ReceivePacket") == true
+        }
+
+
+
 //        // Vec3f is present in SDK AST only
 //        module.replaceWithSdkRefs { decl in
 //            (decl as? SwiftObject)?.name.hasSuffix("EOS_AntiCheatCommon_Vec3f") == true

@@ -5,107 +5,71 @@ import Foundation
 import EOSSDK
 #endif
 
-/// `Array<Value>` ->` Pointer<Value>, Pointer<Int>`
-public func withArrayBuffer<Element, LengthType: BinaryInteger>(
-    capacity: Int? = nil,
-    _ nested: (UnsafeMutablePointer<Element>?, UnsafeMutablePointer<LengthType>?) throws -> Void) rethrows -> Array<Element>
-{
-    let bufferCapacity = capacity ?? .zero
-
-    return try Array<Element>(unsafeUninitializedCapacity: bufferCapacity) { buffer, initializedCount in
-
-        var bufferLength: LengthType = LengthType(exactly: bufferCapacity)!
-
-        do {
-            try nested(buffer.baseAddress,
-                       &bufferLength)
-        } catch SwiftEOSError.result(.EOS_LimitExceeded) where capacity == nil {
-            try nested(buffer.baseAddress,
-                       &bufferLength)
-        }
-
-        initializedCount = Int(exactly: bufferLength)!
-    }
-}
-
 
 /// `inout Array<Value>` ->` Pointer<Value>, Pointer<Int>`
-public func withPointersToInOutArray<LengthType: BinaryInteger, Element, R>(
-    inoutArray: inout Array<Element>?,
-    nested: (UnsafeMutablePointer<Element>?, UnsafeMutablePointer<LengthType>?) throws -> R) rethrows -> R
+public func withPointersToInOutArray<SdkInteger: BinaryInteger, Element, R>(
+    inoutOptionalArray: inout Array<Element>?,
+    nested: (UnsafeMutablePointer<Element>?, UnsafeMutablePointer<SdkInteger>?) throws -> R) throws -> R
 {
-    guard var array = inoutArray else {
-        return try nested(nil, nil)
-    }
-    let result = try withPointerForInOut(array: &array, capacity: array.capacity, nested)
-    inoutArray = array
-    return result
-}
+    // Initialize capacity to zero
+    var sdkCapacity: SdkInteger = .zero
 
-/// `inout Array<Value>` ->` Pointer<Value>, Pointer<Int>`
-public func withPointerForInOut<Element, LengthType: BinaryInteger, R>(
-    array: inout Array<Element>,
-    capacity: Int? = nil,
-    _ nested: (UnsafeMutablePointer<Element>?, UnsafeMutablePointer<LengthType>?) throws -> R) rethrows -> R
-{
-    let bufferCapacity = capacity ?? .zero
+    do {
+        // If array is provided
+        if var array = inoutOptionalArray {
 
-    var returnValue: R!
+            // Initialize capacity to array capacity
+            sdkCapacity = try safeNumericCast(exactly: array.count)
 
-    array = try Array<Element>(unsafeUninitializedCapacity: bufferCapacity) { buffer, initializedCount in
+            // With nested closure receiving pointer to array
+            let result = try nested(&array, &sdkCapacity)
 
-        var bufferLength: LengthType = LengthType(exactly: bufferCapacity)!
+            // Update capacity
+            let swiftCapacity: Int = try safeNumericCast(exactly: sdkCapacity)
 
-        do {
-            returnValue = try nested(buffer.baseAddress,
-                                     &bufferLength)
-        } catch SwiftEOSError.result(.EOS_LimitExceeded) where capacity == nil {
-            returnValue = try nested(buffer.baseAddress,
-                                     &bufferLength)
+            // Update result
+            inoutOptionalArray = Array(array.prefix(swiftCapacity))
+
+            // Return result of nested closure
+            return result
         }
 
-        initializedCount = Int(exactly: bufferLength)!
+        // If new array should be allocated
+        else {
+
+            // With nested closure receiving nil buffer and zero capacity
+            let result = try nested(nil, &sdkCapacity)
+
+            // Fallback if nested closure does not update capacity & throw EOS_LimitExceeded
+//            inoutOptionalArray = []
+
+            // Return result of nested closure
+            return result
+        }
     }
+    catch SwiftEOSError.result(.EOS_LimitExceeded) {
 
-    return returnValue
-}
+        // Nested closure result
+        var result: R!
 
-/// `inout Array<Value>` ->` Pointer<Value>, Pointer<Int>`
-public func withPointerForInOut<Element, LengthType: BinaryInteger, R>(
-    array: inout Array<Element>,
-    count: inout Int,
-    capacity: Int? = nil,
-    _ nested: (UnsafeMutablePointer<Element>?, UnsafeMutablePointer<LengthType>?) throws -> R) rethrows -> R
-{
-    let bufferCapacity = capacity ?? .zero
+        // Update array from pointers
+        inoutOptionalArray = try Array<Element>(unsafeUninitializedCapacity: safeNumericCast(exactly: sdkCapacity)) { buffer, initializedCount in
 
-    var returnValue: R!
+            // If buffer is empty or capacity still zero, rethrow
+            guard let baseAddress = buffer.baseAddress, sdkCapacity != .zero else {
+                throw SwiftEOSError.result(.EOS_LimitExceeded)
+            }
 
-    array = try Array<Element>(unsafeUninitializedCapacity: bufferCapacity) { buffer, initializedCount in
+            // With nested closure receiving pointer to buffer
+            result = try nested(baseAddress, &sdkCapacity)
 
-        var bufferLength: LengthType = LengthType(exactly: bufferCapacity)!
-
-        do {
-            returnValue = try nested(buffer.baseAddress,
-                                     &bufferLength)
-        } catch SwiftEOSError.result(.EOS_LimitExceeded) where capacity == nil {
-            returnValue = try nested(buffer.baseAddress,
-                                     &bufferLength)
+            // Update capacity
+            initializedCount = try safeNumericCast(exactly: sdkCapacity)
         }
 
-        initializedCount = Int(exactly: bufferLength)!
+        // Return result of nested closure
+        return result
     }
-
-    count = array.count
-    return returnValue
-}
-
-public func withElementPointerPointersReturnedAsArray<LengthType: BinaryInteger, Element>(
-    nested: (UnsafeMutablePointer<Element>?, UnsafeMutablePointer<LengthType>?) throws -> Void) rethrows -> Array<Element>
-{
-    var array = Array<Element>()
-    try withPointerForInOut(array: &array, capacity: array.capacity, nested)
-    return array
 }
 
 public func byteArray(from buffer: UnsafeRawBufferPointer) -> [UInt8]? {

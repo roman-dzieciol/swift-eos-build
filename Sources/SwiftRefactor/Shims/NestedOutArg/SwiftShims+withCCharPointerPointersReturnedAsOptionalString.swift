@@ -5,7 +5,7 @@ import SwiftAST
 
 extension SwiftShims {
 
-    static func withCCharPointerPointersReturnedAsOptionalString(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
+    static func withCCharPointerPointersReturnedAsString(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
 
         if let lhsPointer = lhs.type.canonical.asPointer,
            let lhsBuiltin = lhsPointer.pointeeType.asBuiltin,
@@ -16,12 +16,11 @@ extension SwiftShims {
            rhsBuiltin.isString,
            rhs.isInOutParm
         {
-            return .function.throwingNilResult(
-                .function.withCCharPointerPointersReturnedAsOptionalString(
+            return .function.withCCharPointerPointersReturnedAsString(
                     bufferPointerName: rhs.name,
                     countPointerName: lhsArrayCount.name,
                     nest: nested
-                ))
+                )
         }
         return nil
     }
@@ -29,12 +28,12 @@ extension SwiftShims {
 
 extension SwiftExpr.function {
 
-    static func withCCharPointerPointersReturnedAsOptionalString(
+    static func withCCharPointerPointersReturnedAsString(
         bufferPointerName: String,
         countPointerName: String,
         nest: SwiftExpr
     ) -> SwiftExpr {
-        SwiftFunctionCallExpr.named("withCCharPointerPointersReturnedAsOptionalString", args: [
+        SwiftFunctionCallExpr.named("withCCharPointerPointersReturnedAsString", args: [
             .closure([bufferPointerName, countPointerName], nest: nest) ])
     }
 }

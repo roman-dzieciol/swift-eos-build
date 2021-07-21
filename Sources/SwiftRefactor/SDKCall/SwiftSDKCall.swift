@@ -90,7 +90,7 @@ public class SwiftSDKCall {
                    lhsObject.members.count == 1,
                    lhsObject.members.first?.name == "ApiVersion"
                 {
-                    code = .try(.function.withSdkObjectMutablePointerFromSwiftObject(
+                    code = .try(.function.withSdkObjectOptionalMutablePointerFromSwiftObject(
                         rhsObject.expr.call([]),
                         managedBy: .string("pointerManager"),
                         pointerName: rhs.name,
@@ -106,6 +106,7 @@ public class SwiftSDKCall {
                     self.code = shimmed
                     self.sdkArgs += [lhs.arg(rhs.expr)]
                     function.returnType = rhs.type.nonOptional
+                    function.link(.returnedOutParam, ref: rhs)
 
                     if returnComment == nil {
 

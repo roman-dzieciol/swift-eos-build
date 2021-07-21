@@ -6,7 +6,7 @@ import SwiftAST
 extension SwiftShims {
 
     /// `Pointer<Pointer<SdkObject>?>`: `inout SwiftObject`
-    static func withSdkObjectPointerPointerFromInOutSwiftObject(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
+    static func withSdkObjectOptionalPointerToOptionalPointerFromInOutOptionalSwiftObject(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
 
         if rhs.isInOutParm,
            let rhsObject = rhs.type.canonical.asDeclRef?.decl.canonical as? SwiftObject,
@@ -17,7 +17,7 @@ extension SwiftShims {
            !lhsObject.inSwiftEOS,
            lhsObject === rhsObject.sdk
         {
-            return .function.withSdkObjectPointerPointerFromInOutSwiftObject(
+            return .function.withSdkObjectOptionalPointerToOptionalPointerFromInOutOptionalSwiftObject(
                 inoutSwiftObject: rhs.expr.inout,
                 pointerManager: .string("pointerManager"),
                 pointerPointerName: rhs.name,

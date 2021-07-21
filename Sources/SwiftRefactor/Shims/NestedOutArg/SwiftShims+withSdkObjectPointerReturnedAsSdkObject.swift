@@ -17,14 +17,25 @@ extension SwiftShims {
            !(rhsObject is SwiftEnum),
            lhsObject === rhsObject
         {
-            return .function.throwingNilResult(
-                .function.withPointeeReturned(
-                    managedBy: .string("pointerManager"),
-                    pointerName: rhs.name,
-                    nest: nested
-                ))
+            return .function.withSdkObjectPointerReturnedAsSdkObject(
+                managedBy: .string("pointerManager"),
+                pointerName: rhs.name,
+                nest: nested
+            )
         }
         return nil
     }
+}
 
+extension SwiftExpr.function {
+
+    static func withSdkObjectPointerReturnedAsSdkObject(
+        managedBy pointerManager: SwiftExpr,
+        pointerName: String,
+        nest: SwiftExpr
+    ) -> SwiftExpr {
+        SwiftFunctionCallExpr.named("withSdkObjectPointerReturnedAsSdkObject", args: [
+            pointerManager.arg("managedBy"),
+            .closure([pointerName], nest: nest) ])
+    }
 }

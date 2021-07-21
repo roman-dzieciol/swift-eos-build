@@ -15,7 +15,7 @@ extension SwiftShims {
            let rhsOpaque = rhs.type.canonical.asOpaquePointer?.pointeeType.asOpaque,
            lhsOpaque == rhsOpaque
         {
-            return .function.returningActorFromHandle(nest: nested)
+            return .function.throwingNilResult(.function.returningActorFromHandle(nest: nested))
         }
 
         return nil

@@ -19,12 +19,14 @@ public enum SwiftASTLinkType {
     case functionSendCompletionResult
     case functionSendCompletion
     case functionSendNotification
+    case implementation
     case initializer
     case invocation
     case member
     case module
     case outer
     case releaseFunc
+    case returnedOutParam
     case removeNotifyFunc
     case sdk
     case swifty

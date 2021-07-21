@@ -5,7 +5,7 @@ import SwiftAST
 
 extension SwiftShims {
 
-    static func withBytePointerPointersReturnedAsByteArray(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
+    static func withBytePointersReturnedAsByteArray(lhs: SwiftVarDecl, rhs: SwiftVarDecl, nested: SwiftExpr) throws -> SwiftExpr? {
 
         if rhs.isInOutParm,
            let lhsPointer = lhs.type.canonical.asPointer,
@@ -16,7 +16,7 @@ extension SwiftShims {
            rhsBuiltin.isByte,
            let rhsArrayCount = rhs.linked(.arrayLength) as? SwiftVarDecl
         {
-            return .function.withElementPointerPointersReturnedAsArray(
+            return .function.withBytePointersReturnedAsByteArray(
                 bufferPointerName: rhs.name,
                 countPointerName: rhsArrayCount.name,
                 nest: nested)
