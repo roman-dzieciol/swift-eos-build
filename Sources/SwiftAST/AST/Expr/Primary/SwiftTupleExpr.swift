@@ -9,6 +9,10 @@ public final class SwiftTupleExpr: SwiftPrimaryExpr {
         self.items = items
     }
 
+    public override func perform<R>(_ action: (SwiftExpr) -> R?) -> R? {
+        return action(self) ?? items.firstNonNil { $0.perform(action) }
+    }
+
     public override func write(to swift: SwiftOutputStream) {
         swift.write(token: "(")
         swift.write(items, separated: ",")
@@ -24,6 +28,10 @@ public final class SwiftTupleItemExpr: SwiftExpr {
     public init(identifier: SwiftIdentifier, expr: SwiftExpr) {
         self.identifier = identifier
         self.expr = expr
+    }
+
+    public override func perform<R>(_ action: (SwiftExpr) -> R?) -> R? {
+        return action(self) ?? identifier.perform(action) ?? expr.perform(action)
     }
 
     public override func write(to swift: SwiftOutputStream) {

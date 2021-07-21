@@ -19,6 +19,10 @@ public final class SwiftExplicitMemberExpr: SwiftPostfixExpr {
         self.argumentNames = argumentNames
     }
 
+    public override func perform<R>(_ action: (SwiftExpr) -> R?) -> R? {
+        return action(self) ?? expr.perform(action) ?? identifier.perform(action) ?? argumentNames.firstNonNil { $0.perform(action) }
+    }
+
     public override func evaluateType(in context: SwiftDeclContext?) -> SwiftType? {
         return identifier.evaluateType(in: context)
     }

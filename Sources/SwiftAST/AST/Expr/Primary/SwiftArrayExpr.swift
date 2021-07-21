@@ -12,6 +12,10 @@ public final class SwiftArrayExpr: SwiftPrimaryExpr {
         self.itemType = itemType
     }
 
+    public override func perform<R>(_ action: (SwiftExpr) -> R?) -> R? {
+        return action(self) ?? items.firstNonNil { $0.perform(action) }
+    }
+
     public override func evaluateType(in context: SwiftDeclContext?) -> SwiftType? {
         return itemType
     }

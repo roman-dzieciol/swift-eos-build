@@ -11,6 +11,10 @@ public final class SwiftAssignmentExpr: SwiftBinaryExpr {
         self.rhs = rhs
     }
 
+    public override func perform<R>(_ action: (SwiftExpr) -> R?) -> R? {
+        return action(self) ?? lhs.perform(action) ?? rhs.perform(action)
+    }
+
     public override func write(to swift: SwiftOutputStream) {
         swift.write(lhs)
         swift.write(token: "=")

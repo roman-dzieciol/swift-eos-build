@@ -9,6 +9,10 @@ public final class SwiftMemberExpr: SwiftPrimaryExpr {
         self.member = member
     }
 
+    public override func perform<R>(_ action: (SwiftExpr) -> R?) -> R? {
+        return action(self) ?? member.perform(action)
+    }
+
     public override func evaluateType(in context: SwiftDeclContext?) -> SwiftType? {
         return member.evaluateType(in: context)
     }

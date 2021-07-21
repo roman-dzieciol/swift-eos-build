@@ -31,6 +31,10 @@ public class SwiftFunctionCallExpr: SwiftPostfixExpr {
                   useTrailingClosures: useTrailingClosures)
     }
 
+    public override func perform<R>(_ action: (SwiftExpr) -> R?) -> R? {
+        return action(self) ?? expr.perform(action) ?? args.perform(action)
+    }
+
     public override func evaluateType(in context: SwiftDeclContext?) -> SwiftType? {
         return expr.evaluateType(in: context)
     }
@@ -81,6 +85,10 @@ public final class SwiftFunctionCallArgClauseExpr: SwiftExpr {
         self.useTrailingClosures = useTrailingClosures
     }
 
+    public override func perform<R>(_ action: (SwiftExpr) -> R?) -> R? {
+        return action(self) ?? list.perform(action)
+    }
+
     public override func write(to swift: SwiftOutputStream) {
         if list.items.isEmpty || !list.itemsToWrite.isEmpty {
             swift.write(nested: "(", ")") {
@@ -127,6 +135,10 @@ public final class SwiftFunctionCallArgListExpr: SwiftExpr {
         }
     }
 
+    public override func perform<R>(_ action: (SwiftExpr) -> R?) -> R? {
+        return action(self) ?? items.firstNonNil { $0.perform(action) }
+    }
+
     public override func write(to swift: SwiftOutputStream) {
         swift.write(itemsToWrite, separated: ",")
     }
@@ -146,6 +158,10 @@ public class SwiftFunctionCallArgExpr: SwiftExpr {
 
     public convenience init(_ string: String?, expr: SwiftExpr) {
         self.init(identifier: string.map { .string($0) }, expr: expr)
+    }
+
+    public override func perform<R>(_ action: (SwiftExpr) -> R?) -> R? {
+        return action(self) ?? identifier?.perform(action) ?? expr.perform(action)
     }
 
     public override func evaluateThrowing() -> Bool {

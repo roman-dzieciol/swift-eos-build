@@ -12,6 +12,10 @@ public final class SwiftSelfMethodExpr: SwiftSelfExpr {
         self.identifier = identifier
     }
 
+    public override func perform<R>(_ action: (SwiftExpr) -> R?) -> R? {
+        return action(self) ?? identifier.perform(action)
+    }
+
     public override func evaluateType(in context: SwiftDeclContext?) -> SwiftType? {
         return identifier.evaluateType(in: context)
     }
@@ -29,6 +33,10 @@ public final class SwiftSelfSubscriptExpr: SwiftSelfExpr {
 
     public init(function: SwiftExpr) {
         self.function = function
+    }
+
+    public override func perform<R>(_ action: (SwiftExpr) -> R?) -> R? {
+        return action(self) ?? function.perform(action)
     }
 
     public override func write(to swift: SwiftOutputStream) {

@@ -41,6 +41,10 @@ public final class SwiftClosureExpr: SwiftPrimaryExpr {
         self.init(signature: signature, statements: statements)
     }
 
+    public override func perform<R>(_ action: (SwiftExpr) -> R?) -> R? {
+        return action(self) ?? signature.perform(action) ?? statements.perform(action)
+    }
+
     public override func evaluateThrowing() -> Bool {
         signature.isThrowing || statements.evaluateThrowing()
     }
@@ -89,6 +93,10 @@ public final class SwiftClosureSignatureExpr: SwiftExpr {
         self.init(captures: .init(captures), params: .init(params), omitParams: omitParams, resultType: resultType, omitResultType: omitResultType, isThrowing: isThrowing)
     }
 
+    public override func perform<R>(_ action: (SwiftExpr) -> R?) -> R? {
+        return action(self) ?? captures.perform(action) ?? params.perform(action)
+    }
+
     public override func evaluateThrowing() -> Bool {
         self.isThrowing
     }
@@ -125,6 +133,10 @@ public final class SwiftClosureParameterListExpr: SwiftExpr {
         self.init(items: items.map { .init($0) })
     }
 
+    public override func perform<R>(_ action: (SwiftExpr) -> R?) -> R? {
+        return action(self) ?? items.firstNonNil { $0.perform(action) }
+    }
+
     public override func write(to swift: SwiftOutputStream) {
         guard !items.isEmpty else { return }
 //        swift.write(token: "(")
@@ -150,6 +162,10 @@ public final class SwiftClosureParameterExpr: SwiftExpr {
         self.init(identifier: .string(named), type: type, omitType: omitType)
     }
 
+    public override func perform<R>(_ action: (SwiftExpr) -> R?) -> R? {
+        return action(self) ?? identifier.perform(action)
+    }
+
     public override func write(to swift: SwiftOutputStream) {
         swift.write(identifier)
         if !omitType, let type = type {
@@ -173,6 +189,10 @@ public final class SwiftCaptureListExpr: SwiftExpr {
         self.init(items: items.map { .init($0) })
     }
 
+    public override func perform<R>(_ action: (SwiftExpr) -> R?) -> R? {
+        return action(self) ?? items.firstNonNil { $0.perform(action) }
+    }
+
     public override func write(to swift: SwiftOutputStream) {
         guard !items.isEmpty else { return }
         swift.write(token: "[")
@@ -193,6 +213,10 @@ public final class SwiftCaptureItemExpr: SwiftExpr {
 
     public convenience init(_ named: String) {
         self.init(identifier: .string(named), specifier: "")
+    }
+
+    public override func perform<R>(_ action: (SwiftExpr) -> R?) -> R? {
+        return action(self) ?? identifier.perform(action)
     }
 
     public override func write(to swift: SwiftOutputStream) {

@@ -11,6 +11,10 @@ public final class SwiftPostfixSelfExpr: SwiftPostfixExpr {
         self.expr = expr
     }
 
+    public override func perform<R>(_ action: (SwiftExpr) -> R?) -> R? {
+        return action(self) ?? expr.perform(action)
+    }
+
     public override func evaluateType(in context: SwiftDeclContext?) -> SwiftType? {
         return context?.evaluateType()
     }

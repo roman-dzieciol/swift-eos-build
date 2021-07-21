@@ -14,6 +14,10 @@ public final class SwiftSubscriptExpr: SwiftPostfixExpr {
         self.args = args
     }
 
+    public override func perform<R>(_ action: (SwiftExpr) -> R?) -> R? {
+        return action(self) ?? expr.perform(action) ?? args.perform(action)
+    }
+
     public override func write(to swift: SwiftOutputStream) {
         swift.write(expr)
         swift.write(token: "[")

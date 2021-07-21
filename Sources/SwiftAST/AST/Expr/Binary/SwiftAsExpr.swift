@@ -13,6 +13,10 @@ public final class SwiftAsExpr: SwiftBinaryExpr {
         self.rhs = rhs
     }
 
+    public override func perform<R>(_ action: (SwiftExpr) -> R?) -> R? {
+        return action(self) ?? lhs.perform(action) ?? rhs.perform(action)
+    }
+
     public override func evaluateType(in context: SwiftDeclContext?) -> SwiftType? {
         if isOptional != false {
             return rhs.evaluateType(in: context)?.optional

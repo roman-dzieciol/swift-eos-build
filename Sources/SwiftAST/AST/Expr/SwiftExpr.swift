@@ -22,6 +22,10 @@ public class SwiftExpr: SwiftOutputStreamable, CustomStringConvertible {
         SwiftWriterString.description(for: self)
     }
 
+    public func perform<R>(_ action: (SwiftExpr) -> R?) -> R? {
+        return action(self)
+    }
+
     public func evaluateType(in context: SwiftDeclContext?) -> SwiftType? {
         nil
     }

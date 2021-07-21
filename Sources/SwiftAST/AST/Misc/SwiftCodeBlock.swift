@@ -12,6 +12,10 @@ public class SwiftCodeBlock: SwiftExpr {
         self.statements = statements
     }
 
+    public override func perform<R>(_ action: (SwiftExpr) -> R?) -> R? {
+        return action(self) ?? statements.firstNonNil {  $0.perform(action) }
+    }
+
     public override func evaluateType(in context: SwiftDeclContext?) -> SwiftType? {
         for statement in statements {
             if let evaluatedType = statement.evaluateType(in: context) {
