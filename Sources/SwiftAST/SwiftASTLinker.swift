@@ -14,24 +14,39 @@ public class SwiftASTLinker {
     private init(){}
 
     public func links(for ast: SwiftAST) -> [SwiftASTLink] {
-        links[ast.uuid, default: []]
+        objc_sync_enter(self)
+        defer { objc_sync_exit(self) }
+
+        return links[ast.uuid, default: []]
     }
 
     public func link(for ast: SwiftAST, _ linkType: SwiftASTLinkType, ref: SwiftAST) {
+        objc_sync_enter(self)
+        defer { objc_sync_exit(self) }
+
         links[ast.uuid, default: []].append(.init(type: linkType, ref: ref))
     }
 
     public func unlink(for ast: SwiftAST, _ linkType: SwiftASTLinkType, ref: SwiftAST) {
+        objc_sync_enter(self)
+        defer { objc_sync_exit(self) }
+
         links[ast.uuid]?.removeAll(where: { $0.type == linkType && $0.ref === ref })
     }
 
     public func linkedRefs(for ast: SwiftAST, _ linkType: SwiftASTLinkType) -> [SwiftAST] {
-        links(for: ast)
+        objc_sync_enter(self)
+        defer { objc_sync_exit(self) }
+
+        return links(for: ast)
             .filter { $0.type == linkType }
             .compactMap { $0.ref }
     }
 
     public func linked(for ast: SwiftAST, _ linkType: SwiftASTLinkType) -> SwiftAST? {
+        objc_sync_enter(self)
+        defer { objc_sync_exit(self) }
+
         let linkedRefs = linkedRefs(for: ast, linkType)
         //        if linkedRefs.count > 1 {
         //            fatalError()
@@ -40,10 +55,16 @@ public class SwiftASTLinker {
     }
 
     public func unlink(for ast: SwiftAST, all linkType: SwiftASTLinkType) {
+        objc_sync_enter(self)
+        defer { objc_sync_exit(self) }
+
         links[ast.uuid]?.removeAll(where: { $0.type == linkType })
     }
 
     public func removeCode(for ast: SwiftAST) {
+        objc_sync_enter(self)
+        defer { objc_sync_exit(self) }
+
         linkedRefs(for: ast, .code).forEach { ref in
             if let codeAst = ref as? SwiftCodeAST {
                 codeAst.output.output = nil
@@ -61,9 +82,10 @@ public class SwiftASTLinker {
 
     public func uuid() -> Key {
         objc_sync_enter(self)
+        defer { objc_sync_exit(self) }
+
         _uuid += 1
         let result = _uuid
-        objc_sync_exit(self)
         return result
     }
 
