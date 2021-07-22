@@ -28,14 +28,12 @@ final public class CTestableImpl {
         headersString += "\n"
         headersString += "\n"
 
-
         implString = "\n"
         implString += "#include <stdio.h>\n"
         implString += "#include <stdlib.h>\n"
         implString += "#include <assert.h>\n"
         implString += "#include \"include/TestableEOSSDK.h\"\n"
         implString += "\n"
-
 
         functions = []
 

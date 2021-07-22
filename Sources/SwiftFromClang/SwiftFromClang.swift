@@ -6,7 +6,6 @@ import ClangAST
 final public class SwiftFromClang {
 
     let clangAST: TranslationUnitDecl
-
     let resolver: TypeResolver
 
     public init(ast clangAST: ClangAST) {
@@ -15,7 +14,6 @@ final public class SwiftFromClang {
     }
 
     public func swiftModule() throws -> SwiftModule {
-
         return try swiftAST(from: clangAST, stack: []) as! SwiftModule
     }
 
@@ -49,7 +47,6 @@ final public class SwiftFromClang {
             return nil
 
         default:
-            //            fatalError("\(ast)")
             return nil
         }
     }
@@ -182,7 +179,6 @@ final public class SwiftFromClang {
 
         case let clangType as TypedefType:
             return swiftType(from: clangType.decl.name, stack: stack)
-            //            return from(clangType: clangType.innerType)
 
         case let clangType as ElaboratedType:
             return swiftType(from: clangType.innerType, stack: stack)

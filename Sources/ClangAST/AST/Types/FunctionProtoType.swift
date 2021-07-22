@@ -7,7 +7,7 @@ final public class FunctionProtoType: ASTType {
     }()
 
     public lazy var returnType: ASTType = {
-        inner[0] as! ASTType
+        inner.first as! ASTType
     }()
 
     public lazy var paramTypes: [ASTType] = {
@@ -15,10 +15,9 @@ final public class FunctionProtoType: ASTType {
     }()
 
     private func validated(cc: String?) -> String? {
-        guard cc == nil ||
-                cc == "cdecl" else {
-                    fatalError("\(cc ?? "")")
-                }
+        guard cc == nil || cc == "cdecl" else {
+            fatalError("\(cc ?? "")")
+        }
         return cc
     }
 }

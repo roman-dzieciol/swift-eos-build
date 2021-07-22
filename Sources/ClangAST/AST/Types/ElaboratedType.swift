@@ -7,6 +7,6 @@ final public class ElaboratedType: ASTType {
     }()
 
     public lazy var innerType: ASTType = {
-        inner[0] as! ASTType
+        inner.first as! ASTType
     }()
 }

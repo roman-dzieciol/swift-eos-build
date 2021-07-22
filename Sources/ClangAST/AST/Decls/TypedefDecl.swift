@@ -9,7 +9,7 @@ final public class TypedefDecl: NamedDecl {
     }()
 
     public lazy var innerType: ASTType = {
-        inner[0] as! ASTType
+        inner.first as! ASTType
     }()
 
 }

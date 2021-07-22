@@ -11,12 +11,11 @@ final public class QualType: ASTType {
     }()
 
     public lazy var innerType: ASTType = {
-        inner[0] as! ASTType
+        inner.first as! ASTType
     }()
 
     private func validated(qualifiers: String?) -> String? {
-        guard qualifiers == nil ||
-                qualifiers == "const" else {
+        guard qualifiers == nil || qualifiers == "const" else {
             fatalError("\(qualifiers ?? "")")
         }
         return qualifiers
