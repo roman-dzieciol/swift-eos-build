@@ -51,6 +51,7 @@ final public class SwiftActorsPass: SwiftRefactorPass {
             let objectName = "SwiftEOS_" + namespace + "_Actor"
             let object = object(named: objectName)
             object.link(.module, ref: module)
+            object.attributes.insert("final")
 
 
             let handleParm = function.parms.first(where: { $0.name == "Handle" })!

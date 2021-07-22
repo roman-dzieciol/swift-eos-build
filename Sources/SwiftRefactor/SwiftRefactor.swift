@@ -55,6 +55,7 @@ final public class SwiftRefactor {
             SwiftCleanupPass(),
             SwiftNamespacePass(),
             SwiftUnitTestsPass(swiftTestsModule: swiftTestsModule, swiftSdkTestsModule: swiftSdkTestsModule),
+            SwiftFinalPass(),
         ]
 
 

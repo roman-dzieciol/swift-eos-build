@@ -29,6 +29,7 @@ final public class SwiftUnitTestsPass: SwiftRefactorPass {
 
                         var statements: [SwiftStmt] = []
                         let testObject = SwiftObject(name: object.name + "Tests", tagName: "class", superTypes: ["XCTestCase"])
+                        testObject.attributes.insert("final")
                         var asserts: [SwiftStmt] = []
 
                         asserts.append(TestAsserts.assertNil(object: sdkObject, lhsString: "cstruct", options: testOptions))
@@ -68,6 +69,7 @@ final public class SwiftUnitTestsPass: SwiftRefactorPass {
                     let testObject = SwiftObject(name: "Swift" + sdkFunction.name + "Tests", tagName: "class", superTypes: ["XCTestCase"])
                     let result = SdkTestFunctionBuilder(swiftFunction: function).build()
                     testObject.append(result)
+                    testObject.attributes.insert("final")
                     self.swiftSdkTestsModule.append(testObject)
                 }
         }
