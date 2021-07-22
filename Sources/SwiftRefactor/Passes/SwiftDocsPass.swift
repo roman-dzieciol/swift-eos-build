@@ -13,18 +13,22 @@ public class SwiftDocsPass: SwiftRefactorPass {
             $0 is SwiftObject || $0 is SwiftFunction || $0 is SwiftTypealias || $0 is SwiftEnum
         }
 
-        try SwiftDocPassVisitor(allTypes: allTypes).visit(ast: module)
+        let allTypeNames = Set(allTypes.map { $0.name })
+
+        DispatchQueue.concurrentPerform(iterations: module.inner.count) { index in
+            try! SwiftDocPassVisitor(allTypes: allTypes, allTypeNames: allTypeNames).visit(ast: module.inner[index])
+        }
     }
 }
 
-class SwiftDocPassVisitor: SwiftVisitor {
+final private class SwiftDocPassVisitor: SwiftVisitor {
 
     let allTypes: [SwiftAST]
     let allTypeNames: Set<String>
 
-    public init(allTypes: [SwiftAST]) {
+    public init(allTypes: [SwiftAST], allTypeNames: Set<String>) {
         self.allTypes = allTypes
-        self.allTypeNames = Set(allTypes.map { $0.name })
+        self.allTypeNames = allTypeNames
     }
 
     public override func visit(ast: SwiftAST) throws {
