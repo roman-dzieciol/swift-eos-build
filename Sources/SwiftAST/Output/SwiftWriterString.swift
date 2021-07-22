@@ -1,10 +1,12 @@
 
 import Foundation
 
-final public class SwiftWriterString: SwiftWriterStream<String> {
+final public class SwiftWriterString {
+
+    private let writer: SwiftWriterStream<String>
 
     public init() {
-        super.init(outputStream: String())
+        self.writer = SwiftWriterStream<String>(outputStream: String())
     }
 
     public static func description(for outputtable: SwiftOutputStreamable) -> String {
@@ -16,7 +18,7 @@ final public class SwiftWriterString: SwiftWriterStream<String> {
     }
 
     public func from(_ inner: SwiftOutputStreamable) -> String {
-        write(inner)
-        return outputStream
+        writer.write(inner)
+        return writer.outputStream
     }
 }

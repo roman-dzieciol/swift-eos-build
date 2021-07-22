@@ -9,7 +9,6 @@ public protocol SwiftOutputStream {
     func write(textIfNeeded text: String)
     func write(token: String)
     func write(name: String)
-    func write(optRef: SwiftVarDecl)
     func write(nested opening: String, _ closing: String, _ contents: () -> Void)
     func write(_ inner: SwiftOutputStreamable?)
     func write(_ inner: [SwiftOutputStreamable])
