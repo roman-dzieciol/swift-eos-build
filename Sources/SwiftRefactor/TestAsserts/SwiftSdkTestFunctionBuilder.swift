@@ -85,7 +85,7 @@ final class SdkTestFunctionBuilder {
         let testFunction = SwiftFunction(
             name: "test" + sdkFunction.name + "_Null",
             returnType: .void,
-            code: SwiftCodeBlock(statements: testFunctionImpl))
+            code: SwiftStatementsBuilder(statements: testFunctionImpl))
         testFunction.isThrowing = true
 
         return testFunction
@@ -204,7 +204,7 @@ final class SdkTestFunctionBuilder {
             resultType: nil,
             omitResultType: false,
             isThrowing: false,
-            statements: SwiftCodeBlock(statements: implementation)
+            statements: SwiftStatementsBuilder(statements: implementation)
         )
 
         return .string("__on_\(sdkFunction.name)").assign(implementationClosure)

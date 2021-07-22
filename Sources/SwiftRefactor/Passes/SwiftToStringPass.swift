@@ -22,13 +22,13 @@ final public class SwiftToStringPass: SwiftRefactorPass {
                 let enumCaseStmts: [SwiftStmt] = swiftEnum.inner
                     .compactMap { $0 as? SwiftEnumCase }
                     .map { enumCase in
-                        SwiftTempExpr { swift in
+                        SwiftUnstructuredExpr { swift in
                             swift.write(name: "case .\(enumCase.name): return \"\(enumCase.name)\"")
                             swift.write(textIfNeeded: "\n")
                         }
                     }
 
-                let switchStmt = SwiftTempExpr { swift in
+                let switchStmt = SwiftUnstructuredExpr { swift in
                     swift.write(name: "switch self {")
                     swift.write(textIfNeeded: "\n")
                     swift.indent(offset: 4) {
@@ -40,7 +40,7 @@ final public class SwiftToStringPass: SwiftRefactorPass {
                 }
 
 
-                let code = SwiftCodeBlock(statements: [switchStmt])
+                let code = SwiftStatementsBuilder(statements: [switchStmt])
                 let member = SwiftMember(name: "description", type: .string.nonOptional, isMutable: true, getter: code, comment: nil)
 
                 tag.append(member)

@@ -65,11 +65,6 @@ final public class SwiftASTLinker {
         objc_sync_enter(self)
         defer { objc_sync_exit(self) }
 
-        linkedRefs(for: ast, .code).forEach { ref in
-            if let codeAst = ref as? SwiftCodeAST {
-                codeAst.output.output = nil
-            }
-        }
         linkedRefs(for: ast, .expr).forEach { ref in
             if let exprRef = ref as? SwiftExprRef,
                let exprBuilder = exprRef.expr as? SwiftExprBuilder {

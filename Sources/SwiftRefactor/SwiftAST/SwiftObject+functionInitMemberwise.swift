@@ -22,7 +22,7 @@ extension SwiftObject {
         inner.append(function)
         link(.functionInitMemberwise, ref: function)
 
-        var statements: [SwiftExpr] = []
+        let statements = SwiftStatementsBuilder()
 
         for member in members {
 
@@ -47,14 +47,13 @@ extension SwiftObject {
             statements.append(stmt)
         }
 
-        function.code = SwiftCodeBlock(statements: statements)
+        function.code = statements
 
         return function
     }
 
 
     func functionDeinit() throws -> SwiftFunction {
-
 
         if let function = linked(.functionDeinit) as? SwiftFunction {
             return function
@@ -71,7 +70,7 @@ extension SwiftObject {
         inner.append(function)
         link(.functionDeinit, ref: function)
 
-        var statements: [SwiftExpr] = []
+        var statements = SwiftStatementsBuilder()
 
         for member in members {
 
@@ -80,7 +79,7 @@ extension SwiftObject {
             }
         }
 
-        function.code = SwiftCodeBlock(statements: statements)
+        function.code = statements
 
         return function
     }

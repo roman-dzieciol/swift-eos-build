@@ -31,9 +31,9 @@ extension SwiftObject {
 
         let sdkObjectExpr: SwiftExpr = .string(SwiftName.sdkObject)
 
-        var statements: [SwiftExpr] = []
+        var statements = SwiftStatementsBuilder()
 
-        statements += [SwiftTempExpr { swift in
+        statements += [SwiftUnstructuredExpr { swift in
             swift.write(name: "guard")
             swift.write(name: "let")
             swift.write(name: SwiftName.sdkObject)
@@ -63,19 +63,19 @@ extension SwiftObject {
             do {
                 if let shimmed = try rhsMemberExpr.shimmed(.immutableShims, lhs: lhs, rhs: rhs) {
                     let stmt = SwiftExprBuilder(expr: lhsExpr.assign(shimmed))
-                    statements.append(stmt)
+                    statements += [stmt]
                     stmt.link(ast: lhs)
                     stmt.link(ast: rhs)
                 } else {
-                    statements.append(.string("/* TODO: \(lhs.name) */"))
+                    statements += [.string("/* TODO: \(lhs.name) */")]
                 }
 
             } catch {
-                statements.append(.string("/* TODO: \(lhs.name) */"))
+                statements += [.string("/* TODO: \(lhs.name) */")]
             }
         }
 
-        function.code = SwiftCodeBlock(statements: statements)
+        function.code = statements
 
         return function
     }
@@ -105,8 +105,8 @@ extension SwiftObject {
 
         link(.functionSendCompletionResult, ref: function)
 
-        let statements: [SwiftExpr] = [
-            SwiftTempExpr { swift in
+        function.code = SwiftStatementsBuilder(statements: [
+            SwiftUnstructuredExpr { swift in
             swift.write(name: "guard")
             swift.write(name: "let")
             swift.write(name: SwiftName.sdkCallbackInfoPointer)
@@ -122,11 +122,9 @@ extension SwiftObject {
             swift.write(name: "guard let callbackInfo = try? Self.init(sdkObject: \(SwiftName.sdkCallbackInfoPointer).pointee) else { return }")
         },
             .string("callback").member("completionResult").call([.string("callbackInfo").arg(nil)]),
-        ]
+        ])
 
         inner.append(function)
-
-        function.code = SwiftCodeBlock(statements: statements)
 
         return function
     }
@@ -155,8 +153,8 @@ extension SwiftObject {
 
         link(.functionSendCompletion, ref: function)
 
-        let statements: [SwiftExpr] = [
-            SwiftTempExpr { swift in
+        function.code = SwiftStatementsBuilder(statements: [
+            SwiftUnstructuredExpr { swift in
             swift.write(name: "guard")
             swift.write(name: "let")
             swift.write(name: SwiftName.sdkCallbackInfoPointer)
@@ -172,11 +170,9 @@ extension SwiftObject {
             swift.write(name: "guard let callbackInfo = try? Self.init(sdkObject: \(SwiftName.sdkCallbackInfoPointer).pointee) else { return }")
         },
             .string("callback").member("completion").call([.string("callbackInfo").arg(nil)]),
-        ]
+        ])
 
         inner.append(function)
-
-        function.code = SwiftCodeBlock(statements: statements)
 
         return function
     }
@@ -205,8 +201,8 @@ extension SwiftObject {
 
         link(.functionSendNotification, ref: function)
 
-        let statements: [SwiftExpr] = [
-            SwiftTempExpr { swift in
+        function.code = SwiftStatementsBuilder(statements: [
+            SwiftUnstructuredExpr { swift in
             swift.write(name: "guard")
             swift.write(name: "let")
             swift.write(name: SwiftName.sdkCallbackInfoPointer)
@@ -222,19 +218,10 @@ extension SwiftObject {
             swift.write(name: "guard let callbackInfo = try? Self.init(sdkObject: \(SwiftName.sdkCallbackInfoPointer).pointee) else { return }")
         },
             .string("callback").member("notify").call([.string("callbackInfo").arg(nil)]),
-        ]
+        ])
 
         inner.append(function)
-
-        function.code = SwiftCodeBlock(statements: statements)
 
         return function
     }
 }
-
-//        public static func sendNotification(_ ptr: UnsafePointer<EOS_Achievements_OnAchievementsUnlockedCallbackInfo>?) {
-//            guard let ptr = ptr else { return }
-//            let callback = __SwiftEOS__NotificationCallback<Self>.from(pointer: ptr.pointee.ClientData)
-//            let callbackInfo = Self.init(sdkObject: ptr.pointee)
-//            callback?.notify(callbackInfo)
-//        }

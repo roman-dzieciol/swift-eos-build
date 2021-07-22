@@ -17,7 +17,7 @@ final class SwiftCleanupPassVisitor: SwiftVisitor {
 
         // DEV: ensure functions have some code, for testing individual pass compilation
         if let function = ast as? SwiftFunction, function.code == nil {
-            function.code = SwiftTempExpr { swift in
+            function.code = SwiftUnstructuredExpr { swift in
                 swift.write(name: "fatalError()")
             }
         }

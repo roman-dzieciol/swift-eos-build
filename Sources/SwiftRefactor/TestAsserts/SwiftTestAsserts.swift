@@ -44,7 +44,7 @@ struct TestAsserts {
             )
             asserts.append(assertExpr)
         }
-        return SwiftCodeBlock(statements: asserts)
+        return SwiftStatementsBuilder(statements: asserts)
     }
 
     static func assertNil(sdkParam: SwiftVarDecl, swiftFunction: SwiftFunction, sdkFunction: SwiftFunction) -> SwiftExpr {
@@ -213,7 +213,7 @@ struct TestAsserts {
                 resultType: nil,
                 omitResultType: false,
                 isThrowing: false,
-                statements: SwiftCodeBlock(statements: closureStatements)
+                statements: SwiftStatementsBuilder(statements: closureStatements)
             )
 
             return closure.arg(labelExpr)

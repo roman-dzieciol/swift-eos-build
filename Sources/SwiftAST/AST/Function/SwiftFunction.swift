@@ -17,7 +17,7 @@ final public class SwiftFunction: SwiftDecl {
     }
 
     public convenience init(name: String, isAsync: Bool = false, isOptional: Bool = false, isThrowing: Bool = false, returnType: SwiftType, inner: [SwiftAST] = [], comment: SwiftComment? = nil, code: @escaping (SwiftOutputStream) -> Void) {
-        self.init(name: name, isAsync: isAsync, isOptional: isOptional, isThrowing: isThrowing, returnType: returnType, inner: inner, comment: comment, code: SwiftTempExpr(output: code))
+        self.init(name: name, isAsync: isAsync, isOptional: isOptional, isThrowing: isThrowing, returnType: returnType, inner: inner, comment: comment, code: SwiftUnstructuredExpr(output: code))
     }
 
     public init(name: String, isAsync: Bool = false, isOptional: Bool = false, isThrowing: Bool = false, returnType: SwiftType, inner: [SwiftAST] = [], comment: SwiftComment? = nil, code: SwiftExpr? = nil) {

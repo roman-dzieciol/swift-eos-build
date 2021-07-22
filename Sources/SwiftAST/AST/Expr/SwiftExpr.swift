@@ -40,22 +40,22 @@ public class SwiftExpr: SwiftOutputStreamable, CustomStringConvertible {
 }
 
 
-public final class SwiftTempExpr: SwiftExpr {
+public final class SwiftUnstructuredExpr: SwiftExpr {
 
-    public let output: SwiftOutputStreamable
+    public let output: (SwiftOutputStream) -> Void
 
-    public init(output: SwiftOutputStreamable) {
-        self.output = output
-    }
-
-    public init(output: @escaping (SwiftOutputStream) -> Void) {
-        self.output = SwiftCode { swift in
-            output(swift)
+    public init(output streamable: SwiftOutputStreamable) {
+        self.output = { swift in
+            swift.write(streamable)
         }
     }
 
+    public init(output: @escaping (SwiftOutputStream) -> Void) {
+        self.output = output
+    }
+
     public override func write(to swift: SwiftOutputStream) {
-        swift.write(output)
+        output(swift)
     }
 }
 

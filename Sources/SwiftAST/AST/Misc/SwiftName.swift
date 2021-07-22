@@ -1,6 +1,7 @@
 
 import Foundation
 
+
 public struct SwiftName {
 
     static func token(isOptional: Bool?) -> String {

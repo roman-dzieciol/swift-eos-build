@@ -1,6 +1,7 @@
 
 import Foundation
 
+
 final public class SwiftStatementsBuilder: SwiftExpr {
 
 
@@ -25,6 +26,12 @@ final public class SwiftStatementsBuilder: SwiftExpr {
     }
 
     public override func write(to swift: SwiftOutputStream) {
+        let statements = statements.filter {
+            if let builder = $0 as? SwiftExprBuilder, builder.expr == nil {
+                return false
+            }
+            return true
+        }
         if !statements.isEmpty {
             swift.write(statements, separated: "\n")
         }

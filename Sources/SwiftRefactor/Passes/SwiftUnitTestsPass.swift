@@ -41,12 +41,12 @@ final public class SwiftUnitTestsPass: SwiftRefactorPass {
                         statements.append(.try(.function.withZeroInitializedCStruct(
                             type: .string(sdkObject.name).member("self"),
                             cstructVarName: "cstruct",
-                            nest: SwiftCodeBlock(statements: asserts))))
+                            nest: SwiftStatementsBuilder(statements: asserts))))
 
                         let function = SwiftFunction(
                             name: "testItZeroInitializesFrom" + sdkObject.name,
                             returnType: .void,
-                            code: SwiftCodeBlock(statements: statements))
+                            code: SwiftStatementsBuilder(statements: statements))
                         function.isThrowing = true
                         testObject.append(function)
                         self.swiftTestsModule.append(testObject)
