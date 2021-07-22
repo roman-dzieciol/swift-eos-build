@@ -5,7 +5,7 @@ public class SwiftVarDecl: SwiftTypeDecl {
 
     final public var isMutable: Bool
 
-    public var isInOutParm: Bool {
+    final public var isInOutParm: Bool {
         isMutable && self is SwiftFunctionParm
     }
 
@@ -22,11 +22,11 @@ public class SwiftVarDecl: SwiftTypeDecl {
 
 extension SwiftType {
 
-    public func tempVar(named: SwiftVarDecl? = nil, attributes: Set<String> = [], isMutable: Bool = false) -> SwiftVarDecl {
+    final public func tempVar(named: SwiftVarDecl? = nil, attributes: Set<String> = [], isMutable: Bool = false) -> SwiftVarDecl {
         SwiftVarDecl(name: named?.name ?? "$0", inner: [], attributes: attributes, type: self, isMutable: isMutable, comment: nil)
     }
 
-    public func toVar(named: String, isMutable: Bool = false) -> SwiftVar {
+    final public func toVar(named: String, isMutable: Bool = false) -> SwiftVar {
         SwiftVar(name: named, type: self, isMutable: isMutable)
     }
 }

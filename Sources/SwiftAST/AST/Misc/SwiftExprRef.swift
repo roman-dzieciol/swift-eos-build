@@ -15,7 +15,7 @@ final public class SwiftExprRef: SwiftAST {
 
 extension SwiftExpr {
 
-    public func link(ast: SwiftAST) {
+    final public func link(ast: SwiftAST) {
         ast.link(.expr, ref: SwiftExprRef(expr: self))
     }
 }

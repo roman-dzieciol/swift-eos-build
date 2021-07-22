@@ -1,28 +1,7 @@
 
 import Foundation
 
-final public class SwiftTypealias: SwiftDecl {
-
-    public var type: SwiftType
-
-    public override var canonical: SwiftAST {
-        type.canonical.asDeclRef?.decl.canonical ?? self
-    }
-
-    public override var canonicalType: SwiftType? {
-        type.canonical
-    }
-
-    public init(name: String, type: SwiftType, comment: SwiftComment? = nil) {
-        self.type = type
-        //type.isOptional == nil ? type.copy { $0.optional } : type
-        super.init(name: name, inner: [], comment: comment)
-    }
-
-    public override func handle(visitor: SwiftVisitor) throws {
-        try visitor.visitReplacing(type: &type)
-        try super.handle(visitor: visitor)
-    }
+final public class SwiftTypealias: SwiftTypeDecl {
     
     public override func copy() -> SwiftTypealias {
         let copy = SwiftTypealias(name: name, type: type, comment: comment?.copy())

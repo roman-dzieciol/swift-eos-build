@@ -119,18 +119,9 @@ private class SwiftUpdateDeclsInTypesVisitor: SwiftVisitor {
 
     public override func visit(type: SwiftType) throws -> SwiftType {
 
-        if let resolvedType = type as? SwiftDeclRefType {
-            guard let copiedAST = resolvedType.decl.linked(.swifty) as? SwiftDecl else { fatalError() }
-            return SwiftDeclRefType(decl: copiedAST, qual: resolvedType.qual)
+        if let resolvedType = type as? SwiftDeclRefType, let swiftAST = resolvedType.decl.swifty as? SwiftDecl {
+            return SwiftDeclRefType(decl: swiftAST, qual: resolvedType.qual)
         }
-
-//        if let genericType = type as? SwiftGenericType {
-//            guard let copiedAST = genericType.decl.copiedAST as? SwiftDecl else { fatalError() }
-//            let types = try genericType.types.compactMap {
-//                try super.visit(type: $0, stack: stack, typeStack: typeStack + [])
-//            }
-//            return SwiftGenericType(decl: copiedAST, types: types, qual: genericType.qual)
-//        }
 
         return try super.visit(type: type)
     }

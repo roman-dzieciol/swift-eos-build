@@ -179,7 +179,7 @@ final public class SwiftFunctionCallArgExpr: SwiftExpr {
 
 extension SwiftFunctionParm {
 
-    public func arg(_ expr: SwiftExpr) -> SwiftFunctionCallArgExpr {
+    final public func arg(_ expr: SwiftExpr) -> SwiftFunctionCallArgExpr {
         if let label = label, label != name {
             return SwiftFunctionCallArgExpr(identifier: .string(label), expr: expr)
         } else {
@@ -191,7 +191,7 @@ extension SwiftFunctionParm {
 
 extension SwiftExpr {
 
-    public func call(_ args: [SwiftFunctionCallArgExpr], useTrailingClosures: Bool = true) -> SwiftFunctionCallExpr {
+    final public func call(_ args: [SwiftFunctionCallArgExpr], useTrailingClosures: Bool = true) -> SwiftFunctionCallExpr {
         SwiftFunctionCallExpr(
             expr: self,
             args: SwiftFunctionCallArgClauseExpr(
@@ -206,7 +206,7 @@ extension SwiftExpr {
 
 
 extension SwiftFunction {
-    public func call(_ args: [SwiftFunctionCallArgExpr], useTrailingClosures: Bool = true) -> SwiftFunctionCallExpr {
+    final public func call(_ args: [SwiftFunctionCallArgExpr], useTrailingClosures: Bool = true) -> SwiftFunctionCallExpr {
         self.expr.call(args, useTrailingClosures: useTrailingClosures)
     }
 }

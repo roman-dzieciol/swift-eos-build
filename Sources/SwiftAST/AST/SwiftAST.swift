@@ -40,55 +40,11 @@ public struct SwiftASTLink {
 
 public class SwiftAST: SwiftOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible {
 
-    final public func linkedRefs(_ linkType: SwiftASTLinkType) -> [SwiftAST] {
-        SwiftASTLinker.shared.linkedRefs(for: self, linkType)
-    }
-
-    final public func linked(_ linkType: SwiftASTLinkType) -> SwiftAST? {
-        SwiftASTLinker.shared.linked(for: self, linkType)
-    }
-
-    final public func link(_ linkType: SwiftASTLinkType, ref: SwiftAST) {
-        SwiftASTLinker.shared.link(for: self, linkType, ref: ref)
-    }
-    final public func unlink(_ linkType: SwiftASTLinkType, ref: SwiftAST) {
-        SwiftASTLinker.shared.unlink(for: self, linkType, ref: ref)
-    }
-
-    final func linkCopy(from: SwiftAST, to: SwiftAST) {
-        from.link(.copiedTo, ref: to)
-        to.link(.copiedFrom, ref: from)
-    }
-
-    final public func unlink(all linkType: SwiftASTLinkType) {
-        SwiftASTLinker.shared.unlink(for: self, all: linkType)
-    }
-
-    final public func removeCode() {
-        SwiftASTLinker.shared.removeCode(for: self)
-    }
-
-    final public var sdk: SwiftAST? {
-        linked(.sdk)
-    }
-
-    final public var swifty: SwiftAST? {
-        linked(.swifty)
-    }
-
     final public var name: String
     final public var attributes: Set<String>
     final public var comment: SwiftComment?
     final public let uuid: SwiftASTLinker.Key = SwiftASTLinker.shared.uuid()
     final public var inner: [SwiftAST]
-
-    final public weak var origAST: SwiftAST? {
-        if let sourceAST = linked(.sdk) {
-            return sourceAST.origAST
-        } else {
-            return self
-        }
-    }
 
     public var canonical: SwiftAST {
         self
@@ -96,24 +52,6 @@ public class SwiftAST: SwiftOutputStreamable, CustomStringConvertible, CustomDeb
 
     public var canonicalType: SwiftType? {
         nil
-    }
-
-    final public var inSwiftEOS: Bool {
-        linked(.module)?.name != "EOS"
-    }
-
-    final public var inModule: Bool {
-        if let outer = linked(.outer) {
-            return outer.inModule
-        }
-        return self is SwiftModule
-    }
-
-    final public var asSource: Self? {
-        if let sourceAST = linked(.sdk) as? Self, sourceAST !== self {
-            return sourceAST
-        }
-        return nil
     }
 
     public init(name: String, inner: [SwiftAST] = [], attributes: Set<String> = [], comment: SwiftComment? = nil) {
@@ -139,8 +77,7 @@ public class SwiftAST: SwiftOutputStreamable, CustomStringConvertible, CustomDeb
 
     public var debugDescriptionDetails: String {
         "\(name)" +
-        (origAST.map { " sdk: \($0.name)" } ?? "")
-
+        (sdk.map { " sdk: \($0.name)" } ?? "")
     }
 
     public func write(to swift: SwiftOutputStream) {
@@ -154,15 +91,9 @@ public class SwiftAST: SwiftOutputStreamable, CustomStringConvertible, CustomDeb
         self.comment = self.comment ?? SwiftComment(comments:[])
         self.comment?.add(comment: comment)
     }
+}
 
-    final public func function(matching function: SwiftFunction) -> SwiftFunction? {
-        inner
-            .compactMap { $0 as? SwiftFunction }
-            .first(where: { innerFunction in
-                innerFunction.name == function.name &&
-                innerFunction.parms.map { $0.name } == function.parms.map { $0.name }
-            })
-    }
+extension SwiftAST {
 
     final public func append(_ ast: SwiftAST) {
         inner.append(ast)
@@ -198,5 +129,55 @@ public class SwiftAST: SwiftOutputStreamable, CustomStringConvertible, CustomDeb
     final public func removeFromOuter() {
         guard let outer = linked(.outer) else { fatalError() }
         outer.removeAll([self])
+    }
+}
+
+extension SwiftAST {
+
+    final public var sdk: SwiftAST? {
+        linked(.sdk)
+    }
+
+    final public var swifty: SwiftAST? {
+        linked(.swifty)
+    }
+
+    final public var inSwiftEOS: Bool {
+        linked(.module)?.name != "EOS"
+    }
+
+    final public var inModule: Bool {
+        if let outer = linked(.outer) {
+            return outer.inModule
+        }
+        return self is SwiftModule
+    }
+
+    final public func linkedRefs(_ linkType: SwiftASTLinkType) -> [SwiftAST] {
+        SwiftASTLinker.shared.linkedRefs(for: self, linkType)
+    }
+
+    final public func linked(_ linkType: SwiftASTLinkType) -> SwiftAST? {
+        SwiftASTLinker.shared.linked(for: self, linkType)
+    }
+
+    final public func link(_ linkType: SwiftASTLinkType, ref: SwiftAST) {
+        SwiftASTLinker.shared.link(for: self, linkType, ref: ref)
+    }
+    final public func unlink(_ linkType: SwiftASTLinkType, ref: SwiftAST) {
+        SwiftASTLinker.shared.unlink(for: self, linkType, ref: ref)
+    }
+
+    final func linkCopy(from: SwiftAST, to: SwiftAST) {
+        from.link(.copiedTo, ref: to)
+        to.link(.copiedFrom, ref: from)
+    }
+
+    final public func unlink(all linkType: SwiftASTLinkType) {
+        SwiftASTLinker.shared.unlink(for: self, all: linkType)
+    }
+
+    final public func removeCode() {
+        SwiftASTLinker.shared.removeCode(for: self)
     }
 }

@@ -42,7 +42,7 @@ public final class SwiftExplicitMemberExpr: SwiftPostfixExpr {
 
 extension SwiftExpr {
 
-    public func outer() -> SwiftExpr? {
+    final public func outer() -> SwiftExpr? {
         if let member = self as? SwiftExplicitMemberExpr {
             return member.expr
         }

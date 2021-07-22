@@ -31,7 +31,7 @@ final public class SwiftCommentBlock: SwiftComment {
 }
 
 extension SwiftCommentBlock {
-    public func fixEosResultComment() {
+    final public func fixEosResultComment() {
 
         if let paragraph = paragraphComments.first, let text = paragraph.textComments.first {
             if let successRange = text.name.range(of: "EOS_Success") {

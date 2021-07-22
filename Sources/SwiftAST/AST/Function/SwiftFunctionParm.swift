@@ -21,10 +21,6 @@ final public class SwiftFunctionParm: SwiftVarDecl {
         SwiftFunctionParmType(label: label, isMutable: isMutable, parmType: type)
     }
 
-    public override func declType() -> SwiftType? {
-        type
-    }
-
     public override func copy() -> SwiftFunctionParm {
         let copy = SwiftFunctionParm(label: label, name: name, type: type, isMutable: isMutable, attributes: attributes, comment: comment?.copy())
         linkCopy(from: self, to: copy)
@@ -58,11 +54,11 @@ extension SwiftFunctionParm {
         link(.sdk, ref: member)
     }
 
-    public var toMember: SwiftMember {
+    final public var toMember: SwiftMember {
         SwiftMember(name: name, type: type, isMutable: isMutable, getter: nil, comment: nil)
     }
 
-    public var toVar: SwiftVar {
+    final public var toVar: SwiftVar {
         SwiftVar(name: name, type: type, isMutable: isMutable)
     }
 }

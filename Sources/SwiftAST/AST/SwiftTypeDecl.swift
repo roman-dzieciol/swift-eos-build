@@ -17,12 +17,13 @@ public class SwiftTypeDecl: SwiftDecl {
         type.canonical
     }
 
-    public override func declType() -> SwiftType? {
-        type
-    }
-
     public init(name: String, inner: [SwiftAST] = [], attributes: Set<String> = [], type: SwiftType, comment: SwiftComment? = nil) {
         self.type = type
         super.init(name: name, inner: inner, attributes: attributes, comment: comment)
+    }
+
+    public override func handle(visitor: SwiftVisitor) throws {
+        try visitor.visitReplacing(type: &type)
+        try super.handle(visitor: visitor)
     }
 }

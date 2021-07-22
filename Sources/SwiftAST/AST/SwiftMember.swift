@@ -21,10 +21,6 @@ final public class SwiftMember: SwiftVarDecl {
         return copy
     }
 
-    public override func declType() -> SwiftType? {
-        type
-    }
-
     public override func write(to swift: SwiftOutputStream) {
         swift.write(comment)
         swift.write(name: access)

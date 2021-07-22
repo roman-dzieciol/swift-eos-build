@@ -20,7 +20,7 @@ public final class SwiftDeclRefExpr: SwiftPrimaryExpr {
 
 extension SwiftDeclRefType {
 
-    public var declRefExpr: SwiftDeclRefExpr {
+    final public var declRefExpr: SwiftDeclRefExpr {
         .init(declRef: self)
     }
 }

@@ -24,7 +24,7 @@ public final class SwiftInOutExpr: SwiftPrefixExpr {
 }
 
 extension SwiftExpr {
-    public var `inout`: SwiftInOutExpr {
+    final public var `inout`: SwiftInOutExpr {
         SwiftInOutExpr(identifier: self)
     }
 

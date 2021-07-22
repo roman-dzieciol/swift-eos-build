@@ -123,9 +123,9 @@ private class SwiftUseSdkTypesPassVisitor: SwiftVisitor {
 
         if let declType = type as? SwiftDeclRefType,
            declType.decl is SwiftUnion,
-           let sdkDecl = declType.decl.origAST as? SwiftUnion,
+           let sdkDecl = declType.decl.sdk as? SwiftUnion,
            let outerStruct = stack.last(where: { $0 is SwiftObject }),
-           let outerSdkStruct = outerStruct.origAST as? SwiftObject {
+           let outerSdkStruct = outerStruct.sdk as? SwiftObject {
             let sdkUnionName = outerSdkStruct.name + "." + sdkDecl.name
             os_log("union: %{public}s.%{public}s", stackPath, sdkUnionName)
             return SwiftBuiltinType(name: sdkUnionName, qual: type.qual)

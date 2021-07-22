@@ -13,9 +13,4 @@ public class SwiftDecl: SwiftAST {
         SwiftDeclRefType(decl: self, qual: qual)
     }
 
-
-    public func declType() -> SwiftType? {
-        nil
-    }
-
 }

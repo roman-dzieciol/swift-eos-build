@@ -19,7 +19,7 @@ final public class SwiftCommentParam: SwiftComment {
 
 extension SwiftCommentParam {
     
-    public func link(param: SwiftFunctionParm) {
+    final public func link(param: SwiftFunctionParm) {
         link(.commented, ref: param)
         param.link(.comment, ref: self)
     }

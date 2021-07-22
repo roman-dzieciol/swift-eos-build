@@ -62,23 +62,23 @@ public final class SwiftUnstructuredExpr: SwiftExpr {
 
 extension SwiftExpr {
 
-    public var optional: SwiftExpr {
+    final public var optional: SwiftExpr {
         SwiftOptionalChainingExpr(expr: self)
     }
 
-    public func arg(_ identifier: SwiftExpr?) -> SwiftFunctionCallArgExpr {
+    final public func arg(_ identifier: SwiftExpr?) -> SwiftFunctionCallArgExpr {
         SwiftFunctionCallArgExpr(identifier: identifier, expr: self)
     }
 
-    public func arg(_ string: String) -> SwiftFunctionCallArgExpr {
+    final public func arg(_ string: String) -> SwiftFunctionCallArgExpr {
         SwiftFunctionCallArgExpr(identifier: .string(string), expr: self)
     }
 
-    public func member(_ string: String) -> SwiftExplicitMemberExpr {
+    final public func member(_ string: String) -> SwiftExplicitMemberExpr {
         member(.string(string))
     }
 
-    public func member(_ expr: SwiftExpr) -> SwiftExplicitMemberExpr {
+    final public func member(_ expr: SwiftExpr) -> SwiftExplicitMemberExpr {
         if !(self is SwiftOptionalChainingExpr),
            !(expr is SwiftOptionalChainingExpr),
            let type = self.evaluateType(in: nil),

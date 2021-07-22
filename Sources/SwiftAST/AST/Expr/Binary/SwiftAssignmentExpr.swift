@@ -24,7 +24,7 @@ public final class SwiftAssignmentExpr: SwiftBinaryExpr {
 
 extension SwiftExpr {
 
-    public func assign(_ rhs: SwiftExpr) -> SwiftAssignmentExpr {
+    final public func assign(_ rhs: SwiftExpr) -> SwiftAssignmentExpr {
         SwiftAssignmentExpr(lhs: self, rhs: rhs)
     }
 
