@@ -69,59 +69,59 @@ final public class SwiftBuiltinType: SwiftType {
 
 extension SwiftType {
 
-    public var asBuiltin: SwiftBuiltinType? {
+    final public var asBuiltin: SwiftBuiltinType? {
         self as? SwiftBuiltinType
     }
 
-    public var isNumeric: Bool {
+    final public var isNumeric: Bool {
         isInt || isFloatingPoint
     }
 
-    public var isInt: Bool {
+    final public var isInt: Bool {
         asBuiltin?.builtinName.hasPrefix("UInt") == true ||
         asBuiltin?.builtinName.hasPrefix("Int") == true
     }
 
-    public var isFloatingPoint: Bool {
+    final public var isFloatingPoint: Bool {
         asBuiltin?.builtinName == "Double" ||
         asBuiltin?.builtinName == "Float"
     }
 
-    public var isByte: Bool {
+    final public var isByte: Bool {
         asBuiltin?.builtinName == "UInt8"  ||
         asBuiltin?.builtinName == "Int8"
     }
 
-    public var isString: Bool {
+    final public var isString: Bool {
         asBuiltin?.builtinName == "String"
     }
 
-    public var isCChar: Bool {
+    final public var isCChar: Bool {
         asBuiltin?.builtinName == "CChar"
     }
 
-    public var isVoid: Bool {
+    final public var isVoid: Bool {
         asBuiltin?.builtinName == "Void"
     }
 
-    public var isBool: Bool {
+    final public var isBool: Bool {
         asBuiltin?.builtinName == "Bool"
     }
 
-    public var isEosBool: Bool {
+    final public var isEosBool: Bool {
         asDeclRef?.decl.canonical.name == "EOS_Bool"
     }
 
-    public var isTuple: Bool {
+    final public var isTuple: Bool {
         asBuiltin?.builtinName.hasPrefix("(") == true &&
         asBuiltin?.builtinName.hasSuffix(")") == true
     }
 
-    public var isFixedWidthString: Bool {
+    final public var isFixedWidthString: Bool {
         asBuiltin?.builtinName.hasPrefix("String_") == true
     }
 
-    public var isUnion: Bool {
+    final public var isUnion: Bool {
         (asBuiltin?.builtinName.contains("__Unnamed_union") == true) ||
         (asDeclRef?.decl.canonical is SwiftUnion)
     }
