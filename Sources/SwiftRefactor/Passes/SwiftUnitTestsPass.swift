@@ -67,7 +67,7 @@ final public class SwiftUnitTestsPass: SwiftRefactorPass {
 
                     guard let function = sdkFunction.swifty as? SwiftFunction, function.inModule else { return }
                     let testObject = SwiftObject(name: "Swift" + sdkFunction.name + "Tests", tagName: "class", superTypes: ["XCTestCase"])
-                    let result = SdkTestFunctionBuilder(swiftFunction: function).build()
+                    let result = SdkTestFunctionBuilder(swiftFunction: function, valueType: .null).build()
                     testObject.append(result)
                     testObject.attributes.insert("final")
                     self.swiftSdkTestsModule.append(testObject)

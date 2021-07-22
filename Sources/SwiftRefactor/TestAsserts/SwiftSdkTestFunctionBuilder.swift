@@ -2,6 +2,13 @@
 import Foundation
 import SwiftAST
 
+public enum TestValueType {
+    case null
+    case empty
+    case one
+    case sample
+}
+
 final class SdkTestFunctionBuilder {
 
     let swiftFunction: SwiftFunction
