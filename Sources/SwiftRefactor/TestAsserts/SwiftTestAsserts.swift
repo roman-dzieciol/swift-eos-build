@@ -230,7 +230,7 @@ struct TestAsserts {
             return objectInit.arg(labelExpr)
         }
 
-        else if canonical.isOpaquePointer(), canonical.isOptional == false {
+        else if canonical.isOpaquePointer, canonical.isOptional == false {
             return .string(".nonZeroPointer").arg(labelExpr)
         }
 
@@ -255,7 +255,7 @@ struct TestAsserts {
             return nilExpr
         }
 
-        if canonical.isOpaquePointer(), canonical.isOptional == false {
+        if canonical.isOpaquePointer, canonical.isOptional == false {
             return .string(".nonZeroPointer")
         }
         return .string("TODO: \(canonical)")

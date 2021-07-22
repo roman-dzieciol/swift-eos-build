@@ -6,7 +6,7 @@ final public class SwiftArrayType: SwiftType {
     public let elementType: SwiftType
 
     public override var canonical: SwiftType {
-        SwiftArrayType(elementType: elementType.canonical, qual: qual)
+        SwiftArrayType(elementType: elementType.canonical, qual: qual, nonCanonical: self)
     }
 
     public override var debugDescriptionDetails: String {
@@ -14,13 +14,9 @@ final public class SwiftArrayType: SwiftType {
         "\(elementType.debugDescription)"
     }
 
-    public override var baseType: SwiftType {
-        elementType.baseType
-    }
-
-    public init(elementType: SwiftType, qual: SwiftQual = .none) {
+    public init(elementType: SwiftType, qual: SwiftQual = .none, nonCanonical: SwiftType? = nil) {
         self.elementType = elementType
-        super.init(qual: qual)
+        super.init(qual: qual, nonCanonical: nonCanonical)
     }
 
     public override func handle(visitor: SwiftVisitor) throws -> SwiftType {
@@ -50,7 +46,7 @@ final public class SwiftArrayType: SwiftType {
         swift.write(nested: "[", "]") {
             swift.write(elementType)
         }
-        swift.write(text: Self.token(isOptional: isOptional))
+        swift.write(text: SwiftName.token(isOptional: isOptional))
     }
 
     public override var nilExpr: SwiftExpr? {
@@ -61,16 +57,12 @@ final public class SwiftArrayType: SwiftType {
 
 extension SwiftType {
 
-    public var asArray: SwiftArrayType? {
+    final public var asArray: SwiftArrayType? {
         self as? SwiftArrayType
     }
 
-    public var isArray: Bool {
+    final public var isArray: Bool {
         self is SwiftArrayType
-    }
-
-    public var asArrayElement: SwiftType? {
-        asArray?.elementType
     }
 
 }

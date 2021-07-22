@@ -5,11 +5,6 @@ public class SwiftTypeDecl: SwiftDecl {
 
     final public var type: SwiftType
 
-    public override var innerType: SwiftType? {
-        get { type }
-        set { newValue.map { type = $0 } }
-    }
-
     public override var expr: SwiftDeclRefExpr {
         self.declRefType(qual: type.qual).declRefExpr
     }

@@ -82,7 +82,7 @@ private class SwiftTypesDeclPassVisitor: SwiftVisitor {
 
         // opaque members are optional
         if let varDecl = ast as? SwiftMember,
-           varDecl.type.canonical.baseType.isOpaque,
+           (varDecl.type.canonical.isOpaque || varDecl.type.canonical.isOpaquePointer), 
            varDecl.type.isOptional != true {
             varDecl.type = varDecl.type.optional
         }
@@ -159,11 +159,7 @@ private class SwiftTypesDeclPassVisitor: SwiftVisitor {
 
                 // Opaque types are optional
                 // Use typealias of opaque type if present
-                if let outerTypealias = varDecl.type.outerTypealias(type: innerPointer.pointeeType) {
-                    varDecl.type = outerTypealias.copy { $0.with(isOptional: true) }
-                } else {
-                    varDecl.type = innerPointer.pointeeType.copy { $0.with(isOptional: true) }
-                }
+                varDecl.type = (pointer.nonCanonical?.pointeeType ?? innerPointer.pointeeType).copy { $0.optional }
                 varDecl.isMutable = pointer.isMutable
             }
 
@@ -182,7 +178,7 @@ private class SwiftTypesDeclPassVisitor: SwiftVisitor {
 
             let canonical = varDecl.type.canonical
 
-            if canonical.asArrayElement?.asPointer?.pointeeType.asCChar != nil {
+            if canonical.asArray?.elementType.asPointer?.pointeeType.asCChar != nil {
                 varDecl.type = SwiftArrayType(elementType: .string, qual: varDecl.type.qual.explicitlyOptional)
             }
         }

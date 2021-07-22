@@ -7,11 +7,6 @@ final public class SwiftFunctionParm: SwiftVarDecl {
 
     public var defaultValue: String?
 
-    public override var innerType: SwiftType? {
-        get { type }
-        set { newValue.map { type = $0 } }
-    }
-
     public init(label: String? = nil, name: String, type: SwiftType, isMutable: Bool = false, attributes: Set<String> = [], comment: SwiftComment? = nil) {
         self.label = label
         super.init(name: name, inner: [], attributes: attributes, type: type, isMutable: isMutable, comment: comment)

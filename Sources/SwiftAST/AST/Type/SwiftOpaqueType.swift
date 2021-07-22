@@ -37,11 +37,11 @@ final public class SwiftOpaqueType: SwiftType {
 
 extension SwiftType {
 
-    public var asOpaque: SwiftOpaqueType? {
+    final public var asOpaque: SwiftOpaqueType? {
         self as? SwiftOpaqueType
     }
 
-    public var isOpaque: Bool {
+    final public var isOpaque: Bool {
         self is SwiftOpaqueType
     }
 }

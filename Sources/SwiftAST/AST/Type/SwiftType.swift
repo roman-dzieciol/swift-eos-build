@@ -18,11 +18,12 @@ extension SwiftType {
 public class SwiftType: SwiftOutputStreamable, CustomDebugStringConvertible, Equatable, Hashable {
 
     final public let qual: SwiftQual
-    public var baseType: SwiftType { self }
-    public var withoutTypealias: SwiftType { self }
-    public var withoutDecls: SwiftType { self }
+
+    private weak var _nonCanonical: SwiftType?
+
+    public var nonCanonical: Self? { _nonCanonical as? Self }
+
     public var canonical: SwiftType { self }
-    public var innerType: SwiftType { self }
 
     final public var isOptional: Bool? {
         qual.isOptional
@@ -40,8 +41,9 @@ public class SwiftType: SwiftOutputStreamable, CustomDebugStringConvertible, Equ
         "\(qual)"
     }
 
-    public init(qual: SwiftQual = .none) {
+    public init(qual: SwiftQual = .none, nonCanonical: SwiftType? = nil) {
         self.qual = qual
+        self._nonCanonical = nonCanonical ?? self
     }
 
     public func isEqual(rhs: SwiftType) -> Bool {
@@ -65,29 +67,8 @@ public class SwiftType: SwiftOutputStreamable, CustomDebugStringConvertible, Equ
 
     }
 
-    public static func token(isOptional: Bool?) -> String {
-        isOptional == true ? "?" : (isOptional == false ? "" : "!")
-    }
-
     public func handle(visitor: SwiftVisitor) throws -> SwiftType {
         self
-    }
-
-    final public func outer(type: SwiftType) -> SwiftType? {
-        sequence(first: self, next: { $0 != $0.innerType ? $0.innerType : nil })
-            .first(where: { $0.innerType.innerType == type })
-    }
-
-    final public func outerTypealias(type: SwiftType) -> SwiftDeclRefType? {
-        if let outerType = outer(type: type)?.asDeclRef, outerType.decl is SwiftTypealias {
-            return outerType
-        }
-        return nil
-    }
-
-    final public func withAlias(in rootType: SwiftType) -> SwiftType {
-        sequence(first: rootType, next: { $0 != $0.innerType ? $0.innerType : nil })
-            .first(where: { $0.innerType == self }) ?? self
     }
 
     public var immutable: SwiftType { self }
@@ -103,10 +84,6 @@ public class SwiftType: SwiftOutputStreamable, CustomDebugStringConvertible, Equ
 
     final public var explicitlyOptional: SwiftType {
         isOptional == nil ? copy({ $0.explicitlyOptional }) : self
-    }
-
-    final public var isHandlePointer: Bool {
-        canonical.asOpaquePointer?.pointeeType.asOpaque?.typeName.hasSuffix("Handle") == true
     }
 
     public var nilExpr: SwiftExpr? {

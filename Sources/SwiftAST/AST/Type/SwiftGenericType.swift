@@ -9,7 +9,8 @@ final public class SwiftGenericType: SwiftType {
     public override var canonical: SwiftType {
         SwiftGenericType(genericType: genericType.canonical,
                          specializationTypes: specializationTypes.map { $0.canonical },
-                         qual: qual)
+                         qual: qual,
+                         nonCanonical: self)
     }
 
     public override var debugDescriptionDetails: String {
@@ -18,10 +19,10 @@ final public class SwiftGenericType: SwiftType {
         "<\(specializationTypes.map { $0.debugDescription }.joined(separator: ",") )>"
     }
 
-    public init(genericType: SwiftType, specializationTypes: [SwiftType], qual: SwiftQual) {
+    public init(genericType: SwiftType, specializationTypes: [SwiftType], qual: SwiftQual, nonCanonical: SwiftType? = nil) {
         self.genericType = genericType
         self.specializationTypes = specializationTypes
-        super.init(qual: qual)
+        super.init(qual: qual, nonCanonical: nonCanonical)
     }
 
     public override func handle(visitor: SwiftVisitor) throws -> SwiftType {
@@ -56,13 +57,13 @@ final public class SwiftGenericType: SwiftType {
         swift.write(nested: "<", ">") {
             swift.write(specializationTypes, separated: ",")
         }
-        swift.write(text: Self.token(isOptional: isOptional))
+        swift.write(text: SwiftName.token(isOptional: isOptional))
     }
 }
 
 extension SwiftType {
 
-    public var asGeneric: SwiftGenericType? {
+    final public var asGeneric: SwiftGenericType? {
         self as? SwiftGenericType
     }
 }

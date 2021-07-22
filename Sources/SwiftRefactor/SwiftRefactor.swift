@@ -27,7 +27,6 @@ final public class SwiftRefactor {
         let swiftSdkTestsModule = SwiftModule(name: "SwiftEOSWithTestableSDKTests")
 
         try SwiftApiNotesPass().refactor(module: sdkModule, apiNotesURLs: apiNotesURLs)
-        try SwiftOpaquePass().refactor(module: sdkModule)
 
         os_log("Copying module for refactoring...")
         let module = try copy(sdkModule: sdkModule)

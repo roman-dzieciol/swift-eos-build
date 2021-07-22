@@ -13,11 +13,6 @@ final public class SwiftTypealias: SwiftDecl {
         type.canonical
     }
 
-    public override var innerType: SwiftType? {
-        get { type }
-        set { newValue.map { type = $0 } }
-    }
-
     public init(name: String, type: SwiftType, comment: SwiftComment? = nil) {
         self.type = type
         //type.isOptional == nil ? type.copy { $0.optional } : type

@@ -9,13 +9,9 @@ final public class SwiftFunctionParmType: SwiftType {
 
     public let parmType: SwiftType
 
-    public override var baseType: SwiftType { parmType }
-    public override var withoutTypealias: SwiftType { self }
-
     public override var canonical: SwiftType {
         parmType.canonical.copy { _ in qual }
     }
-    public override var innerType: SwiftType { parmType }
 
     public override var debugDescriptionDetails: String {
         "\(super.debugDescriptionDetails), " +
@@ -28,6 +24,21 @@ final public class SwiftFunctionParmType: SwiftType {
         self.parmType = parmType
         self.isMutable = isMutable
         super.init(qual: parmType.qual)
+    }
+
+    public override func isEqual(rhs: SwiftType) -> Bool {
+        guard let rhs = rhs as? Self else { return false }
+        return super.isEqual(rhs: rhs) &&
+        label == rhs.label &&
+        isMutable == rhs.isMutable &&
+        parmType == rhs.parmType
+    }
+
+    public override func hash(into hasher: inout Hasher) {
+        super.hash(into: &hasher)
+        hasher.combine(label)
+        hasher.combine(isMutable)
+        hasher.combine(parmType)
     }
 
     public override func handle(visitor: SwiftVisitor) throws -> SwiftType {

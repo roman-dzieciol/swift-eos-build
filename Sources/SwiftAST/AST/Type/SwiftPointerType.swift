@@ -5,26 +5,20 @@ final public class SwiftPointerType: SwiftType {
 
     public let pointeeType: SwiftType
 
-    public override var baseType: SwiftType {
-        pointeeType.baseType
-    }
+    public let isMutable: Bool
 
     public override var canonical: SwiftType {
-        SwiftPointerType(pointeeType: pointeeType.canonical, isMutable: isMutable, qual: qual)
+        SwiftPointerType(pointeeType: pointeeType.canonical, isMutable: isMutable, qual: qual, nonCanonical: self)
     }
-
-    public override var innerType: SwiftType { pointeeType }
-
-    public let isMutable: Bool
 
     public override var debugDescriptionDetails: String {
         "\(super.debugDescriptionDetails), \(pointeeType.debugDescription)"
     }
 
-    public init(pointeeType: SwiftType, isMutable: Bool = false, qual: SwiftQual = .none) {
+    public init(pointeeType: SwiftType, isMutable: Bool = false, qual: SwiftQual = .none, nonCanonical: SwiftType? = nil) {
         self.pointeeType = pointeeType
         self.isMutable = isMutable
-        super.init(qual: qual)
+        super.init(qual: qual, nonCanonical: nonCanonical)
     }
 
     public override func handle(visitor: SwiftVisitor) throws -> SwiftType {
@@ -38,12 +32,14 @@ final public class SwiftPointerType: SwiftType {
     public override func isEqual(rhs: SwiftType) -> Bool {
         guard let rhs = rhs as? Self else { return false }
         return super.isEqual(rhs: rhs) &&
-        pointeeType == rhs.pointeeType
+        pointeeType == rhs.pointeeType &&
+        isMutable == rhs.isMutable
     }
 
     public override func hash(into hasher: inout Hasher) {
         super.hash(into: &hasher)
         hasher.combine(pointeeType)
+        hasher.combine(isMutable)
     }
 
     public override func copy(_ adjust: (SwiftQual) -> SwiftQual) -> SwiftType {
@@ -80,7 +76,7 @@ final public class SwiftPointerType: SwiftType {
             }
         }
 
-        swift.write(text: Self.token(isOptional: isOptional))
+        swift.write(text: SwiftName.token(isOptional: isOptional))
     }
 
     public override var isTrivial: Bool {
@@ -90,27 +86,23 @@ final public class SwiftPointerType: SwiftType {
 
 extension SwiftType {
 
-    public var asPointer: SwiftPointerType? {
+    final public var asPointer: SwiftPointerType? {
         self as? SwiftPointerType
     }
 
-    public var isPointer: Bool {
+    final public var isPointer: Bool {
         self is SwiftPointerType
     }
 
-    public var asImmutablePointer: SwiftPointerType? {
-        (asPointer?.isMutable == false) ? asPointer : nil
+    final public var asOpaquePointer: SwiftPointerType? {
+        asPointer?.pointeeType.isOpaque == true ? asPointer : nil
     }
 
-    public var asMutablePointer: SwiftPointerType? {
-        (asPointer?.isMutable == true) ? asPointer : nil
+    final public var isOpaquePointer: Bool {
+        asOpaquePointer != nil
     }
 
-    public var asOpaquePointer: SwiftPointerType? {
-        (asPointer?.pointeeType is SwiftOpaqueType) ? asPointer : nil
-    }
-
-    public func isOpaquePointer() -> Bool {
-        ((withoutTypealias as? SwiftPointerType)?.pointeeType.withoutTypealias as? SwiftOpaqueType) != nil
+    final public var isHandlePointer: Bool {
+        asOpaquePointer?.pointeeType.asOpaque?.typeName.hasSuffix("Handle") == true
     }
 }

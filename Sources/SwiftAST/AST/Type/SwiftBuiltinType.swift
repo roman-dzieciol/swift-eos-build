@@ -37,7 +37,7 @@ final public class SwiftBuiltinType: SwiftType {
 
     public override func write(to swift: SwiftOutputStream) {
         swift.write(name: builtinName)
-        swift.write(text: Self.token(isOptional: isOptional))
+        swift.write(text: SwiftName.token(isOptional: isOptional))
     }
 
     public override var isTrivial: Bool {
@@ -130,23 +130,23 @@ extension SwiftType {
 
 extension SwiftType {
 
-    public var asInt: SwiftBuiltinType? {
+    final public var asInt: SwiftBuiltinType? {
         isInt ? asBuiltin : nil
     }
 
-    public var asByte: SwiftBuiltinType? {
+    final public var asByte: SwiftBuiltinType? {
         isByte ? asBuiltin : nil
     }
 
-    public var asString: SwiftBuiltinType? {
+    final public var asString: SwiftBuiltinType? {
         isString ? asBuiltin : nil
     }
 
-    public var asCChar: SwiftBuiltinType? {
+    final public var asCChar: SwiftBuiltinType? {
         isCChar ? asBuiltin : nil
     }
 
-    public var asVoid: SwiftBuiltinType? {
+    final public var asVoid: SwiftBuiltinType? {
         isVoid ? asBuiltin : nil
     }
 }

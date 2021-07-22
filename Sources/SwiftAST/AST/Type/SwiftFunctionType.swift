@@ -11,7 +11,8 @@ final public class SwiftFunctionType: SwiftType {
         SwiftFunctionType(paramTypes: paramTypes.map { $0.canonical },
                           isThrowing: isThrowing,
                           returnType: returnType.canonical,
-                          qual: qual)
+                          qual: qual,
+                          nonCanonical: self)
     }
 
     public override var debugDescriptionDetails: String {
@@ -21,11 +22,11 @@ final public class SwiftFunctionType: SwiftType {
         " -> \(returnType.debugDescription)"
     }
 
-    public init(paramTypes: [SwiftType], isThrowing: Bool = false, returnType: SwiftType, qual: SwiftQual = .none) {
+    public init(paramTypes: [SwiftType], isThrowing: Bool = false, returnType: SwiftType, qual: SwiftQual = .none, nonCanonical: SwiftType? = nil) {
         self.isThrowing = isThrowing
         self.returnType = returnType.isOptional == nil ? returnType.copy { $0.optional } : returnType
         self.paramTypes = paramTypes
-        super.init(qual: qual)
+        super.init(qual: qual, nonCanonical: nonCanonical)
     }
 
     public override func handle(visitor: SwiftVisitor) throws -> SwiftType {
@@ -73,7 +74,7 @@ final public class SwiftFunctionType: SwiftType {
             swift.write(nested: "(", ")") {
                 writeBaseType()
             }
-            swift.write(text: Self.token(isOptional: isOptional))
+            swift.write(text: SwiftName.token(isOptional: isOptional))
         } else {
             writeBaseType()
         }
@@ -83,11 +84,11 @@ final public class SwiftFunctionType: SwiftType {
 
 extension SwiftType {
 
-    public var asFunction: SwiftFunctionType? {
+    final public var asFunction: SwiftFunctionType? {
         self as? SwiftFunctionType
     }
 
-    public var isFunction: Bool {
+    final public var isFunction: Bool {
         self is SwiftFunctionType
     }
 }

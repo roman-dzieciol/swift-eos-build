@@ -27,7 +27,7 @@ extension SwiftShims {
 
                 let rhsArrayCountExpr: SwiftExpr = nested.outer().map { $0.member(rhsArrayCount.expr) } ?? rhsArrayCount.expr
 
-                if rhsPointer.pointeeType.isOptional != false || rhsPointer.pointeeType.isOpaquePointer() {
+                if rhsPointer.pointeeType.isOptional != false || rhsPointer.pointeeType.isOpaquePointer {
                     return .try(.function.trivialOptionalArrayFromOptionalTrivialOptionalPointer(start: nested, count: rhsArrayCountExpr))
                 } else if rhsPointer.isOptional != false {
                     return .try(.function.trivialOptionalArrayFromTrivialOptionalPointer(start: nested, count: rhsArrayCountExpr))

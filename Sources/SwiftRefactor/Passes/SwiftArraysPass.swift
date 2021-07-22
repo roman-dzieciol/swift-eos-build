@@ -52,10 +52,9 @@ private class SwiftArraysPassVisitor: SwiftVisitor {
                 }
 
                 // Pointer<Pointer<Opaque>> is [Pointer<Opaque>]
-                else if let innerPointer = pointer.pointeeType.asPointer,
-                        let opaque = innerPointer.pointeeType.asOpaque,
-                        let alias = varDecl.type.outer(type: opaque) {
-                    varDecl.type = SwiftArrayType(elementType: alias.copy { $0.with(isOptional: innerPointer.isOptional).explicitlyOptional }, qual: qual)
+                else if let innerPointer = pointer.pointeeType.asOpaquePointer  {
+                    let elementType = (pointer.nonCanonical ?? innerPointer).pointeeType
+                    varDecl.type = SwiftArrayType(elementType: elementType.copy { $0.with(isOptional: elementType.isOptional).explicitlyOptional }, qual: qual)
                 }
 
                 // Pointer<Void> is [UInt8]
@@ -80,11 +79,8 @@ private class SwiftArraysPassVisitor: SwiftVisitor {
 
                 // Pointer<?> is [?]
                 else {
-                    var alias = pointer.pointeeType.withAlias(in: varDecl.type)
-                    if alias == pointer {
-                        alias = pointer.pointeeType
-                    }
-                    varDecl.type = SwiftArrayType(elementType: alias.explicitlyOptional, qual: qual)
+                    let elementType = (pointer.nonCanonical ?? pointer).pointeeType
+                    varDecl.type = SwiftArrayType(elementType: elementType.explicitlyOptional, qual: qual)
                 }
 
                 varDecl.isMutable = pointer.isMutable

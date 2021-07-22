@@ -13,9 +13,7 @@ final public class SwiftRemoveTagsPass: SwiftRefactorPass {
 
         // Remove typealiases
         module.inner.removeAll(where: {
-            ((($0 as? SwiftTypealias)?
-                .type.withoutTypealias as? SwiftDeclRefType)?
-                .decl as? SwiftObject)?
+            (($0 as? SwiftTypealias)?.type.canonical.asDeclRef?.decl as? SwiftObject)?
                 .name.hasPrefix(Self.tagPrefix) == true
         })
 
@@ -32,7 +30,7 @@ private class SwiftUseStructsDirectlyVisitor: SwiftVisitor {
 
     override func visit(type: SwiftType) throws -> SwiftType {
 
-        if let declType = type.withoutTypealias as? SwiftDeclRefType,
+        if let declType = type.canonical.asDeclRef,
            let swiftObject = declType.decl as? SwiftObject,
            declType !== type,
            swiftObject.name.hasPrefix(SwiftRemoveTagsPass.tagPrefix) {

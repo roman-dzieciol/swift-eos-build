@@ -5,11 +5,6 @@ final public class SwiftMember: SwiftVarDecl {
 
     public var getter: SwiftExpr?
 
-    public override var innerType: SwiftType? {
-        get { type }
-        set { newValue.map { type = $0 } }
-    }
-
     public init(name: String, type: SwiftType, isMutable: Bool = false, getter: SwiftExpr? = nil, comment: SwiftComment? = nil) {
         self.getter = getter
         super.init(name: name, inner: [], type: type, isMutable: isMutable, comment: comment)

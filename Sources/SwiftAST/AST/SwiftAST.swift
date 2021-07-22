@@ -98,10 +98,6 @@ public class SwiftAST: SwiftOutputStreamable, CustomStringConvertible, CustomDeb
         nil
     }
 
-    public var innerType: SwiftType? {
-        nil
-    }
-
     final public var inSwiftEOS: Bool {
         linked(.module)?.name != "EOS"
     }
