@@ -1,4 +1,4 @@
 import Foundation
 
-public class ConstantArrayType: ASTType {
+final public class ConstantArrayType: ASTType {
 }

@@ -3,7 +3,7 @@ import Foundation
 
 public class SwiftTypeDecl: SwiftDecl {
 
-    public var type: SwiftType
+    final public var type: SwiftType
 
     public override var innerType: SwiftType? {
         get { type }

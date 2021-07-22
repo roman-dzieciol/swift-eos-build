@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class SwiftPointerType: SwiftType {
+final public class SwiftPointerType: SwiftType {
 
     public let pointeeType: SwiftType
 

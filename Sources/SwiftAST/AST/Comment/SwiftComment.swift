@@ -3,13 +3,13 @@ import Foundation
 
 public class SwiftComment: SwiftAST {
 
-    public var comments: [SwiftComment] { inner.compactMap { $0 as? SwiftComment } }
-    public var paramComments: [SwiftCommentParam] { inner.compactMap { $0 as? SwiftCommentParam } }
-    public var blockComments: [SwiftCommentBlock] { inner.compactMap { $0 as? SwiftCommentBlock } }
-    public var paragraphComments: [SwiftCommentParagraph] { inner.compactMap { $0 as? SwiftCommentParagraph } }
-    public var textComments: [SwiftCommentText] { inner.compactMap { $0 as? SwiftCommentText } }
+    final public var comments: [SwiftComment] { inner.compactMap { $0 as? SwiftComment } }
+    final public var paramComments: [SwiftCommentParam] { inner.compactMap { $0 as? SwiftCommentParam } }
+    final public var blockComments: [SwiftCommentBlock] { inner.compactMap { $0 as? SwiftCommentBlock } }
+    final public var paragraphComments: [SwiftCommentParagraph] { inner.compactMap { $0 as? SwiftCommentParagraph } }
+    final public var textComments: [SwiftCommentText] { inner.compactMap { $0 as? SwiftCommentText } }
 
-    public var isTopLevel: Bool { type(of: self) == SwiftComment.self }
+    final public var isTopLevel: Bool { type(of: self) == SwiftComment.self }
 
     public init(name: String = "", comments: [SwiftComment]) {
         super.init(name: name, inner: comments)
@@ -33,14 +33,14 @@ public class SwiftComment: SwiftAST {
         swift.write(inner)
     }
 
-    public override func add(comment: String) {
+    final public override func add(comment: String) {
         inner.append(SwiftCommentParagraph(text: [comment]))
     }
 }
 
 extension SwiftComment {
 
-    func paramComment(named: String) -> SwiftCommentParam? {
+    final func paramComment(named: String) -> SwiftCommentParam? {
         paramComments.first(where: { $0.name == named })
     }
 

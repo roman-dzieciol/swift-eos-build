@@ -3,7 +3,7 @@ import Foundation
 
 public class ASTType: ClangAST {
     
-    public lazy var type: String = {
+    final public lazy var type: String = {
         let type = info["type"] as! [String: Any]
         return type["qualType"] as! String
     }()

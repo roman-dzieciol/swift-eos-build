@@ -2,7 +2,7 @@
 import Foundation
 import SwiftAST
 
-public class SwiftCleanupPass: SwiftRefactorPass {
+final public class SwiftCleanupPass: SwiftRefactorPass {
 
     public override init() {}
 
@@ -11,7 +11,7 @@ public class SwiftCleanupPass: SwiftRefactorPass {
     }
 }
 
-class SwiftCleanupPassVisitor: SwiftVisitor {
+final class SwiftCleanupPassVisitor: SwiftVisitor {
 
     override func visit(ast: SwiftAST) throws {
 

@@ -2,7 +2,7 @@
 import Foundation
 import SwiftEOSBuildCore
 
-public class SwiftFunction: SwiftDecl {
+final public class SwiftFunction: SwiftDecl {
 
     public var returnType: SwiftType
     public var isThrowing: Bool

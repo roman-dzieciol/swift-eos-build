@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class SwiftGenericType: SwiftType {
+final public class SwiftGenericType: SwiftType {
 
     public let genericType: SwiftType
     public let specializationTypes: [SwiftType]

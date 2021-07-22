@@ -2,7 +2,7 @@
 import Foundation
 import SwiftAST
 
-public class SwiftEpicPass: SwiftRefactorPass {
+final public class SwiftEpicPass: SwiftRefactorPass {
 
     public override init() {}
 
@@ -11,7 +11,7 @@ public class SwiftEpicPass: SwiftRefactorPass {
     }
 }
 
-class SwiftModuleEpicPassVisitor: SwiftVisitor {
+final class SwiftModuleEpicPassVisitor: SwiftVisitor {
 
     private func adjust(name: inout String)  {
         if name.hasPrefix("EOS_") {

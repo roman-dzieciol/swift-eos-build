@@ -3,9 +3,9 @@ import Foundation
 
 public class SwiftFunctionCallExpr: SwiftPostfixExpr {
 
-    public let expr: SwiftExpr
-    public let args: SwiftFunctionCallArgClauseExpr
-    public let useTrailingClosures: Bool
+    final public let expr: SwiftExpr
+    final public let args: SwiftFunctionCallArgClauseExpr
+    final public let useTrailingClosures: Bool
 
     public init(
         expr: SwiftExpr,
@@ -144,7 +144,7 @@ public final class SwiftFunctionCallArgListExpr: SwiftExpr {
     }
 }
 
-public class SwiftFunctionCallArgExpr: SwiftExpr {
+final public class SwiftFunctionCallArgExpr: SwiftExpr {
 
     public let identifier: SwiftIdentifier?
     public let expr: SwiftExpr

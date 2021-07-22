@@ -2,7 +2,7 @@
 import Foundation
 
 
-public class SwiftVar: SwiftVarDecl {
+final public class SwiftVar: SwiftVarDecl {
 
     public var varDeclExpr: SwiftVarDeclRefExpr {
         SwiftVarDeclRefExpr(varDecl: self)

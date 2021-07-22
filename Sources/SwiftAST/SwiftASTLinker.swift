@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class SwiftASTLinker {
+final public class SwiftASTLinker {
 
     public static let shared = SwiftASTLinker()
 

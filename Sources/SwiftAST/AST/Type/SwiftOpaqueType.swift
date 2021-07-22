@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class SwiftOpaqueType: SwiftType {
+final public class SwiftOpaqueType: SwiftType {
 
     public let typeName: String
 

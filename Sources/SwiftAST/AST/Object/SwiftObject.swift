@@ -4,9 +4,9 @@ import Algorithms
 
 public class SwiftObject: SwiftDecl {
 
-    public var tagName: String
-    public var superTypes: [String]
-    public var members: [SwiftMember] { inner.compactMap { $0 as? SwiftMember } }
+    final public var tagName: String
+    final public var superTypes: [String]
+    final public var members: [SwiftMember] { inner.compactMap { $0 as? SwiftMember } }
 
     public init(name: String, tagName: String, superTypes: [String], inner: [SwiftAST] = [], comment: SwiftComment? = nil) {
         self.tagName = tagName
@@ -20,7 +20,7 @@ public class SwiftObject: SwiftDecl {
         return copy
     }
 
-    public func membersAsFunctionParms() -> [SwiftFunctionParm] {
+    final public func membersAsFunctionParms() -> [SwiftFunctionParm] {
         members.compactMap { member in
             SwiftFunctionParm(member: member)
         }
@@ -68,11 +68,11 @@ public class SwiftObject: SwiftDecl {
 
 extension SwiftObject: SwiftDeclContext {
 
-    public func evaluateType() -> SwiftType? {
+    final public func evaluateType() -> SwiftType? {
         SwiftDeclRefType(decl: self)
     }
 
-    public func removeArrayCounts() {
+    final public func removeArrayCounts() {
 
         let arrayCounts = members
             .filter {

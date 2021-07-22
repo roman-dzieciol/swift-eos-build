@@ -3,7 +3,7 @@ import Foundation
 import SwiftAST
 import os.log
 
-public class SwiftSDKCall {
+final public class SwiftSDKCall {
 
     let function: SwiftFunction
     let sdkFunction: SwiftFunction

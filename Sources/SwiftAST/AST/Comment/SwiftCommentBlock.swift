@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class SwiftCommentBlock: SwiftComment {
+final public class SwiftCommentBlock: SwiftComment {
 
     public override func copy() -> SwiftCommentBlock {
         let copy = SwiftCommentBlock(name: name, comments: comments.map { $0.copy() })

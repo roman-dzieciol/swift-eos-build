@@ -1,6 +1,6 @@
 import Foundation
 
-public class ParenType: ASTType {
+final public class ParenType: ASTType {
 
 
     public lazy var innerType: ASTType = {

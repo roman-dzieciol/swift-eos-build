@@ -2,7 +2,7 @@
 import Foundation
 import SwiftAST
 
-public class SwiftTypesPass: SwiftRefactorPass {
+final public class SwiftTypesPass: SwiftRefactorPass {
 
     public override func refactor(module: SwiftModule) throws {
         try SwiftTypesTypePassVisitor().visit(ast: module)

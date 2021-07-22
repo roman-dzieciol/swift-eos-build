@@ -3,7 +3,7 @@ import Foundation
 import SwiftAST
 import os.log
 
-public class SwiftRemoveOptionsPass: SwiftRefactorPass {
+final public class SwiftRemoveOptionsPass: SwiftRefactorPass {
 
     public override func refactor(module: SwiftModule) throws {
 

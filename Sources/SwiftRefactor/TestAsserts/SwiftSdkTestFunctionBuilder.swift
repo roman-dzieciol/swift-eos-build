@@ -2,7 +2,7 @@
 import Foundation
 import SwiftAST
 
-class SdkTestFunctionBuilder {
+final class SdkTestFunctionBuilder {
 
     let swiftFunction: SwiftFunction
     let swiftFunctionParms: [SwiftFunctionParm]
@@ -20,7 +20,9 @@ class SdkTestFunctionBuilder {
     var postconditionCalls: [String] = []
     var autoreleaseCalls: [String] = []
 
-    init(swiftFunction: SwiftFunction) {
+    let valueType: TestValueType
+
+    init(swiftFunction: SwiftFunction, valueType: TestValueType) {
         self.swiftFunction = swiftFunction
         self.swiftFunctionParms = swiftFunction.parms
 
@@ -31,6 +33,7 @@ class SdkTestFunctionBuilder {
         self.postconditions = SwiftStatementsBuilder()
         self.postconditionsGroup = postconditions
         self.autoreleaseAsserts = SwiftStatementsBuilder()
+        self.valueType = valueType
     }
 
     func build() -> SwiftFunction {

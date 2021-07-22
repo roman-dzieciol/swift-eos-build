@@ -2,7 +2,7 @@
 
 import Foundation
 
-public class SwiftExprRef: SwiftAST {
+final public class SwiftExprRef: SwiftAST {
 
     public let expr: SwiftExpr
 

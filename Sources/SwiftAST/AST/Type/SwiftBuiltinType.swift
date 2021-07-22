@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class SwiftBuiltinType: SwiftType {
+final public class SwiftBuiltinType: SwiftType {
 
     public let builtinName: String
 

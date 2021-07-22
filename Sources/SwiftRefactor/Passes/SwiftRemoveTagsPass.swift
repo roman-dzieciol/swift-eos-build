@@ -2,7 +2,7 @@
 import Foundation
 import SwiftAST
 
-public class SwiftRemoveTagsPass: SwiftRefactorPass {
+final public class SwiftRemoveTagsPass: SwiftRefactorPass {
 
     static let tagPrefix = "_tag"
 

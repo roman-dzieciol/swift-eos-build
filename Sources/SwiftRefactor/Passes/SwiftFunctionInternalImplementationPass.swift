@@ -3,7 +3,7 @@
 import Foundation
 import SwiftAST
 
-public class SwiftFunctionInternalImplementationPass: SwiftRefactorPass {
+final public class SwiftFunctionInternalImplementationPass: SwiftRefactorPass {
 
     public override func refactor(module: SwiftModule) throws {
         try SwiftFunctionInternalImplementationPassVisitor().visit(ast: module)

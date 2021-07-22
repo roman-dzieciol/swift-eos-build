@@ -3,7 +3,7 @@ import Foundation
 import SwiftAST
 import ClangAST
 
-public class SwiftFromClang {
+final public class SwiftFromClang {
 
     let clangAST: TranslationUnitDecl
 

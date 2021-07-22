@@ -1,4 +1,4 @@
 import Foundation
 
-public class MaxFieldAlignmentAttr: Attr {
+final public class MaxFieldAlignmentAttr: Attr {
 }

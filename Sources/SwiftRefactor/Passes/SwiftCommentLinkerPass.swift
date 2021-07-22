@@ -3,7 +3,7 @@
 import Foundation
 import SwiftAST
 
-public class SwiftCommentLinkerPass: SwiftRefactorPass {
+final public class SwiftCommentLinkerPass: SwiftRefactorPass {
 
     public override func refactor(module: SwiftModule) throws {
         try SwiftCommentLinkerPassVisitor().visit(ast: module)

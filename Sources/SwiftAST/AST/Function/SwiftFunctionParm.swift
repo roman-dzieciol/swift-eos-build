@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class SwiftFunctionParm: SwiftVarDecl {
+final public class SwiftFunctionParm: SwiftVarDecl {
 
     public var label: String?
 

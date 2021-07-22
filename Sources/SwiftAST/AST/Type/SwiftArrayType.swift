@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class SwiftArrayType: SwiftType {
+final public class SwiftArrayType: SwiftType {
 
     public let elementType: SwiftType
 

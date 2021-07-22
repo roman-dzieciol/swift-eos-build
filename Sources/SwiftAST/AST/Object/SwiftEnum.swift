@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class SwiftEnum: SwiftObject {
+final public class SwiftEnum: SwiftObject {
 
     public init(name: String, superTypes: [String], inner: [SwiftAST] = [], comment: SwiftComment? = nil) {
         super.init(name: name, tagName: "enum", superTypes: superTypes, inner: inner, comment: comment)

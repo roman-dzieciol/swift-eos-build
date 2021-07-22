@@ -23,7 +23,7 @@ public func withNotification<SwiftCallbackInfo>(
     }
 }
 
-public class SwiftEOS_Notification<SwiftCallbackInfo> {
+final public class SwiftEOS_Notification<SwiftCallbackInfo> {
 
     let pointerManager: SwiftEOS__PointerManager
     let callback: __SwiftEOS__NotificationCallback<SwiftCallbackInfo>
@@ -45,7 +45,7 @@ public class SwiftEOS_Notification<SwiftCallbackInfo> {
     }
 }
 
-class __SwiftEOS__NotificationCallback<SwiftCallbackInfo> {
+final class __SwiftEOS__NotificationCallback<SwiftCallbackInfo> {
 
     let notify: (SwiftCallbackInfo) -> Void
 

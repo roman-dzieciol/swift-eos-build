@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class SwiftStatementsBuilder: SwiftExpr {
+final public class SwiftStatementsBuilder: SwiftExpr {
 
 
     public var statements: [SwiftStmt]

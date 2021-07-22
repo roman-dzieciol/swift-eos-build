@@ -2,7 +2,7 @@
 import Foundation
 import SwiftAST
 
-public class SwiftOpaquePass: SwiftRefactorPass {
+final public class SwiftOpaquePass: SwiftRefactorPass {
 
     public override init() {}
 
@@ -11,7 +11,7 @@ public class SwiftOpaquePass: SwiftRefactorPass {
     }
 }
 
-class SwiftOpaquePassVisitor: SwiftVisitor {
+final class SwiftOpaquePassVisitor: SwiftVisitor {
 
     override func visit(type: SwiftType) throws -> SwiftType {
 

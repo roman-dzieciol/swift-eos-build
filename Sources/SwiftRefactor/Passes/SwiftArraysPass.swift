@@ -2,7 +2,7 @@
 import Foundation
 import SwiftAST
 
-public class SwiftArraysPass: SwiftRefactorPass {
+final public class SwiftArraysPass: SwiftRefactorPass {
 
     public override func refactor(module: SwiftModule) throws {
 

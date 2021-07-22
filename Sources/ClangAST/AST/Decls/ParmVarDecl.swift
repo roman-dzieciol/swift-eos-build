@@ -1,5 +1,5 @@
 import Foundation
 
-public class ParmVarDecl: VarDecl {
+final public class ParmVarDecl: VarDecl {
 
 }

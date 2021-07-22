@@ -1,6 +1,6 @@
 import Foundation
 
-public class FieldDecl: NamedDecl {
+final public class FieldDecl: NamedDecl {
 
     public lazy var type: String = {
         let type = info["type"] as! [String: Any]

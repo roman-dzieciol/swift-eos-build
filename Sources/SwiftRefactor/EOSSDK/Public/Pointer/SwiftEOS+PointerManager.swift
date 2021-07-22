@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class SwiftEOS__PointerManager {
+final public class SwiftEOS__PointerManager {
 
     /** Closures called on `deinit` */
     private var onDeinit: [() -> Void]

@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class SwiftCodeAST: SwiftAST {
+final public class SwiftCodeAST: SwiftAST {
 
     public let output: SwiftOutput
 
@@ -12,7 +12,7 @@ public class SwiftCodeAST: SwiftAST {
 }
 
 
-public class SwiftOutput: SwiftOutputStreamable {
+final public class SwiftOutput: SwiftOutputStreamable {
 
     public var output: ((SwiftOutputStream) -> Void)?
 

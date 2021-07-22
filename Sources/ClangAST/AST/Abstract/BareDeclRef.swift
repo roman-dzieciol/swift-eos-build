@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class BareDeclRef: ClangAST {
+final public class BareDeclRef: ClangAST {
 
     public lazy var name: String = {
         string(key: "name")!

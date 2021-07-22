@@ -1,7 +1,7 @@
 import Foundation
 
 
-public class UnaryOperator: Operator {
+final public class UnaryOperator: Operator {
 
     public lazy var isPostfix: Bool? = {
         info["isPostfix"] as? Bool

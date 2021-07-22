@@ -2,7 +2,7 @@
 import Foundation
 
 
-public class SwiftExprBuilder: SwiftExpr {
+final public class SwiftExprBuilder: SwiftExpr {
 
     public var expr: SwiftExpr?
     

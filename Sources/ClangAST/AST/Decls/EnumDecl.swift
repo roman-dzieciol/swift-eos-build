@@ -1,6 +1,6 @@
 import Foundation
 
 
-public class EnumDecl: NamedDecl {
+final public class EnumDecl: NamedDecl {
 
 }

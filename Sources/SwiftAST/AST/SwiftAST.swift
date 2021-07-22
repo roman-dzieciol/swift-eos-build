@@ -40,49 +40,49 @@ public struct SwiftASTLink {
 
 public class SwiftAST: SwiftOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible {
 
-    public func linkedRefs(_ linkType: SwiftASTLinkType) -> [SwiftAST] {
+    final public func linkedRefs(_ linkType: SwiftASTLinkType) -> [SwiftAST] {
         SwiftASTLinker.shared.linkedRefs(for: self, linkType)
     }
 
-    public func linked(_ linkType: SwiftASTLinkType) -> SwiftAST? {
+    final public func linked(_ linkType: SwiftASTLinkType) -> SwiftAST? {
         SwiftASTLinker.shared.linked(for: self, linkType)
     }
 
-    public func link(_ linkType: SwiftASTLinkType, ref: SwiftAST) {
+    final public func link(_ linkType: SwiftASTLinkType, ref: SwiftAST) {
         SwiftASTLinker.shared.link(for: self, linkType, ref: ref)
     }
-    public func unlink(_ linkType: SwiftASTLinkType, ref: SwiftAST) {
+    final public func unlink(_ linkType: SwiftASTLinkType, ref: SwiftAST) {
         SwiftASTLinker.shared.unlink(for: self, linkType, ref: ref)
     }
 
-    func linkCopy(from: SwiftAST, to: SwiftAST) {
+    final func linkCopy(from: SwiftAST, to: SwiftAST) {
         from.link(.copiedTo, ref: to)
         to.link(.copiedFrom, ref: from)
     }
 
-    public func unlink(all linkType: SwiftASTLinkType) {
+    final public func unlink(all linkType: SwiftASTLinkType) {
         SwiftASTLinker.shared.unlink(for: self, all: linkType)
     }
 
-    public func removeCode() {
+    final public func removeCode() {
         SwiftASTLinker.shared.removeCode(for: self)
     }
 
-    public var sdk: SwiftAST? {
+    final public var sdk: SwiftAST? {
         linked(.sdk)
     }
 
-    public var swifty: SwiftAST? {
+    final public var swifty: SwiftAST? {
         linked(.swifty)
     }
 
-    public var name: String
-    public var attributes: Set<String>
-    public var comment: SwiftComment?
-    public let uuid: SwiftASTLinker.Key = SwiftASTLinker.shared.uuid()
-    public var inner: [SwiftAST]
+    final public var name: String
+    final public var attributes: Set<String>
+    final public var comment: SwiftComment?
+    final public let uuid: SwiftASTLinker.Key = SwiftASTLinker.shared.uuid()
+    final public var inner: [SwiftAST]
 
-    public weak var origAST: SwiftAST? {
+    final public weak var origAST: SwiftAST? {
         if let sourceAST = linked(.sdk) {
             return sourceAST.origAST
         } else {
@@ -102,18 +102,18 @@ public class SwiftAST: SwiftOutputStreamable, CustomStringConvertible, CustomDeb
         nil
     }
 
-    public var inSwiftEOS: Bool {
+    final public var inSwiftEOS: Bool {
         linked(.module)?.name != "EOS"
     }
 
-    public var inModule: Bool {
+    final public var inModule: Bool {
         if let outer = linked(.outer) {
             return outer.inModule
         }
         return self is SwiftModule
     }
 
-    public var asSource: Self? {
+    final public var asSource: Self? {
         if let sourceAST = linked(.sdk) as? Self, sourceAST !== self {
             return sourceAST
         }
@@ -159,7 +159,7 @@ public class SwiftAST: SwiftOutputStreamable, CustomStringConvertible, CustomDeb
         self.comment?.add(comment: comment)
     }
 
-    public func function(matching function: SwiftFunction) -> SwiftFunction? {
+    final public func function(matching function: SwiftFunction) -> SwiftFunction? {
         inner
             .compactMap { $0 as? SwiftFunction }
             .first(where: { innerFunction in
@@ -168,19 +168,19 @@ public class SwiftAST: SwiftOutputStreamable, CustomStringConvertible, CustomDeb
             })
     }
 
-    public func append(_ ast: SwiftAST) {
+    final public func append(_ ast: SwiftAST) {
         inner.append(ast)
         ast.unlink(all: .outer)
         ast.link(.outer, ref: self)
     }
 
-    public func append(contentsOf array: [SwiftAST]) {
+    final public func append(contentsOf array: [SwiftAST]) {
         for item in array {
             append(item)
         }
     }
 
-    public func removeAll(_ array: [SwiftAST]) {
+    final public func removeAll(_ array: [SwiftAST]) {
         removeAll(Set(array.map { ObjectIdentifier($0) }) )
         let comments = array.compactMap { $0.linked(.comment) }
         if let decl = self as? SwiftDecl {
@@ -188,7 +188,7 @@ public class SwiftAST: SwiftOutputStreamable, CustomStringConvertible, CustomDeb
         }
     }
 
-    public func removeAll(_ objects: Set<ObjectIdentifier>) {
+    final public func removeAll(_ objects: Set<ObjectIdentifier>) {
         inner.removeAll { decl in
             if objects.contains(ObjectIdentifier(decl)) {
                 decl.unlink(.outer, ref: self)
@@ -199,7 +199,7 @@ public class SwiftAST: SwiftOutputStreamable, CustomStringConvertible, CustomDeb
         }
     }
 
-    public func removeFromOuter() {
+    final public func removeFromOuter() {
         guard let outer = linked(.outer) else { fatalError() }
         outer.removeAll([self])
     }

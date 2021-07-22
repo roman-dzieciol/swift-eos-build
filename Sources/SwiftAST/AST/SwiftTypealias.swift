@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class SwiftTypealias: SwiftDecl {
+final public class SwiftTypealias: SwiftDecl {
 
     public var type: SwiftType
 

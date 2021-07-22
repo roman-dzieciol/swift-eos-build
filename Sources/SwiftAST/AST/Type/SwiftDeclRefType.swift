@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class SwiftDeclRefType: SwiftType {
+final public class SwiftDeclRefType: SwiftType {
 
     public let decl: SwiftDecl
 

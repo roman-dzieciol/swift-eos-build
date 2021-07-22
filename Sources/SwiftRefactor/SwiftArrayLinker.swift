@@ -5,7 +5,7 @@ import os.log
 
 
 
-class SwiftyArrayLinker {
+final class SwiftyArrayLinker {
 
     let prefixesToAdd = ["", "In"]
     let bufferSuffixesToRemove = ["", "Buffer", "s", "Ids"]

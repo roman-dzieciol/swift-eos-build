@@ -1,5 +1,5 @@
 import Foundation
 
-public class EmptyDecl: Decl {
+final public class EmptyDecl: Decl {
 
 }

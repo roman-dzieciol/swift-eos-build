@@ -2,7 +2,7 @@
 import Foundation
 
 
-public class SwiftCodeBlock: SwiftExpr {
+final public class SwiftCodeBlock: SwiftExpr {
 
     public let statements: [SwiftStmt]
 

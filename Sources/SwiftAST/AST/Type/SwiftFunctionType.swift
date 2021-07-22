@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class SwiftFunctionType: SwiftType {
+final public class SwiftFunctionType: SwiftType {
 
     public let paramTypes: [SwiftType]
     public let returnType: SwiftType

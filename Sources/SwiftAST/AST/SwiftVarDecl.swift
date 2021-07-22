@@ -3,13 +3,13 @@ import Foundation
 
 public class SwiftVarDecl: SwiftTypeDecl {
 
-    public var isMutable: Bool
+    final public var isMutable: Bool
 
     public var isInOutParm: Bool {
         isMutable && self is SwiftFunctionParm
     }
 
-    public var sdkVarDecl: SwiftVarDecl {
+    final public var sdkVarDecl: SwiftVarDecl {
         linked(.sdk) as! SwiftVarDecl
     }
 

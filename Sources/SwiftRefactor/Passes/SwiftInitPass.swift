@@ -2,7 +2,7 @@
 import Foundation
 import SwiftAST
 
-public class SwiftInitPass: SwiftRefactorPass {
+final public class SwiftInitPass: SwiftRefactorPass {
 
     public override init() {}
 

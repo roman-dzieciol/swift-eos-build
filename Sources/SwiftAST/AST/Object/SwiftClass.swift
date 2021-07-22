@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class SwiftClass: SwiftObject {
+final public class SwiftClass: SwiftObject {
 
     public init(name: String, superTypes: [String], inner: [SwiftAST] = [], comment: SwiftComment? = nil) {
         super.init(name: name, tagName: "class", superTypes: superTypes, inner: inner, comment: comment)

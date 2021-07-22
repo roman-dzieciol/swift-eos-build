@@ -2,7 +2,7 @@
 
 import Foundation
 
-public class FunctionDecl: NamedDecl {
+final public class FunctionDecl: NamedDecl {
 
     public lazy var type: String = {
         let type = info["type"] as! [String: Any]

@@ -1,6 +1,6 @@
 import Foundation
 
-public class ElaboratedType: ASTType {
+final public class ElaboratedType: ASTType {
 
     public lazy var ownedTagDecl: Decl? = {
         TagDecl(dictionary(key: "ownedTagDecl")!)

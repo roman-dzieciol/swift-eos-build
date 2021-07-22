@@ -1,4 +1,4 @@
 import Foundation
 
-public class VisibilityAttr: Attr {
+final public class VisibilityAttr: Attr {
 }

@@ -4,7 +4,7 @@ import Foundation
 import SwiftAST
 
 
-public class SwiftForEachVisitor: SwiftVisitor {
+final public class SwiftForEachVisitor: SwiftVisitor {
 
     public let declAction: (SwiftAST) throws -> Bool
     public let typeAction: (SwiftType) throws -> SwiftType

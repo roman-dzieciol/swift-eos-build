@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class SwiftModule: SwiftDecl {
+final public class SwiftModule: SwiftDecl {
 
     public override func write(to swift: SwiftOutputStream) {
         swift.write(comment)

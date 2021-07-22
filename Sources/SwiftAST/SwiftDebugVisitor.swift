@@ -8,7 +8,7 @@ public func dbg(_ decl: SwiftAST) {
     SwiftDebugVisitor.write(ast: decl)
 }
 
-public class SwiftDebugVisitor: SwiftVisitor {
+final public class SwiftDebugVisitor: SwiftVisitor {
 
     var output: String = ""
     var indent: String = ""

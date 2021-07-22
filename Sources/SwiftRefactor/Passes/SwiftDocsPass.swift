@@ -3,7 +3,7 @@ import Foundation
 import SwiftAST
 import NaturalLanguage
 
-public class SwiftDocsPass: SwiftRefactorPass {
+final public class SwiftDocsPass: SwiftRefactorPass {
 
     public override init() {}
 

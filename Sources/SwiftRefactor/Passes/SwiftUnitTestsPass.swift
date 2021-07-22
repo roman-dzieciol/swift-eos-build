@@ -2,7 +2,7 @@
 import Foundation
 import SwiftAST
 
-public class SwiftUnitTestsPass: SwiftRefactorPass {
+final public class SwiftUnitTestsPass: SwiftRefactorPass {
 
     let swiftTestsModule: SwiftModule
     let swiftSdkTestsModule: SwiftModule
@@ -53,7 +53,7 @@ public class SwiftUnitTestsPass: SwiftRefactorPass {
                     }
                 }
         }
-        }
+    }
 
     func addFunctionTests(for module: SwiftModule) throws {
         guard let sdkModule = module.sdk else { return }

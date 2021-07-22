@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class SwiftEnumCase: SwiftDecl {
+final public class SwiftEnumCase: SwiftDecl {
 
     public var valueTokens: [String]
 

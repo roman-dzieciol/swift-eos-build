@@ -2,7 +2,7 @@
 import Foundation
 import SwiftAST
 
-public class SwiftDebugPass: SwiftRefactorPass {
+final public class SwiftDebugPass: SwiftRefactorPass {
 
     let action: (_ module: SwiftModule) throws -> Void
 

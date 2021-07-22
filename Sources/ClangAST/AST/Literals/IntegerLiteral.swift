@@ -1,6 +1,6 @@
 import Foundation
 
-public class IntegerLiteral: Literal {
+final public class IntegerLiteral: Literal {
 
     public lazy var value: String = {
         string(key: "value")!

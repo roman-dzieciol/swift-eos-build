@@ -4,11 +4,11 @@ import os.log
 
 public class ClangAST: ClangJSON, CustomDebugStringConvertible {
 
-    public lazy var kind: String = {
+    final public lazy var kind: String = {
         string(key: "kind")!
     }()
 
-    public lazy var inner: [ClangAST] = {
+    final public lazy var inner: [ClangAST] = {
         let infoArray = info["inner"] as? [[String: Any]] ?? []
         return infoArray.map { ClangAST.from(info: $0) }
     }()
@@ -72,7 +72,7 @@ public class ClangAST: ClangJSON, CustomDebugStringConvertible {
         return clangAST
     }
 
-    public func preloadAST() {
+    final public func preloadAST() {
         inner.forEach { $0.preloadAST() }
     }
 

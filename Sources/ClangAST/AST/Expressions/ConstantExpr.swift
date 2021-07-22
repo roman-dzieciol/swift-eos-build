@@ -1,4 +1,4 @@
 import Foundation
 
-public class ConstantExpr: Expr {
+final public class ConstantExpr: Expr {
 }

@@ -1,5 +1,5 @@
 import Foundation
 
-public class ParagraphComment: Comment {
+final public class ParagraphComment: Comment {
 
 }

@@ -1,7 +1,7 @@
 import Foundation
 
 
-public class DeclRefExpr: Expr {
+final public class DeclRefExpr: Expr {
 
     public lazy var referencedDecl: BareDeclRef = {
         BareDeclRef(dictionary(key: "referencedDecl")!)

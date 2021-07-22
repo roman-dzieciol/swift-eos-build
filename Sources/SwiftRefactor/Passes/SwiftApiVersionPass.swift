@@ -2,7 +2,7 @@
 import Foundation
 import SwiftAST
 
-public class SwiftApiVersionPass: SwiftRefactorPass {
+final public class SwiftApiVersionPass: SwiftRefactorPass {
 
     public override func refactor(module: SwiftModule) throws {
 

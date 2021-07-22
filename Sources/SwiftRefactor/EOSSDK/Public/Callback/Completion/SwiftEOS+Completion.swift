@@ -20,7 +20,7 @@ public func withCompletionResult<SwiftCallbackInfo, R>(
     }
 }
 
-class __SwiftEOS__CompletionCallbackWithResult<SwiftCallbackInfo> {
+final class __SwiftEOS__CompletionCallbackWithResult<SwiftCallbackInfo> {
 
     let pointerManager: SwiftEOS__PointerManager
 
@@ -56,7 +56,7 @@ public func withCompletion<SwiftCallbackInfo, R>(
     }
 }
 
-class __SwiftEOS__CompletionCallback<SwiftCallbackInfo> {
+final class __SwiftEOS__CompletionCallback<SwiftCallbackInfo> {
 
     let pointerManager: SwiftEOS__PointerManager
 

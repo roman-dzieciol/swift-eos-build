@@ -2,7 +2,7 @@
 import Foundation
 import SwiftAST
 
-public class SwiftApiNotesPass: SwiftRefactorPass {
+final public class SwiftApiNotesPass: SwiftRefactorPass {
 
     public func refactor(module: SwiftModule, apiNotesURLs: [URL]) throws {
 

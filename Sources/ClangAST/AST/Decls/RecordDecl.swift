@@ -2,7 +2,7 @@
 import Foundation
 
 
-public class RecordDecl: Decl {
+final public class RecordDecl: Decl {
 
     public lazy var name: String? = {
         string(key: "name")

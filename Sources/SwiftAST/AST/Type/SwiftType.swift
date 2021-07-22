@@ -17,14 +17,14 @@ extension SwiftType {
 
 public class SwiftType: SwiftOutputStreamable, CustomDebugStringConvertible, Equatable, Hashable {
 
-    public let qual: SwiftQual
+    final public let qual: SwiftQual
     public var baseType: SwiftType { self }
     public var withoutTypealias: SwiftType { self }
     public var withoutDecls: SwiftType { self }
     public var canonical: SwiftType { self }
     public var innerType: SwiftType { self }
 
-    public var isOptional: Bool? {
+    final public var isOptional: Bool? {
         qual.isOptional
     }
 
@@ -73,19 +73,19 @@ public class SwiftType: SwiftOutputStreamable, CustomDebugStringConvertible, Equ
         self
     }
 
-    public func outer(type: SwiftType) -> SwiftType? {
+    final public func outer(type: SwiftType) -> SwiftType? {
         sequence(first: self, next: { $0 != $0.innerType ? $0.innerType : nil })
             .first(where: { $0.innerType.innerType == type })
     }
 
-    public func outerTypealias(type: SwiftType) -> SwiftDeclRefType? {
+    final public func outerTypealias(type: SwiftType) -> SwiftDeclRefType? {
         if let outerType = outer(type: type)?.asDeclRef, outerType.decl is SwiftTypealias {
             return outerType
         }
         return nil
     }
 
-    public func withAlias(in rootType: SwiftType) -> SwiftType {
+    final public func withAlias(in rootType: SwiftType) -> SwiftType {
         sequence(first: rootType, next: { $0 != $0.innerType ? $0.innerType : nil })
             .first(where: { $0.innerType == self }) ?? self
     }
@@ -93,19 +93,19 @@ public class SwiftType: SwiftOutputStreamable, CustomDebugStringConvertible, Equ
     public var immutable: SwiftType { self }
     public var mutable: SwiftType { self }
 
-    public var optional: SwiftType {
+    final public var optional: SwiftType {
         isOptional != true ? copy({ $0.optional }) : self
     }
 
-    public var nonOptional: SwiftType {
+    final public var nonOptional: SwiftType {
         isOptional != false ? copy({ $0.nonOptional }) : self
     }
 
-    public var explicitlyOptional: SwiftType {
+    final public var explicitlyOptional: SwiftType {
         isOptional == nil ? copy({ $0.explicitlyOptional }) : self
     }
 
-    public var isHandlePointer: Bool {
+    final public var isHandlePointer: Bool {
         canonical.asOpaquePointer?.pointeeType.asOpaque?.typeName.hasSuffix("Handle") == true
     }
 

@@ -3,7 +3,7 @@ import Foundation
 import SwiftAST
 import os.log
 
-public class SwiftRefactor {
+final public class SwiftRefactor {
 
     public struct Modules {
         public let sdkModule: SwiftModule

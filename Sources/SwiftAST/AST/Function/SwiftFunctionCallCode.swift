@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class SwiftFunctionCallCode: SwiftCode {
+final public class SwiftFunctionCallCode: SwiftCode {
 
     public let call: SwiftOutput
     public var parms: [SwiftOutput] { outputs }

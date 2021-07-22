@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class SwiftFunctionParmType: SwiftType {
+final public class SwiftFunctionParmType: SwiftType {
 
     public let label: String?
 

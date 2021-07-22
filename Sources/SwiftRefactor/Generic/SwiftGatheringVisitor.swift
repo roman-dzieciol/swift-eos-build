@@ -2,7 +2,7 @@
 import Foundation
 import SwiftAST
 
-public class SwiftGatheringVisitor: SwiftVisitor {
+final public class SwiftGatheringVisitor: SwiftVisitor {
 
     public let astFilter: (SwiftAST) -> Bool?
     public let typeFilter: ((SwiftType) -> Bool?)?

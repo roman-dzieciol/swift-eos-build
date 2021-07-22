@@ -1,6 +1,6 @@
 import Foundation
 
-public class BinaryOperator: Operator {
+final public class BinaryOperator: Operator {
 
     public override func tokens() -> [String] {
         assert(inner.count == 2)

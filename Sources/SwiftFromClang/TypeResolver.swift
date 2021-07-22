@@ -4,7 +4,7 @@ import SwiftAST
 import ClangAST
 
 
-public class TypeResolver {
+final public class TypeResolver {
 
     var allTypes: [SwiftDecl]
     let incompleteTypes: [RecordDecl]

@@ -1,7 +1,7 @@
 import Foundation
 
 
-public class EnumConstantDecl: NamedDecl {
+final public class EnumConstantDecl: NamedDecl {
 
     public func valueTokens() -> [String] {
         Array(

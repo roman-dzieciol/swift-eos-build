@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class SwiftCommentParam: SwiftComment {
+final public class SwiftCommentParam: SwiftComment {
 
     public override func copy() -> SwiftCommentParam {
         let copy = SwiftCommentParam(name: name, comments: comments.map { $0.copy() })

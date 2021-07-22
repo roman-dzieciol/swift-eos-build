@@ -1,6 +1,6 @@
 import Foundation
 
-public class QualType: ASTType {
+final public class QualType: ASTType {
 
     public var isConst: Bool {
         qualifiers == "const"

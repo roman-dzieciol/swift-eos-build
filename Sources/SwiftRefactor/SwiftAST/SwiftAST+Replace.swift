@@ -29,7 +29,7 @@ extension SwiftAST {
     }
 }
 
-class SwiftDeclReplacePassVisitor: SwiftVisitor {
+final class SwiftDeclReplacePassVisitor: SwiftVisitor {
 
     let transform: (SwiftAST) -> SwiftAST
 

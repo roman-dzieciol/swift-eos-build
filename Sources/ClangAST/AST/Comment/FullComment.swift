@@ -1,5 +1,5 @@
 import Foundation
 
-public class FullComment: Comment {
+final public class FullComment: Comment {
 //
 }

@@ -3,7 +3,7 @@ import Foundation
 
 public class NamedDecl: Decl {
 
-    public lazy var name: String = {
+    final public lazy var name: String = {
         string(key: "name")!
     }()
 

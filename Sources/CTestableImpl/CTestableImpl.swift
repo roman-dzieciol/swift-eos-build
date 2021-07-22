@@ -2,7 +2,7 @@
 import Foundation
 import ClangAST
 
-public class CTestableImpl {
+final public class CTestableImpl {
 
     let clangAST: TranslationUnitDecl
     let headersURL: URL

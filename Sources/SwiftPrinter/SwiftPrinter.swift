@@ -2,7 +2,7 @@
 import Foundation
 import SwiftAST
 
-public class SwiftPrinter {
+final public class SwiftPrinter {
 
     let outputDir: URL
     let imports: [String]

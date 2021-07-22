@@ -1,4 +1,4 @@
 import Foundation
 
-public class TranslationUnitDecl: Decl {
+final public class TranslationUnitDecl: Decl {
 }

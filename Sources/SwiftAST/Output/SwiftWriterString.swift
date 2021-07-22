@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class SwiftWriterString: SwiftWriterStream<String> {
+final public class SwiftWriterString: SwiftWriterStream<String> {
 
     public init() {
         super.init(outputStream: String())

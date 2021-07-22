@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class SwiftActor: SwiftObject {
+final public class SwiftActor: SwiftObject {
 
     public init(name: String, superTypes: [String], inner: [SwiftAST] = [], comment: SwiftComment? = nil) {
         super.init(name: name, tagName: "actor", superTypes: superTypes, inner: inner, comment: comment)

@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class SwiftCommentParagraph: SwiftComment {
+final public class SwiftCommentParagraph: SwiftComment {
 
     public init(comments: [SwiftCommentText]) {
         super.init(name: "", comments: comments)

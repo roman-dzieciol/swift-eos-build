@@ -1,6 +1,6 @@
 import Foundation
 
-public class FunctionProtoType: ASTType {
+final public class FunctionProtoType: ASTType {
 
     public lazy var cc: String? = {
         validated(cc: string(key: "cc"))

@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class SwiftMember: SwiftVarDecl {
+final public class SwiftMember: SwiftVarDecl {
 
     public var getter: SwiftExpr?
 

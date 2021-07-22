@@ -24,7 +24,7 @@ final class SwiftRefactorTests: XCTestCase {
     }
 }
 
-class GTest {
+final class GTest {
 
     static let current = GTest()
 

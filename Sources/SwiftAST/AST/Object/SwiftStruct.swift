@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class SwiftStruct: SwiftObject {
+final public class SwiftStruct: SwiftObject {
 
     public init(name: String, superTypes: [String], inner: [SwiftAST] = [], comment: SwiftComment? = nil) {
         super.init(name: name, tagName: "struct", superTypes: superTypes, inner: inner, comment: comment)

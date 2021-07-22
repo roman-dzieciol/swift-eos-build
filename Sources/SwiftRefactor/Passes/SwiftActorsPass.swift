@@ -3,7 +3,7 @@ import Foundation
 import SwiftAST
 
 // TODO: Add Actor support
-public class SwiftActorsPass: SwiftRefactorPass {
+final public class SwiftActorsPass: SwiftRefactorPass {
 
     public override func refactor(module: SwiftModule) throws {
 

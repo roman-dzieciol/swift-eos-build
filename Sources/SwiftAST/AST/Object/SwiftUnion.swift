@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class SwiftUnion: SwiftObject {
+final public class SwiftUnion: SwiftObject {
 
     public init(name: String, superTypes: [String], inner: [SwiftAST] = [], comment: SwiftComment? = nil) {
         super.init(name: name, tagName: "struct", superTypes: superTypes, inner: inner, comment: comment)

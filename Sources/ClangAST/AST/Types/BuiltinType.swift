@@ -1,5 +1,5 @@
 import Foundation
 
-public class BuiltinType: ASTType {
+final public class BuiltinType: ASTType {
 
 }

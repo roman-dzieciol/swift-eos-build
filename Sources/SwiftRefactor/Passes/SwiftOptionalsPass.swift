@@ -2,7 +2,7 @@
 import Foundation
 import SwiftAST
 
-public class SwiftOptionalsPass: SwiftRefactorPass {
+final public class SwiftOptionalsPass: SwiftRefactorPass {
 
     public override func refactor(module: SwiftModule) throws {
         try SwiftOptionalsPassVisitor().visit(ast: module)

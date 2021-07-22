@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class SwiftOptionalType: SwiftType {
+final public class SwiftOptionalType: SwiftType {
 
     public let nonOptionalType: SwiftType
 
