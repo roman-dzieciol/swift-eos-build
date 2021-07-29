@@ -11,6 +11,7 @@ The Swift API uses only Swift types. All pointers required by the C SDK are mana
  * Sample app: https://github.com/roman-dzieciol/swift-eos-sample
  * Swift-compatible EOS SDK xcframework binary: https://github.com/roman-dzieciol/swift-eos-build/releases/tag/0.0.1
  * Testable (for unit tests only) version of the EOS SDK: https://github.com/roman-dzieciol/swift-eos-test
+ * C++ UE4-based implementation (WIP) https://github.com/roman-dzieciol/ue-eos-build
  * Patched binaries (after launching the tool): `./Temp/EOS-SDK-IOS-16697186-v1/EOSSDK.xcframework`
 
 
